@@ -205,3 +205,14 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# 크롤링 데이터
+data/
+
+# VSCode 설정
+.vscode/
+
+# Selenium WebDriver
+drivers/
+chromedriver
+geckodriver
