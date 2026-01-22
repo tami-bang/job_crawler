@@ -6,7 +6,6 @@
 - selectors: CSS 선택자
 - dynamic: Selenium 사용 여부
 """
-
 sites = {
     "saramin": {
         "name": "사람인",
@@ -15,13 +14,13 @@ sites = {
             "?searchType=search&searchword={keyword}&recruitPage={page}"
         ),
         "selectors": {
-            "card": "div.item_recruit",              # 공고 블록
-            "title": "h2.job_tit a",                 # 공고 제목
-            "company": "strong.corp_name",           # 회사명
-            "location": "div.job_condition span.loc",# 근무지
-            "url": "h2.job_tit a"                    # 상세 URL
+            "card": "div.item_recruit",
+            "title": "h2.job_tit a",
+            "company": "strong.corp_name",
+            "location": "div.job_condition span.loc",
+            "url": "h2.job_tit a"
         },
-        "dynamic": True  # Selenium 사용
+        "dynamic": True
     },
     "jobkorea": {
         "name": "잡코리아",
@@ -36,6 +35,6 @@ sites = {
             "location": "span.loc",        # 근무지
             "url": "a.title"               # 상세 URL
         },
-        "dynamic": True  # Selenium 사용
+        "dynamic": True
     }
 }

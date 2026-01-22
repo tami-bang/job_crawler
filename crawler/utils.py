@@ -8,4 +8,4 @@ def save_jobs(jobs, filename="data/jobs.csv"):
         os.makedirs("data")
     df = pd.DataFrame(jobs)
     df.to_csv(filename, index=False, encoding="utf-8-sig")
-    print(f"{len(jobs)}개의 공고 저장 완료: {filename}")
+    print(f"[INFO] {len(jobs)}개의 공고 저장 완료: {filename}")
