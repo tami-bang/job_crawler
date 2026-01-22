@@ -1,9 +1,11 @@
-# crawler/utils.py
+# crawler/saver.py
 import pandas as pd
 import os
 
 def save_jobs(jobs, filename="data/jobs.csv"):
-    """크롤링 데이터 CSV 저장"""
+    """
+    크롤링 데이터 CSV 저장
+    """
     if not os.path.exists("data"):
         os.makedirs("data")
     df = pd.DataFrame(jobs)

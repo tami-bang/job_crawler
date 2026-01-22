@@ -1,4 +1,4 @@
-# crawler/parser_base.py 함수 하나만 두고, 사이트별 selector만 전달
+# crawler/parser.py
 from bs4 import BeautifulSoup
 
 def parse_html(html, selectors):
