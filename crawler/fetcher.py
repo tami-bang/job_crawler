@@ -1,5 +1,6 @@
 # crawler/fetcher.py
 import requests
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -14,7 +15,7 @@ HEADERS = {
                   "Chrome/144.0.7559.97 Safari/537.36"
 }
 
-def fetch(url, dynamic=False, retries=2):
+def fetch(url, dynamic=False, retries=3, wait_selector="body", min_html_length=500):
     """
     안정화 fetch 함수
     dynamic=True -> Selenium 사용
@@ -24,13 +25,13 @@ def fetch(url, dynamic=False, retries=2):
     for attempt in range(1, retries + 1):
         if dynamic:
             options = Options()
+            options.page_load_strategy = "eager"
+            options.add_argument("--headless=new")
             options.add_argument("--disable-gpu")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-blink-features=AutomationControlled")
             options.add_argument("--window-size=1920,1080")
-            # Headless 모드 끄고 실제 브라우저로 확인 가능
-            # options.add_argument("--headless=new")  
 
             service = Service(ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=options)
@@ -39,10 +40,10 @@ def fetch(url, dynamic=False, retries=2):
                 print(f"[INFO] Selenium 시도 {attempt}: {url}")
                 driver.get(url)
 
-                # 카드 로딩될 때까지 최대 10초 대기
+                # 호출자가 넘긴 selector 기준으로 대기한다.
                 try:
-                    WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, "div.item_recruit"))
+                    WebDriverWait(driver, 6).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, wait_selector or "body"))
                     )
                 except:
                     print("[WARN] 페이지 로딩 지연 또는 카드 없음")
@@ -50,7 +51,7 @@ def fetch(url, dynamic=False, retries=2):
                 html = driver.page_source
                 driver.quit()
                 
-                if html:
+                if is_healthy_html(html, min_html_length=min_html_length):
                     return html
             except Exception as e:
                 print(f"[ERROR] Selenium 요청 실패: {e}")
@@ -60,11 +61,31 @@ def fetch(url, dynamic=False, retries=2):
                 print(f"[INFO] requests 시도 {attempt}: {url}")
                 response = requests.get(url, headers=HEADERS, timeout=10)
                 response.raise_for_status()
-                return response.text
+                if is_healthy_html(response.text, min_html_length=min_html_length):
+                    return response.text
+                print("[ERROR] requests returned unhealthy HTML")
             except requests.RequestException as e:
                 print(f"[ERROR] requests 실패: {e}")
 
-        print(f"[WARN] 시도 {attempt} 실패, 재시도 중...")
+        if attempt < retries:
+            sleep_seconds = min(2 ** (attempt - 1), 8)
+            print(f"[WARN] Attempt {attempt} failed. Retrying in {sleep_seconds}s.")
+            time.sleep(sleep_seconds)
 
     print("[ERROR] 모든 시도 실패")
     return None
+
+
+def is_healthy_html(html, min_html_length=500):
+    if not html or len(html) < min_html_length:
+        return False
+
+    lowered = html.lower()
+    blocked_markers = [
+        "captcha",
+        "access denied",
+        "blocked",
+        "비정상적인 접근",
+        "서비스 이용이 제한",
+    ]
+    return not any(marker in lowered for marker in blocked_markers)

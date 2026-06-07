@@ -1,6 +1,6 @@
 {
   "saramin": {
-    "name": "사람인",
+    "name": "Saramin",
     "base_url": "https://www.saramin.co.kr/zf_user/search?searchType=search&searchword={keyword}&recruitPage={page}",
     "selectors": {
       "card": "div.item_recruit",
@@ -12,14 +12,14 @@
     "dynamic": true
   },
   "jobkorea": {
-    "name": "잡코리아",
+    "name": "JobKorea",
     "base_url": "https://www.jobkorea.co.kr/Search/?stext={keyword}&page={page}",
     "selectors": {
-      "card": "div.list-post",
-      "title": "a.title",
-      "company": "a.name",
-      "location": "span.loc",
-      "url": "a.title"
+      "card": "div[data-sentry-component=\"CardJob\"]",
+      "title": "a[data-sentry-component=\"Title\"]",
+      "company": "",
+      "location": "[data-sentry-component=\"GrayChip\"] span.truncate",
+      "url": "a[data-sentry-component=\"Title\"]"
     },
     "dynamic": true
   }

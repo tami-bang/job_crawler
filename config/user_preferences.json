@@ -1,0 +1,273 @@
+{
+  "profile_name": "Default JobKorea Developer Radar",
+  "search_keywords": [
+    "프론트엔드",
+    "프론트엔드개발자",
+    "웹개발",
+    "웹개발자",
+    "React",
+    "Vue",
+    "JavaScript",
+    "TypeScript",
+    "HTML",
+    "CSS",
+    "Next.js",
+    "백엔드",
+    "백엔드개발자",
+    "Python",
+    "Django",
+    "FastAPI",
+    "API",
+    "SQL",
+    "DB",
+    "풀스택",
+    "풀스택개발자",
+    "웹서비스",
+    "SaaS",
+    "플랫폼",
+    "AI",
+    "인공지능",
+    "AI개발",
+    "AI서비스",
+    "LLM",
+    "생성형AI",
+    "ChatGPT",
+    "Claude",
+    "Gemini",
+    "Copilot",
+    "Cursor",
+    "바이브코딩",
+    "바이브코더",
+    "AI자동화",
+    "업무자동화",
+    "RAG",
+    "프롬프트엔지니어",
+    "프롬프트",
+    "서비스기획",
+    "PM",
+    "프로덕트매니저",
+    "IT기획",
+    "기획자",
+    "주니어개발자",
+    "신입개발자",
+    "QA",
+    "테스트자동화",
+    "품질"
+  ],
+  "preferences": {
+    "job_categories": {
+      "primary": "AI·개발·데이터",
+      "preferred": [
+        "AI·개발·데이터",
+        "백엔드개발자",
+        "프론트엔드개발자",
+        "웹개발자",
+        "앱개발자",
+        "시스템엔지니어",
+        "네트워크엔지니어",
+        "DBA",
+        "데이터엔지니어",
+        "데이터사이언티스트",
+        "보안엔지니어",
+        "소프트웨어개발자",
+        "게임개발자",
+        "하드웨어개발자",
+        "AI/ML엔지니어",
+        "블록체인개발자",
+        "클라우드엔지니어",
+        "웹퍼블리셔",
+        "IT컨설팅",
+        "AI/ML연구원",
+        "데이터분석가",
+        "데이터라벨러",
+        "프롬프트엔지니어",
+        "AI보안전문가",
+        "MLOps엔지니어",
+        "AI서비스개발자"
+      ],
+      "low_priority": [
+        "QA"
+      ]
+    },
+    "locations": {
+      "preferred": ["서울", "경기", "인천"],
+      "avoid": []
+    },
+    "career": {
+      "preferred": [
+        "신입",
+        "경력무관",
+        "1~3년",
+        "경력1년",
+        "경력2년",
+        "경력3년",
+        "경력1년↑",
+        "경력2년↑",
+        "경력3년↑"
+      ],
+      "avoid": ["경력10년", "경력15년", "10~15년", "16~20년", "21년 이상"]
+    },
+    "education": {
+      "preferred": [
+        "대학졸업(2,3년)",
+        "고등학교졸업",
+        "학력무관",
+        "대학교졸업(4년)",
+        "초대졸",
+        "고졸",
+        "대졸"
+      ],
+      "avoid": []
+    },
+    "employment_types": {
+      "preferred": ["정규직", "계약직", "인턴"],
+      "avoid": ["파견직", "도급", "아르바이트"]
+    },
+    "skill_keywords": {
+      "preferred": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Vue",
+        "Node",
+        "Spring",
+        "Django",
+        "FastAPI",
+        "SQL",
+        "AWS",
+        "Docker",
+        "Git"
+      ]
+    },
+    "career_goal_boosts": {
+      "frontend_web": {
+        "label": "커리어 목표 1단계 프론트엔드/웹개발",
+        "weight": 18,
+        "keywords": [
+          "프론트엔드",
+          "프론트엔드개발자",
+          "웹개발",
+          "웹개발자",
+          "React",
+          "Vue",
+          "JavaScript",
+          "TypeScript",
+          "HTML",
+          "CSS",
+          "Next.js",
+          "퍼블리싱",
+          "웹퍼블리싱"
+        ]
+      },
+      "backend": {
+        "label": "커리어 목표 2단계 백엔드",
+        "weight": 16,
+        "keywords": [
+          "백엔드",
+          "백엔드개발자",
+          "Python",
+          "Django",
+          "FastAPI",
+          "Flask",
+          "Java",
+          "Spring",
+          "API",
+          "SQL",
+          "DB"
+        ]
+      },
+      "fullstack_web_service": {
+        "label": "커리어 목표 3단계 풀스택/웹서비스",
+        "weight": 12,
+        "keywords": ["풀스택", "풀스택개발자", "웹서비스", "SaaS", "플랫폼"]
+      },
+      "ai_llm_automation": {
+        "label": "추가 관심 AI/LLM/업무자동화",
+        "weight": 10,
+        "keywords": [
+          "AI",
+          "인공지능",
+          "LLM",
+          "생성형AI",
+          "ChatGPT",
+          "Claude",
+          "Gemini",
+          "Copilot",
+          "Cursor",
+          "바이브코딩",
+          "바이브코더",
+          "AI자동화",
+          "업무자동화",
+          "Python 자동화",
+          "RPA",
+          "RAG",
+          "프롬프트엔지니어",
+          "프롬프트",
+          "AI서비스",
+          "AI플랫폼",
+          "AI개발"
+        ]
+      },
+      "pm_service_planning": {
+        "label": "커리어 목표 확장 PM/서비스기획/테크PM",
+        "weight": 7,
+        "keywords": [
+          "PM",
+          "프로덕트매니저",
+          "서비스기획",
+          "IT기획",
+          "기획자",
+          "프로덕트",
+          "요구사항",
+          "기획",
+          "테크PM",
+          "데이터 기반 기획"
+        ]
+      },
+      "qa_experience": {
+        "label": "현재 QA 경험 활용 가능",
+        "weight": 1,
+        "keywords": ["QA", "테스트", "테스트자동화", "품질", "검증", "자동화테스트"]
+      }
+    },
+    "penalties": {
+      "critical": ["보험영업", "방문판매"],
+      "major": ["영업", "고객상담", "TM"],
+      "minor": ["교대근무", "주말근무", "QA", "테스트", "검증", "품질보증"]
+    }
+  },
+  "weights": {
+    "base_score": 10,
+    "detail_completed_bonus": 5,
+    "job_primary": 25,
+    "job_preferred": 14,
+    "job_low_priority": 2,
+    "location_preferred": 18,
+    "career_preferred": 16,
+    "education_preferred": 10,
+    "employment_type_preferred": 16,
+    "skill_preferred": 4,
+    "fullstack_combination_bonus": 12,
+    "qa_only_penalty": -22,
+    "missing_job_category": -15,
+    "missing_location": -12,
+    "missing_career": -10,
+    "missing_education": -4,
+    "missing_employment_type": -10,
+    "avoid_location": -20,
+    "avoid_career": -20,
+    "avoid_education": -10,
+    "avoid_employment_type": -25,
+    "penalty_critical": -45,
+    "penalty_major": -25,
+    "penalty_minor": -10
+  },
+  "recommendation_levels": [
+    {"min_score": 85, "level": "strong"},
+    {"min_score": 65, "level": "good"},
+    {"min_score": 45, "level": "possible"},
+    {"min_score": 0, "level": "low"}
+  ]
+}
