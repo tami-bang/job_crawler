@@ -39,6 +39,8 @@ npm run dev
 
 브라우저에서 `http://localhost:3000`을 열면 됩니다. API 문서는 `http://localhost:8000/docs`에서 확인할 수 있습니다.
 
+무료 공개 데모는 [GitHub Pages](https://tami-bang.github.io/job_crawler/)에서 사용할 수 있습니다. 공개 데모는 샘플 데이터만 사용하며 찜, 메모, 지원 상태는 방문자의 브라우저 `localStorage`에만 저장됩니다.
+
 ## 수동 수집 실행
 
 대상 사이트의 접근 정책을 존중하기 위해 예약 크롤링은 사용하지 않습니다. GitHub Actions의 `잡코리아 채용공고 수집`은 필요할 때만 수동으로 실행할 수 있으며, 접근 제한을 우회하지 않습니다.

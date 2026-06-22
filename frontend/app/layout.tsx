@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const dataMode = process.env.NEXT_PUBLIC_STATIC_DEMO === "true" ? "DEMO DATA" : "LOCAL DATA";
   return (
     <html lang="ko">
       <body>
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Link href="/jobs">공고 탐색</Link>
             <Link href="/favorites">관심공고</Link>
           </nav>
-          <div className="systemState"><i /> LOCAL DATA</div>
+          <div className="systemState"><i /> {dataMode}</div>
         </header>
         <main>{children}</main>
         <footer>JOB RADAR · 데이터는 로컬에서, 결정은 나답게.</footer>
