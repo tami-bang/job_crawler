@@ -13,6 +13,37 @@ JobKorea list page 수집
 -> CSV export
 ```
 
+## 자동 실행 배포
+
+GitHub Actions에서 평일 오전 9시(KST)에 잡코리아 공고를 자동으로 수집하고 분석합니다.
+
+자동 실행 순서:
+
+```text
+목록 수집 → 상세 수집 → 매칭 분석 → CSV·XLSX 리포트 생성 → 결과 파일 업로드
+```
+
+수동으로 실행하려면 GitHub 저장소의 `Actions` 탭에서 `잡코리아 채용공고 수집`을 선택한 뒤 `Run workflow`를 누릅니다. 키워드 수, 페이지 수, 상세 수집 수, 리포트 수를 실행 전에 조정할 수 있습니다.
+
+실행이 끝나면 해당 실행 화면 아래의 `Artifacts`에서 다음 결과를 내려받을 수 있습니다.
+
+* SQLite 데이터베이스
+* 채용공고 CSV·XLSX 리포트
+* 실행 로그
+
+결과 파일은 14일 동안 보관됩니다. GitHub Actions 실행 환경은 매번 새로 생성되므로 현재 자동 실행은 실행별 결과를 독립적으로 보관합니다.
+
+로컬에서 같은 방식으로 비대화형 실행을 하려면 다음 명령을 사용합니다.
+
+```bash
+python main.py jobkorea-multi-pipeline \
+  --keyword-batch-size 5 \
+  --pages 1 \
+  --detail-limit 25 \
+  --report-top-n 50 \
+  --keyword-delay 2
+```
+
 ## 주요 기능
 
 * JobKorea 검색 결과 list page 수집
@@ -29,9 +60,34 @@ JobKorea list page 수집
 
 Python 3.11 사용을 권장합니다.
 
+### macOS
+
+```bash
+git clone git@github.com:tami-bang/job_crawler.git
+cd job_crawler
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m pip check
+```
+
+실행:
+
+```bash
+python main.py
+```
+
+가상환경 종료:
+
+```bash
+deactivate
+```
+
+### Windows
+
 ```powershell
 py -3.11 -m pip install -r requirements.txt
-py -3.11 -m pip install webdriver-manager
 ```
 
 설치 확인:
@@ -269,6 +325,23 @@ python
 3
 10
 ```
+
+## 테스트
+
+실제 채용 사이트에 요청하지 않고 파서, 날짜 정규화, 중복 저장, 매칭 점수, 리포트 생성을 검증합니다.
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Python 문법 컴파일까지 함께 확인하려면:
+
+```bash
+python -m compileall -q main.py crawler scripts
+python -m unittest discover -s tests -v
+```
+
+프로젝트 정의와 설계 문서는 `docs/`에서 확인할 수 있습니다.
 
 ## 자주 발생하는 문제
 
