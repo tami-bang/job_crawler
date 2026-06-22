@@ -76,6 +76,14 @@ SKILL_HINTS = [
 
 DEFAULT_DETAIL_LOCATION_PREFIXES = ("서울", "경기", "인천")
 
+SCHEMA_EMPLOYMENT_TYPES = {
+    "FULL_TIME": "정규직",
+    "PART_TIME": "아르바이트",
+    "CONTRACTOR": "계약직",
+    "TEMPORARY": "계약직",
+    "INTERN": "인턴",
+}
+
 
 def collect_jobkorea_details(
     fetch_func,
@@ -185,6 +193,7 @@ def get_detail_targets(
 
 def parse_job_detail(html):
     soup = BeautifulSoup(html, "html.parser")
+    structured = extract_jobposting_data(soup)
     meta_deadline = extract_detail_deadline(soup)
     for tag in soup(["script", "style", "noscript"]):
         tag.decompose()
@@ -205,6 +214,10 @@ def parse_job_detail(html):
         "posted_date": posted_date,
         "deadline": deadline,
         "deadline_date": normalize_deadline_date(deadline),
+        "location": extract_structured_location(structured),
+        "career": _normalize_structured_text(structured.get("experienceRequirements")),
+        "education": _normalize_structured_text(structured.get("educationRequirements")),
+        "employment_type": extract_employment_type(structured, text),
     }
 
 
@@ -235,6 +248,10 @@ def update_job_detail(conn, job_posting_id, parsed):
             posted_date = COALESCE(NULLIF(?, ''), posted_date),
             deadline = COALESCE(NULLIF(?, ''), deadline),
             deadline_date = COALESCE(NULLIF(?, ''), deadline_date),
+            location = COALESCE(NULLIF(?, ''), location),
+            career = COALESCE(NULLIF(?, ''), career),
+            education = COALESCE(NULLIF(?, ''), education),
+            employment_type = COALESCE(NULLIF(?, ''), employment_type),
             detail_collected_at = CURRENT_TIMESTAMP,
             detail_status = 'success',
             detail_error = NULL,
@@ -252,9 +269,99 @@ def update_job_detail(conn, job_posting_id, parsed):
             parsed["posted_date"],
             parsed["deadline"],
             parsed["deadline_date"],
+            parsed["location"],
+            parsed["career"],
+            parsed["education"],
+            parsed["employment_type"],
             job_posting_id,
         ),
     )
+
+
+def extract_jobposting_data(soup):
+    for script in soup.find_all("script", type="application/ld+json"):
+        if not script.string:
+            continue
+        try:
+            payload = json.loads(script.string)
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+        posting = _find_jobposting_payload(payload)
+        if posting:
+            return posting
+    return {}
+
+
+def _find_jobposting_payload(payload):
+    if isinstance(payload, list):
+        for item in payload:
+            posting = _find_jobposting_payload(item)
+            if posting:
+                return posting
+        return {}
+
+    if not isinstance(payload, dict):
+        return {}
+
+    schema_type = payload.get("@type")
+    schema_types = schema_type if isinstance(schema_type, list) else [schema_type]
+    if "JobPosting" in schema_types:
+        return payload
+
+    for key in ["@graph", "mainEntity", "itemListElement"]:
+        posting = _find_jobposting_payload(payload.get(key))
+        if posting:
+            return posting
+    return {}
+
+
+def extract_employment_type(structured, visible_text=""):
+    value = structured.get("employmentType")
+    values = value if isinstance(value, list) else [value]
+    normalized = []
+    for item in values:
+        mapped = SCHEMA_EMPLOYMENT_TYPES.get(str(item or "").upper())
+        if mapped and mapped not in normalized:
+            normalized.append(mapped)
+    if normalized:
+        return ", ".join(normalized)
+
+    match = re.search(
+        r"(?:고용형태|근무형태)\s*(?:\n\s*)?(정규직|계약직|인턴|파견직|도급|프리랜서|아르바이트)",
+        visible_text or "",
+    )
+    return match.group(1) if match else ""
+
+
+def extract_structured_location(structured):
+    locations = structured.get("jobLocation")
+    locations = locations if isinstance(locations, list) else [locations]
+    for location in locations:
+        if not isinstance(location, dict):
+            continue
+        address = location.get("address", location)
+        if not isinstance(address, dict):
+            continue
+        parts = [
+            _normalize_structured_text(address.get("addressRegion")),
+            _normalize_structured_text(address.get("addressLocality")),
+        ]
+        value = " ".join(part for part in parts if part).strip()
+        if value:
+            return value
+        street_address = _normalize_structured_text(address.get("streetAddress"))
+        if street_address:
+            return street_address
+    return ""
+
+
+def _normalize_structured_text(value):
+    if isinstance(value, list):
+        return ", ".join(_normalize_structured_text(item) for item in value if item)
+    if isinstance(value, dict):
+        value = value.get("name") or value.get("value") or ""
+    return str(value or "").strip()
 
 
 def mark_detail_failed(job_posting_id, error_message, db_path=DEFAULT_DB_PATH):
