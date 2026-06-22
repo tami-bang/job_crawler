@@ -13,9 +13,35 @@ JobKorea list page 수집
 -> CSV export
 ```
 
-## 자동 실행 배포
+## 웹 대시보드
 
-GitHub Actions에서 평일 오전 9시(KST)에 잡코리아 공고를 자동으로 수집하고 분석합니다.
+저장된 SQLite 데이터를 FastAPI와 Next.js 화면에서 탐색할 수 있습니다. 대시보드에서는 전체·상세·분석·관심공고 수를 확인하고, 공고 검색·찜하기·메모·지원 상태 관리를 할 수 있습니다.
+
+데이터가 없는 개발 환경에서는 샘플 공고를 생성합니다.
+
+```bash
+python scripts/seed_demo_data.py
+```
+
+백엔드 실행:
+
+```bash
+python -m uvicorn backend.main:app --reload
+```
+
+프론트엔드 실행:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+브라우저에서 `http://localhost:3000`을 열면 됩니다. API 문서는 `http://localhost:8000/docs`에서 확인할 수 있습니다.
+
+## 수동 수집 실행
+
+대상 사이트의 접근 정책을 존중하기 위해 예약 크롤링은 사용하지 않습니다. GitHub Actions의 `잡코리아 채용공고 수집`은 필요할 때만 수동으로 실행할 수 있으며, 접근 제한을 우회하지 않습니다.
 
 자동 실행 순서:
 
@@ -31,7 +57,7 @@ GitHub Actions에서 평일 오전 9시(KST)에 잡코리아 공고를 자동으
 * 채용공고 CSV·XLSX 리포트
 * 실행 로그
 
-결과 파일은 14일 동안 보관됩니다. GitHub Actions 실행 환경은 매번 새로 생성되므로 현재 자동 실행은 실행별 결과를 독립적으로 보관합니다.
+결과 파일은 14일 동안 보관됩니다. GitHub Actions 실행 환경은 매번 새로 생성되므로 실행별 결과를 독립적으로 보관합니다.
 
 로컬에서 같은 방식으로 비대화형 실행을 하려면 다음 명령을 사용합니다.
 
@@ -261,6 +287,8 @@ config/user_preferences.json
 
 가중치도 같은 파일에서 수정할 수 있습니다.
 
+`hard_filters.strict_location_only`가 `true`이면 `hard_filters.locations`에 지정된 서울·경기·인천 공고만 매칭 분석과 대시보드에 표시됩니다. 제외 지역은 점수를 낮추는 방식이 아니라 대상에서 제거합니다.
+
 ```json
 {
   "weights": {
@@ -404,7 +432,6 @@ CSV는 `utf-8-sig`로 저장됩니다. Excel에서 바로 열 수 있습니다.
 ## 현재 제외된 기능
 
 * OpenAI API 또는 외부 AI API 분석
-* 대시보드/UI
 * 상세 페이지 OCR
 * Selenium taxonomy 고도화
 * 자동 스케줄러

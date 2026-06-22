@@ -194,6 +194,17 @@ def init_database(db_path=DEFAULT_DB_PATH):
                 FOREIGN KEY (user_profile_id) REFERENCES user_profiles(id),
                 FOREIGN KEY (job_posting_id) REFERENCES job_postings(id)
             );
+
+            CREATE TABLE IF NOT EXISTS favorite_jobs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                job_posting_id INTEGER NOT NULL UNIQUE,
+                memo TEXT,
+                status TEXT NOT NULL DEFAULT 'saved',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (job_posting_id) REFERENCES job_postings(id) ON DELETE CASCADE,
+                CHECK (status IN ('saved', 'planned', 'applied', 'excluded'))
+            );
             """
         )
         _ensure_column(conn, "job_postings", "normalized_url", "TEXT")
@@ -235,6 +246,12 @@ def init_database(db_path=DEFAULT_DB_PATH):
             """
             CREATE UNIQUE INDEX IF NOT EXISTS idx_job_match_results_user_job
             ON job_match_results(user_profile_id, job_posting_id)
+            """
+        )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_favorite_jobs_status_updated
+            ON favorite_jobs(status, updated_at DESC)
             """
         )
 

@@ -209,6 +209,11 @@ __marimo__/
 # 크롤링 데이터
 data/
 
+# Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
 # VSCode 설정
 .vscode/
 

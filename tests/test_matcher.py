@@ -7,6 +7,7 @@ from crawler.matcher import (
     analyze_job,
     apply_score_compression,
     load_preferences,
+    job_passes_hard_filters,
     upsert_match_result,
 )
 
@@ -105,6 +106,13 @@ class MatcherTests(unittest.TestCase):
 
         self.assertEqual(saved["match_score"], analysis["match_score"])
         self.assertEqual(saved["raw_score"], analysis["raw_score"])
+
+    def test_strict_location_filter_excludes_outside_capital_area(self):
+        seoul_job = make_job("Python 백엔드 개발자", "FastAPI SQL")
+        busan_job = {**seoul_job, "location": "부산 해운대구"}
+
+        self.assertTrue(job_passes_hard_filters(seoul_job, self.preferences))
+        self.assertFalse(job_passes_hard_filters(busan_job, self.preferences))
 
 
 if __name__ == "__main__":
