@@ -6,8 +6,9 @@ from crawler.database import get_connection, init_database
 from crawler.matcher import (
     analyze_job,
     apply_score_compression,
-    load_preferences,
+    iter_preference_keywords,
     job_passes_hard_filters,
+    load_preferences,
     upsert_match_result,
 )
 
@@ -113,6 +114,17 @@ class MatcherTests(unittest.TestCase):
 
         self.assertTrue(job_passes_hard_filters(seoul_job, self.preferences))
         self.assertFalse(job_passes_hard_filters(busan_job, self.preferences))
+
+    def test_boolean_location_metadata_is_not_treated_as_keywords(self):
+        keywords = list(iter_preference_keywords(self.preferences))
+
+        self.assertTrue(keywords)
+        self.assertFalse(
+            any(
+                category == "locations" and preference_type == "strict_only"
+                for category, preference_type, _keyword, _weight in keywords
+            )
+        )
 
 
 if __name__ == "__main__":

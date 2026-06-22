@@ -588,7 +588,8 @@ def iter_preference_keywords(preferences):
         yield "job_categories", "preferred", keyword, weights.get("job_preferred", 18)
 
     for category in ["locations", "career", "education", "employment_types"]:
-        for preference_type, keywords in pref[category].items():
+        for preference_type in ["preferred", "avoid"]:
+            keywords = pref[category].get(preference_type, [])
             weight = get_category_weight(category, preference_type, weights)
             for keyword in keywords:
                 yield category, preference_type, keyword, weight
