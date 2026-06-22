@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api, Stats } from "@/lib/api";
+import { api, Stats } from "@/services/api";
 
 const initial: Stats = { total_jobs: 0, detailed_jobs: 0, matched_jobs: 0, favorite_jobs: 0, average_score: 0 };
 

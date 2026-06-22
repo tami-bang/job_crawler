@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { api, Job } from "@/lib/api";
+import { api, Job } from "@/services/api";
 
 const statusLabel: Record<string, string> = {
   saved: "저장",
