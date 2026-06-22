@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 import crawler.fetcher as fetcher
-from crawler.fetcher import is_healthy_html
+from crawler.fetcher import is_blocked_page, is_healthy_html
 
 
 class FetcherHealthTests(unittest.TestCase):
@@ -17,8 +17,25 @@ class FetcherHealthTests(unittest.TestCase):
         self.assertFalse(is_healthy_html("<html></html>", min_html_length=500))
 
     def test_rejects_blocked_page(self):
-        html = "<html><body>CAPTCHA " + ("blocked " * 100) + "</body></html>"
+        html = "<html><body>CAPTCHA " + ("접근할 수 없습니다. " * 100) + "</body></html>"
         self.assertFalse(is_healthy_html(html, min_html_length=500))
+
+    def test_ignores_blocked_word_inside_normal_html(self):
+        html = (
+            "<html><body>"
+            + ("정상 채용 공고 " * 100)
+            + "</body><script>const state = 'blocked';</script></html>"
+        )
+        self.assertTrue(is_healthy_html(html, min_html_length=500))
+        self.assertFalse(is_blocked_page(html))
+
+    def test_ignores_strong_marker_inside_script(self):
+        html = (
+            "<html><body>"
+            + ("정상 채용 공고 " * 100)
+            + "</body><script>const label = 'captcha';</script></html>"
+        )
+        self.assertFalse(is_blocked_page(html))
 
     @patch("crawler.fetcher.WebDriverWait")
     @patch("crawler.fetcher._create_dynamic_driver")

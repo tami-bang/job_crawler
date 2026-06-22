@@ -4,7 +4,7 @@ import json
 
 from crawler.database import finish_crawl_run, get_connection, init_database, start_crawl_run
 from crawler.detail import collect_jobkorea_details
-from crawler.fetcher import fetch
+from crawler.fetcher import fetch, is_blocked_page
 from crawler.health import build_collection_health_report, print_collection_health_report
 from crawler.job_store import save_job_list_items, save_raw_list_page
 from crawler.logger_setup import setup_logger
@@ -101,7 +101,8 @@ def crawl(site_key, keyword, pages=2, sites=None, save_csv=True):
 
 def fetch_list_page(site_key, site, url):
     if site_key == "jobkorea":
-        return fetch(url, dynamic=False)
+        # 목록은 카드 파싱을 먼저 수행한 뒤 차단 여부를 판정한다.
+        return fetch(url, dynamic=False, reject_blocked=False)
 
     return fetch(
         url,
@@ -117,20 +118,32 @@ def fetch_list_jobs(site_key, site, url):
     if site_key != "jobkorea" or jobs or not site.get("dynamic"):
         return html, jobs
 
+    if html and is_blocked_page(html):
+        logger.warning("JobKorea static response looks blocked after card parsing failed.")
+
     print("[INFO] JobKorea static collection failed or returned no cards. Trying Selenium fallback.")
     dynamic_html = fetch(
         url,
         dynamic=True,
         wait_selector=site["selectors"].get("card", "body"),
+        reject_blocked=False,
     )
     if not dynamic_html:
         return html, jobs
 
-    return dynamic_html, parse_html(
+    dynamic_jobs = parse_html(
         dynamic_html,
         site["selectors"],
         base_url=url,
     )
+    if dynamic_jobs:
+        return dynamic_html, dynamic_jobs
+
+    if is_blocked_page(dynamic_html):
+        logger.warning("JobKorea Selenium response is a blocked page.")
+        return None, []
+
+    return dynamic_html, []
 
 
 def sync_taxonomy():
