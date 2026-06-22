@@ -66,6 +66,15 @@ jobs:
             --report-top-n "$REPORT_TOP_N" \
             --keyword-delay 2
 
+      - name: 실제 수집 결과 검증
+        run: |
+          JOB_COUNT=$(python -c "import sqlite3; conn = sqlite3.connect('data/job_radar.db'); print(conn.execute('SELECT COUNT(*) FROM job_postings').fetchone()[0])")
+          echo "수집된 채용공고: $JOB_COUNT건"
+          if [ "$JOB_COUNT" -eq 0 ]; then
+            echo "::error::실제 수집된 채용공고가 없습니다. 대상 사이트 연결 상태를 확인하세요."
+            exit 1
+          fi
+
       - name: 실행 결과 업로드
         if: always()
         uses: actions/upload-artifact@v4
