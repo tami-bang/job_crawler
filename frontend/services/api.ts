@@ -26,7 +26,50 @@ export type Stats = {
   average_score: number | null;
 };
 
+type FavoriteState = Record<number, { memo: string; status: string }>;
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+const STATIC_DEMO = process.env.NEXT_PUBLIC_STATIC_DEMO === "true";
+const FAVORITES_KEY = "job-radar-demo-favorites";
+
+async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
+  const { demoJobs } = await import("./demo-data");
+  const favorites = readFavorites();
+  const term = search.trim().toLowerCase();
+
+  return demoJobs
+    .map((job) => ({
+      ...job,
+      is_favorite: Boolean(favorites[job.id]),
+      favorite_memo: favorites[job.id]?.memo ?? null,
+      favorite_status: favorites[job.id]?.status ?? null,
+    }))
+    .filter((job) => !favoriteOnly || job.is_favorite)
+    .filter((job) => !term || [job.title, job.company_name, job.skill_candidates]
+      .some((value) => value?.toLowerCase().includes(term)));
+}
+
+function readFavorites(): FavoriteState {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(FAVORITES_KEY) ?? "{}") as FavoriteState;
+  } catch {
+    return {};
+  }
+}
+
+function writeFavorites(favorites: FavoriteState) {
+  try {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    window.dispatchEvent(new Event("job-radar-favorites-updated"));
+  } catch {
+    // 저장소가 차단된 브라우저에서도 화면 탐색은 계속 허용합니다.
+  }
+}
+
+async function getDemoJob(jobId: number) {
+  return (await getDemoJobs()).find((job) => job.id === jobId) as Job;
+}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
@@ -39,21 +82,52 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  stats: () => request<Stats>("/api/stats"),
-  jobs: (search = "", favorite = false) =>
-    request<{ items: Job[] }>(
-      `/api/jobs?search=${encodeURIComponent(search)}&favorite=${favorite}`,
-    ),
-  favorite: (jobId: number) =>
-    request<Job>(`/api/jobs/${jobId}/favorite`, {
+  stats: async () => {
+    if (!STATIC_DEMO) return request<Stats>("/api/stats");
+    const jobs = await getDemoJobs();
+    return {
+      total_jobs: jobs.length,
+      detailed_jobs: jobs.length,
+      matched_jobs: jobs.length,
+      favorite_jobs: jobs.filter((job) => job.is_favorite).length,
+      average_score: Math.round(jobs.reduce((sum, job) => sum + job.match_score, 0) / jobs.length),
+    };
+  },
+  jobs: async (search = "", favorite = false) => {
+    if (STATIC_DEMO) return { items: await getDemoJobs(search, favorite) };
+    return request<{ items: Job[] }>(`/api/jobs?search=${encodeURIComponent(search)}&favorite=${favorite}`);
+  },
+  favorite: async (jobId: number) => {
+    if (STATIC_DEMO) {
+      const favorites = readFavorites();
+      favorites[jobId] = { memo: "", status: "saved" };
+      writeFavorites(favorites);
+      return getDemoJob(jobId);
+    }
+    return request<Job>(`/api/jobs/${jobId}/favorite`, {
       method: "POST",
       body: JSON.stringify({ memo: "", status: "saved" }),
-    }),
-  unfavorite: (jobId: number) =>
-    fetch(`${API_URL}/api/jobs/${jobId}/favorite`, { method: "DELETE" }),
-  updateFavorite: (jobId: number, memo: string, status: string) =>
-    request<Job>(`/api/favorites/${jobId}`, {
+    });
+  },
+  unfavorite: async (jobId: number) => {
+    if (STATIC_DEMO) {
+      const favorites = readFavorites();
+      delete favorites[jobId];
+      writeFavorites(favorites);
+      return;
+    }
+    await fetch(`${API_URL}/api/jobs/${jobId}/favorite`, { method: "DELETE" });
+  },
+  updateFavorite: async (jobId: number, memo: string, status: string) => {
+    if (STATIC_DEMO) {
+      const favorites = readFavorites();
+      favorites[jobId] = { memo, status };
+      writeFavorites(favorites);
+      return getDemoJob(jobId);
+    }
+    return request<Job>(`/api/favorites/${jobId}`, {
       method: "PATCH",
       body: JSON.stringify({ memo, status }),
-    }),
+    });
+  },
 };

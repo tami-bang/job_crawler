@@ -7,7 +7,12 @@ const initial: Stats = { total_jobs: 0, detailed_jobs: 0, matched_jobs: 0, favor
 
 export default function StatsPanel() {
   const [stats, setStats] = useState(initial);
-  useEffect(() => { api.stats().then(setStats).catch(() => undefined); }, []);
+  useEffect(() => {
+    const refresh = () => { api.stats().then(setStats).catch(() => undefined); };
+    refresh();
+    window.addEventListener("job-radar-favorites-updated", refresh);
+    return () => window.removeEventListener("job-radar-favorites-updated", refresh);
+  }, []);
   const cards = [
     ["TOTAL", stats.total_jobs, "수집 공고"],
     ["DETAIL", stats.detailed_jobs, "상세 완료"],
