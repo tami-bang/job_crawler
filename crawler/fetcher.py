@@ -3,6 +3,7 @@ import atexit
 import time
 
 import requests
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -68,7 +69,14 @@ def close_dynamic_driver():
 atexit.register(close_dynamic_driver)
 
 
-def fetch(url, dynamic=False, retries=3, wait_selector="body", min_html_length=500):
+def fetch(
+    url,
+    dynamic=False,
+    retries=3,
+    wait_selector="body",
+    min_html_length=500,
+    reject_blocked=True,
+):
     """
     안정화 fetch 함수
     dynamic=True -> Selenium 사용
@@ -92,7 +100,11 @@ def fetch(url, dynamic=False, retries=3, wait_selector="body", min_html_length=5
 
                 html = driver.page_source
 
-                if is_healthy_html(html, min_html_length=min_html_length):
+                if is_healthy_html(
+                    html,
+                    min_html_length=min_html_length,
+                    reject_blocked=reject_blocked,
+                ):
                     return html
             except Exception as e:
                 print(f"[ERROR] Selenium 요청 실패: {e}")
@@ -102,7 +114,11 @@ def fetch(url, dynamic=False, retries=3, wait_selector="body", min_html_length=5
                 print(f"[INFO] requests 시도 {attempt}: {url}")
                 response = requests.get(url, headers=HEADERS, timeout=10)
                 response.raise_for_status()
-                if is_healthy_html(response.text, min_html_length=min_html_length):
+                if is_healthy_html(
+                    response.text,
+                    min_html_length=min_html_length,
+                    reject_blocked=reject_blocked,
+                ):
                     return response.text
                 print("[ERROR] requests returned unhealthy HTML")
             except requests.RequestException as e:
@@ -117,16 +133,28 @@ def fetch(url, dynamic=False, retries=3, wait_selector="body", min_html_length=5
     return None
 
 
-def is_healthy_html(html, min_html_length=500):
+def is_healthy_html(html, min_html_length=500, reject_blocked=True):
     if not html or len(html) < min_html_length:
         return False
 
-    lowered = html.lower()
-    blocked_markers = [
+    return not reject_blocked or not is_blocked_page(html)
+
+
+def is_blocked_page(html):
+    """사용자에게 보이는 차단 안내 문구만 검사한다."""
+    if not html:
+        return False
+
+    soup = BeautifulSoup(html, "html.parser")
+    for hidden in soup(["script", "style", "noscript", "template"]):
+        hidden.decompose()
+
+    visible_text = soup.get_text(" ", strip=True).lower()
+    strong_markers = [
         "captcha",
         "access denied",
-        "blocked",
         "비정상적인 접근",
-        "서비스 이용이 제한",
+        "자동입력 방지",
+        "robot check",
     ]
-    return not any(marker in lowered for marker in blocked_markers)
+    return any(marker in visible_text for marker in strong_markers)
