@@ -19,13 +19,24 @@ def run_matching_analysis(
     with get_connection(db_path) as conn:
         user_profile_id = upsert_user_profile(conn, preferences["profile_name"])
         save_keyword_preferences(conn, user_profile_id, preferences)
-        jobs = get_match_candidate_jobs(conn, limit=limit)
+        candidates = get_match_candidate_jobs(conn, limit=limit)
+        jobs = []
+        filtered_jobs = []
+        for job in candidates:
+            target = jobs if job_passes_hard_filters(job, preferences) else filtered_jobs
+            target.append(job)
+        if filtered_jobs:
+            conn.executemany(
+                "DELETE FROM job_match_results WHERE user_profile_id = ? AND job_posting_id = ?",
+                [(user_profile_id, job["id"]) for job in filtered_jobs],
+            )
         clear_non_detail_match_results(conn, user_profile_id)
 
         result = {
             "profile_id": user_profile_id,
             "target": len(jobs),
             "analyzed": 0,
+            "filtered_out": len(filtered_jobs),
         }
 
         for job in jobs:
@@ -41,6 +52,7 @@ def load_preferences(preferences_path=DEFAULT_PREFERENCES_PATH):
         preferences = json.load(f)
 
     preferences.setdefault("profile_name", "Default Radar")
+    preferences.setdefault("hard_filters", {})
     preferences.setdefault("preferences", {})
     preferences.setdefault("weights", {})
     preferences.setdefault("recommendation_levels", [])
@@ -210,6 +222,32 @@ def analyze_job(job, preferences):
     }
 
 
+def job_passes_hard_filters(job, preferences):
+    filters = preferences.get("hard_filters", {})
+    location = clean_text(job["location"])
+    employment_type = clean_text(job["employment_type"])
+
+    allowed_locations = filters.get("locations", [])
+    excluded_locations = filters.get("exclude_locations", [])
+    if filters.get("strict_location_only") and allowed_locations:
+        if not location or not any(contains_keyword(location, value) for value in allowed_locations):
+            return False
+    if any(contains_keyword(location, value) for value in excluded_locations):
+        return False
+
+    allowed_employment_types = filters.get("employment_types", [])
+    excluded_employment_types = filters.get("exclude_employment_types", [])
+    if allowed_employment_types:
+        if not employment_type or not any(
+            contains_keyword(employment_type, value) for value in allowed_employment_types
+        ):
+            return False
+    if any(contains_keyword(employment_type, value) for value in excluded_employment_types):
+        return False
+
+    return True
+
+
 def score_job_category(context, pref, weights, matched_keywords, missing_keywords, positive_reasons, negative_reasons):
     job_pref = pref["job_categories"]
     score = 0
@@ -223,15 +261,26 @@ def score_job_category(context, pref, weights, matched_keywords, missing_keyword
 
     matched = match_any(context["job_text"], job_pref.get("preferred", []))
     if matched:
-        low_priority = job_pref.get("low_priority", [])
-        value = (
-            weights.get("job_low_priority", 3)
-            if matched in low_priority
-            else weights.get("job_preferred", 18)
-        )
+        value = weights.get("job_preferred", 18)
         score += value
         matched_keywords.append(matched)
         positive_reasons.append(f"JobKorea 희망 직무 '{matched}' 일치: +{value}점")
+        return score
+
+    matched = match_any(context["job_text"], job_pref.get("secondary", []))
+    if matched:
+        value = weights.get("job_secondary", 10)
+        score += value
+        matched_keywords.append(matched)
+        positive_reasons.append(f"보조 희망 직무 '{matched}' 일치: +{value}점")
+        return score
+
+    matched = match_any(context["job_text"], job_pref.get("low_priority", []))
+    if matched:
+        value = weights.get("job_low_priority", 3)
+        score += value
+        matched_keywords.append(matched)
+        positive_reasons.append(f"낮은 우선순위 직무 '{matched}' 확인: +{value}점")
         return score
 
     penalty = weights.get("missing_job_category", -15)
@@ -359,15 +408,46 @@ def score_career_goal_boosts(
 def score_fullstack_combination(context, pref, weights, matched_keywords, positive_reasons):
     boost_groups = pref.get("career_goal_boosts", {})
     frontend = boost_groups.get("frontend_web", {}).get("keywords", [])
-    backend = boost_groups.get("backend", {}).get("keywords", [])
+    backend = (
+        boost_groups.get("backend_python", {}).get("keywords", [])
+        or boost_groups.get("backend", {}).get("keywords", [])
+    )
+    ai_automation = (
+        boost_groups.get("ai_automation", {}).get("keywords", [])
+        or boost_groups.get("ai_llm_automation", {}).get("keywords", [])
+    )
+    data_pipeline = boost_groups.get("data_pipeline_crawling", {}).get("keywords", [])
+    qa_automation = boost_groups.get("qa_automation", {}).get("keywords", [])
+    score = 0
 
     if match_any(context["all_text"], frontend) and match_any(context["all_text"], backend):
         value = weights.get("fullstack_combination_bonus", 10)
+        score += value
         matched_keywords.append("frontend+backend")
         positive_reasons.append(f"프론트엔드와 백엔드 키워드 동시 확인: +{value}점")
-        return value
 
-    return 0
+    if match_any(context["all_text"], ai_automation) and match_any(context["all_text"], data_pipeline):
+        value = weights.get("automation_combination_bonus", 0)
+        score += value
+        matched_keywords.append("ai+automation")
+        positive_reasons.append(f"AI와 데이터 자동화 역량 동시 확인: +{value}점")
+
+    if match_any(context["all_text"], backend) and match_any(context["all_text"], ai_automation):
+        value = weights.get("backend_ai_combination_bonus", 0)
+        score += value
+        matched_keywords.append("backend+ai")
+        positive_reasons.append(f"백엔드와 AI 서비스 키워드 동시 확인: +{value}점")
+
+    if match_any(context["all_text"], qa_automation) and (
+        match_any(context["all_text"], backend)
+        or match_any(context["all_text"], data_pipeline)
+    ):
+        value = weights.get("qa_automation_combination_bonus", 0)
+        score += value
+        matched_keywords.append("development+qa-automation")
+        positive_reasons.append(f"개발과 QA 자동화 역량 동시 확인: +{value}점")
+
+    return score
 
 
 def score_low_priority_qa(context, pref, weights, matched_keywords, negative_reasons):
@@ -375,9 +455,12 @@ def score_low_priority_qa(context, pref, weights, matched_keywords, negative_rea
     qa_keywords = boost_groups.get("qa_experience", {}).get("keywords", [])
     primary_groups = [
         boost_groups.get("frontend_web", {}).get("keywords", []),
-        boost_groups.get("backend", {}).get("keywords", []),
+        boost_groups.get("backend_python", {}).get("keywords", [])
+        or boost_groups.get("backend", {}).get("keywords", []),
         boost_groups.get("fullstack_web_service", {}).get("keywords", []),
-        boost_groups.get("ai_llm_automation", {}).get("keywords", []),
+        boost_groups.get("ai_automation", {}).get("keywords", [])
+        or boost_groups.get("ai_llm_automation", {}).get("keywords", []),
+        boost_groups.get("data_pipeline_crawling", {}).get("keywords", []),
         boost_groups.get("pm_service_planning", {}).get("keywords", []),
     ]
 
@@ -401,6 +484,7 @@ def score_penalties(context, pref, weights, matched_keywords, negative_reasons):
         "critical": weights.get("penalty_critical", -45),
         "major": weights.get("penalty_major", -25),
         "minor": weights.get("penalty_minor", -10),
+        "qa_only": weights.get("penalty_qa_only", -12),
     }
 
     for severity, keywords in pref["penalties"].items():

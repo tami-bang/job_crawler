@@ -1,9 +1,6 @@
 name: 잡코리아 채용공고 수집
 
 on:
-  schedule:
-    # GitHub Actions의 cron은 UTC 기준입니다. 아래 시간은 평일 오전 9시(KST)입니다.
-    - cron: "0 0 * * 1-5"
   workflow_dispatch:
     inputs:
       keyword_batch_size:

@@ -25,6 +25,34 @@ sites.json / user_preferences.json
         Console / CSV / XLSX
 ```
 
+## 웹 대시보드 구성
+
+```text
+Next.js frontend (:3000)
+        ↓ REST API
+FastAPI backend (:8000)
+        ↓
+SQLite data/job_radar.db
+```
+
+- `frontend/`: 통계, 공고 검색, 관심공고와 지원 상태 화면
+- `backend/routes/`: 공고·관심공고 HTTP 인터페이스
+- `backend/services/`: SQL 조회와 관심공고 비즈니스 규칙
+- `crawler/database.py`: 크롤러와 웹 API가 공유하는 스키마 초기화
+- 웹 API는 수집을 실행하지 않고 저장된 데이터와 샘플 데이터만 사용합니다.
+
+### API
+
+| Method | Path | 설명 |
+| --- | --- | --- |
+| GET | `/api/stats` | 전체·상세·분석·관심공고 통계 |
+| GET | `/api/jobs` | 점수순 공고 검색 |
+| GET | `/api/jobs/{id}` | 공고 상세 조회 |
+| POST | `/api/jobs/{id}/favorite` | 관심공고 저장 |
+| DELETE | `/api/jobs/{id}/favorite` | 관심공고 해제 |
+| GET | `/api/favorites` | 관심공고 조회 |
+| PATCH | `/api/favorites/{id}` | 메모·지원 상태 변경 |
+
 ## 모듈 책임
 
 | 모듈 | 책임 |
@@ -58,6 +86,7 @@ sites.json / user_preferences.json
 
 ## 점수 보정
 
+- 하드 필터가 활성화되면 서울·경기·인천 외 지역과 허용되지 않은 고용형태는 점수 계산 전에 제외합니다.
 - 기술 키워드와 커리어 목표 부스트는 설정된 상한까지만 가산합니다.
 - 75점을 넘는 원점수는 설정 비율로 압축해 여러 공고가 100점에 몰리는 현상을 줄입니다.
 - 원점수와 최종 점수를 매칭 결과에 함께 저장해 보정 과정을 비교할 수 있습니다.
