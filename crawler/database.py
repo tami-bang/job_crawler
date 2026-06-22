@@ -213,6 +213,7 @@ def init_database(db_path=DEFAULT_DB_PATH):
         _ensure_column(conn, "job_postings", "detail_status", "TEXT")
         _ensure_column(conn, "job_postings", "detail_error", "TEXT")
         _ensure_column(conn, "job_match_results", "match_score", "REAL")
+        _ensure_column(conn, "job_match_results", "raw_score", "REAL")
         _ensure_column(conn, "job_match_results", "missing_keywords_json", "TEXT")
         _ensure_column(conn, "job_match_results", "positive_reasons_json", "TEXT")
         _ensure_column(conn, "job_match_results", "negative_reasons_json", "TEXT")

@@ -179,19 +179,27 @@ def analyze_job(job, preferences):
     score += score_career(context, pref, weights, matched_keywords, missing_keywords, positive_reasons, negative_reasons)
     score += score_education(context, pref, weights, matched_keywords, missing_keywords, positive_reasons, negative_reasons)
     score += score_employment_type(context, pref, weights, matched_keywords, missing_keywords, positive_reasons, negative_reasons)
-    score += score_career_goal_boosts(context, pref, matched_keywords, positive_reasons)
+    score += score_career_goal_boosts(
+        context,
+        pref,
+        weights,
+        matched_keywords,
+        positive_reasons,
+    )
     score += score_fullstack_combination(context, pref, weights, matched_keywords, positive_reasons)
     score += score_skill_keywords(context, pref, weights, matched_keywords, missing_keywords, positive_reasons)
     score += score_low_priority_qa(context, pref, weights, matched_keywords, negative_reasons)
     score += score_penalties(context, pref, weights, matched_keywords, negative_reasons)
 
-    match_score = clamp_score(score)
+    raw_score = int(round(score))
+    match_score = apply_score_compression(raw_score, weights)
     recommendation_level = get_recommendation_level(
         match_score,
         preferences.get("recommendation_levels", []),
     )
 
     return {
+        "raw_score": raw_score,
         "match_score": match_score,
         "matched_keywords": unique_preserve_order(matched_keywords),
         "missing_keywords": unique_preserve_order(missing_keywords),
@@ -301,21 +309,33 @@ def score_employment_type(context, pref, weights, matched_keywords, missing_keyw
 def score_skill_keywords(context, pref, weights, matched_keywords, missing_keywords, positive_reasons):
     score = 0
     weight = weights.get("skill_preferred", 4)
+    bonus_cap = weights.get("skill_bonus_cap", 20)
 
     for keyword in pref["skill_keywords"]["preferred"]:
         if contains_keyword(context["skill_text"], keyword):
-            score += weight
             matched_keywords.append(keyword)
-            positive_reasons.append(f"보조 기술 키워드 '{keyword}' 확인: +{weight}점")
+            awarded = min(weight, max(0, bonus_cap - score))
+            if awarded > 0:
+                score += awarded
+                positive_reasons.append(
+                    f"보조 기술 키워드 '{keyword}' 확인: +{awarded}점"
+                )
         else:
             missing_keywords.append(keyword)
 
     return score
 
 
-def score_career_goal_boosts(context, pref, matched_keywords, positive_reasons):
+def score_career_goal_boosts(
+    context,
+    pref,
+    weights,
+    matched_keywords,
+    positive_reasons,
+):
     score = 0
     boost_groups = pref.get("career_goal_boosts", {})
+    bonus_cap = weights.get("career_goal_bonus_cap", 30)
 
     for group in boost_groups.values():
         label = group.get("label", "커리어 목표")
@@ -325,9 +345,13 @@ def score_career_goal_boosts(context, pref, matched_keywords, positive_reasons):
         if not matched:
             continue
 
-        score += weight
         matched_keywords.append(matched)
-        positive_reasons.append(f"{label} 관련 키워드 '{matched}' 일치: +{weight}점")
+        awarded = min(weight, max(0, bonus_cap - score))
+        if awarded > 0:
+            score += awarded
+            positive_reasons.append(
+                f"{label} 관련 키워드 '{matched}' 일치: +{awarded}점"
+            )
 
     return score
 
@@ -432,6 +456,7 @@ def upsert_match_result(conn, user_profile_id, job_posting_id, analysis):
             job_posting_id,
             score,
             match_score,
+            raw_score,
             matched_keywords_json,
             missing_keywords_json,
             positive_reasons_json,
@@ -441,11 +466,12 @@ def upsert_match_result(conn, user_profile_id, job_posting_id, analysis):
             created_at,
             updated_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         ON CONFLICT(user_profile_id, job_posting_id)
         DO UPDATE SET
             score = excluded.score,
             match_score = excluded.match_score,
+            raw_score = excluded.raw_score,
             matched_keywords_json = excluded.matched_keywords_json,
             missing_keywords_json = excluded.missing_keywords_json,
             positive_reasons_json = excluded.positive_reasons_json,
@@ -459,6 +485,7 @@ def upsert_match_result(conn, user_profile_id, job_posting_id, analysis):
             job_posting_id,
             analysis["match_score"],
             analysis["match_score"],
+            analysis["raw_score"],
             json.dumps(analysis["matched_keywords"], ensure_ascii=False),
             json.dumps(analysis["missing_keywords"], ensure_ascii=False),
             json.dumps(analysis["positive_reasons"], ensure_ascii=False),
@@ -603,6 +630,18 @@ def build_reason(score, level, positive_reasons, negative_reasons):
 
 def clamp_score(score):
     return max(0, min(100, int(round(score))))
+
+
+def apply_score_compression(score, weights):
+    start = float(weights.get("score_compression_start", 75))
+    ratio = float(weights.get("score_compression_ratio", 0.25))
+    ratio = max(0.0, min(1.0, ratio))
+
+    compressed = score
+    if score > start:
+        compressed = start + ((score - start) * ratio)
+
+    return clamp_score(compressed)
 
 
 def unique_preserve_order(values):

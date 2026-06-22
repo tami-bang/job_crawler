@@ -1,6 +1,8 @@
 # crawler/fetcher.py
-import requests
+import atexit
 import time
+
+import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -15,6 +17,57 @@ HEADERS = {
                   "Chrome/144.0.7559.97 Safari/537.36"
 }
 
+_dynamic_driver = None
+_chrome_driver_path = None
+
+
+def _build_chrome_options():
+    options = Options()
+    options.page_load_strategy = "eager"
+    options.add_argument("--headless=new")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--window-size=1920,1080")
+    return options
+
+
+def _create_dynamic_driver():
+    global _chrome_driver_path
+
+    if not _chrome_driver_path:
+        _chrome_driver_path = ChromeDriverManager().install()
+
+    service = Service(_chrome_driver_path)
+    return webdriver.Chrome(service=service, options=_build_chrome_options())
+
+
+def get_dynamic_driver():
+    global _dynamic_driver
+
+    if _dynamic_driver is None:
+        _dynamic_driver = _create_dynamic_driver()
+    return _dynamic_driver
+
+
+def close_dynamic_driver():
+    global _dynamic_driver
+
+    if _dynamic_driver is None:
+        return
+
+    try:
+        _dynamic_driver.quit()
+    except Exception as exc:
+        print(f"[WARN] Selenium driver close failed: {exc}")
+    finally:
+        _dynamic_driver = None
+
+
+atexit.register(close_dynamic_driver)
+
+
 def fetch(url, dynamic=False, retries=3, wait_selector="body", min_html_length=500):
     """
     안정화 fetch 함수
@@ -24,19 +77,8 @@ def fetch(url, dynamic=False, retries=3, wait_selector="body", min_html_length=5
     """
     for attempt in range(1, retries + 1):
         if dynamic:
-            options = Options()
-            options.page_load_strategy = "eager"
-            options.add_argument("--headless=new")
-            options.add_argument("--disable-gpu")
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--disable-blink-features=AutomationControlled")
-            options.add_argument("--window-size=1920,1080")
-
-            service = Service(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=options)
-            
             try:
+                driver = get_dynamic_driver()
                 print(f"[INFO] Selenium 시도 {attempt}: {url}")
                 driver.get(url)
 
@@ -45,17 +87,16 @@ def fetch(url, dynamic=False, retries=3, wait_selector="body", min_html_length=5
                     WebDriverWait(driver, 6).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, wait_selector or "body"))
                     )
-                except:
+                except Exception:
                     print("[WARN] 페이지 로딩 지연 또는 카드 없음")
 
                 html = driver.page_source
-                driver.quit()
-                
+
                 if is_healthy_html(html, min_html_length=min_html_length):
                     return html
             except Exception as e:
                 print(f"[ERROR] Selenium 요청 실패: {e}")
-                driver.quit()
+                close_dynamic_driver()
         else:
             try:
                 print(f"[INFO] requests 시도 {attempt}: {url}")

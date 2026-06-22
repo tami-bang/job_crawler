@@ -20,6 +20,11 @@ class DatabaseAndStoreTests(unittest.TestCase):
             db_path = str(Path(temp_dir) / "jobs.db")
             init_database(db_path)
             with sqlite3.connect(db_path) as conn:
+                match_columns = {
+                    row[1]
+                    for row in conn.execute("PRAGMA table_info(job_match_results)").fetchall()
+                }
+                self.assertIn("raw_score", match_columns)
                 run_id = conn.execute(
                     "INSERT INTO crawl_runs (source, crawl_type) VALUES ('jobkorea', 'list')"
                 ).lastrowid
@@ -50,4 +55,3 @@ class DatabaseAndStoreTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
