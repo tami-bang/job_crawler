@@ -54,19 +54,10 @@ def crawl(site_key, keyword, pages=2, sites=None, save_csv=True):
             url = site["base_url"].format(keyword=keyword, page=page)
             logger.info(f"Crawling {site['name']} page {page}: {url}")
 
-            html = fetch_list_page(site_key, site, url)
+            html, jobs = fetch_list_jobs(site_key, site, url)
             if not html:
                 logger.warning(f"Failed to fetch page {page}: {url}")
                 continue
-
-            jobs = parse_html(html, site["selectors"], base_url=url)
-            if site_key == "jobkorea" and not jobs and site.get("dynamic"):
-                print("[INFO] No JobKorea cards from requests. Trying Selenium fallback.")
-                html = fetch(url, dynamic=True, wait_selector=site["selectors"].get("card", "body"))
-                if not html:
-                    logger.warning(f"Failed to fetch dynamic page {page}: {url}")
-                    continue
-                jobs = parse_html(html, site["selectors"], base_url=url)
 
             all_jobs.extend(jobs)
 
@@ -116,6 +107,29 @@ def fetch_list_page(site_key, site, url):
         url,
         dynamic=site["dynamic"],
         wait_selector=site["selectors"].get("card", "body"),
+    )
+
+
+def fetch_list_jobs(site_key, site, url):
+    html = fetch_list_page(site_key, site, url)
+    jobs = parse_html(html, site["selectors"], base_url=url) if html else []
+
+    if site_key != "jobkorea" or jobs or not site.get("dynamic"):
+        return html, jobs
+
+    print("[INFO] JobKorea static collection failed or returned no cards. Trying Selenium fallback.")
+    dynamic_html = fetch(
+        url,
+        dynamic=True,
+        wait_selector=site["selectors"].get("card", "body"),
+    )
+    if not dynamic_html:
+        return html, jobs
+
+    return dynamic_html, parse_html(
+        dynamic_html,
+        site["selectors"],
+        base_url=url,
     )
 
 
