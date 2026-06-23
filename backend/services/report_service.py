@@ -193,3 +193,11 @@ def get_smtp_config() -> SmtpConfig:
         sender=sender,
         use_tls=os.getenv("JOB_RADAR_SMTP_TLS", "true").lower() != "false",
     )
+
+
+def is_smtp_configured() -> bool:
+    try:
+        get_smtp_config()
+    except ReportMailConfigError:
+        return False
+    return True

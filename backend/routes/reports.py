@@ -3,12 +3,18 @@ from fastapi import APIRouter, HTTPException
 
 from backend.services.report_service import (
     ReportMailConfigError,
+    is_smtp_configured,
     send_report_email,
     validate_email_address,
 )
 
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
+
+
+@router.get("/status")
+def report_status():
+    return {"ready": is_smtp_configured()}
 
 
 class ReportJob(BaseModel):

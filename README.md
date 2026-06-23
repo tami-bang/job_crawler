@@ -15,7 +15,7 @@ JobKorea list page 수집
 
 ## 웹 대시보드
 
-저장된 SQLite 데이터를 FastAPI와 Next.js 화면에서 탐색할 수 있습니다. 대시보드에서는 전체·상세·분석·관심공고 수를 확인하고, 공고 검색·찜하기·메모·지원 상태 관리, 리스트형 결과 확인, 마감 달력 확인, 엑셀 다운로드를 할 수 있습니다.
+저장된 SQLite 데이터를 FastAPI와 Next.js 화면에서 탐색할 수 있습니다. 대시보드에서는 전체·상세·분석·관심공고 수를 확인하고, 공고 검색·찜하기·메모·지원 상태 관리, 운영 상태 확인, 페이지네이션 리스트, 마감 달력, 엑셀 다운로드를 할 수 있습니다.
 
 데이터가 없는 개발 환경에서는 샘플 공고를 생성합니다.
 
@@ -39,16 +39,28 @@ npm run dev
 
 브라우저에서 `http://localhost:3000`을 열면 됩니다. API 문서는 `http://localhost:8000/docs`에서 확인할 수 있습니다.
 
-무료 공개 데모는 [GitHub Pages](https://tami-bang.github.io/job_crawler/)에서 사용할 수 있습니다. 공개 데모는 샘플 데이터만 사용하며 찜, 메모, 지원 상태는 방문자의 브라우저 `localStorage`에만 저장됩니다. 정적 데모에서도 엑셀 다운로드는 브라우저에서 바로 동작합니다.
+무료 공개 데모는 [GitHub Pages](https://tami-bang.github.io/job_crawler/)에서 사용할 수 있습니다. 공개 데모는 실제 수집 DB를 변환한 정적 스냅샷을 사용하며 찜, 메모, 지원 상태는 방문자의 브라우저 `localStorage`에만 저장됩니다. 정적 데모에서도 엑셀 다운로드는 브라우저에서 바로 동작합니다.
 
-이메일 첨부 발송은 보안상 SMTP 비밀값이 필요하므로 FastAPI 백엔드가 실행 중일 때 `/api/reports/email`로 처리합니다. 공개 GitHub Pages에서 자동 발송을 쓰려면 별도 백엔드 URL을 `REPORT_API_URL` 저장소 변수에 연결하고 다음 환경변수를 설정합니다.
+이메일 첨부 발송은 보안상 SMTP 비밀값이 필요하므로 FastAPI 백엔드가 실행 중일 때 `/api/reports/email`로 처리합니다. 공개 GitHub Pages에서 자동 발송을 쓰려면 별도 FastAPI 백엔드를 배포하고, GitHub 저장소 변수 `REPORT_API_URL`에 그 백엔드 URL을 연결합니다.
+
+백엔드 환경변수:
 
 ```bash
-JOB_RADAR_SMTP_HOST=
+JOB_RADAR_SMTP_HOST=smtp.gmail.com
 JOB_RADAR_SMTP_PORT=587
 JOB_RADAR_SMTP_USER=
 JOB_RADAR_SMTP_PASSWORD=
 JOB_RADAR_SMTP_FROM=
+JOB_RADAR_SMTP_TLS=true
+```
+
+프론트가 실제 발송 서버와 연결되었는지는 대시보드 상단의 `메일 서버 연결됨 / 메일 서버 설정 대기` 상태로 확인할 수 있습니다.
+
+네이버지도 기준 예상 소요시간을 표시하려면 FastAPI 백엔드에 Naver Cloud Platform Maps API 키를 설정합니다. 키가 없으면 화면에는 `지도 API 설정 필요`가 표시되고, 네이버지도 검색 링크만 제공합니다.
+
+```bash
+NAVER_MAPS_CLIENT_ID=
+NAVER_MAPS_CLIENT_SECRET=
 ```
 
 ## 수동 수집 실행
@@ -61,12 +73,13 @@ JOB_RADAR_SMTP_FROM=
 목록 수집 → 상세 수집 → 매칭 분석 → CSV·XLSX 리포트 생성 → 결과 파일 업로드
 ```
 
-수동으로 실행하려면 GitHub 저장소의 `Actions` 탭에서 `잡코리아 채용공고 수집`을 선택한 뒤 `Run workflow`를 누릅니다. 키워드 수, 페이지 수, 상세 수집 수, 리포트 수를 실행 전에 조정할 수 있습니다.
+수동으로 실행하려면 GitHub 저장소의 `Actions` 탭에서 `잡코리아 채용공고 수집`을 선택한 뒤 `Run workflow`를 누릅니다. 기본값은 운영형 수집을 기준으로 `키워드 20개 × 페이지 5개`이며, 실행 전에 키워드 수, 페이지 수, 상세 수집 수, 리포트 수를 조정할 수 있습니다.
 
 실행이 끝나면 해당 실행 화면 아래의 `Artifacts`에서 다음 결과를 내려받을 수 있습니다.
 
 * SQLite 데이터베이스
 * 채용공고 CSV·XLSX 리포트
+* GitHub Pages 정적 데모용 데이터 스냅샷
 * 실행 로그
 
 결과 파일은 14일 동안 보관됩니다. GitHub Actions 실행 환경은 매번 새로 생성되므로 실행별 결과를 독립적으로 보관합니다.
@@ -75,11 +88,12 @@ JOB_RADAR_SMTP_FROM=
 
 ```bash
 python main.py jobkorea-multi-pipeline \
-  --keyword-batch-size 5 \
-  --pages 1 \
-  --detail-limit 25 \
-  --report-top-n 50 \
-  --keyword-delay 2
+  --keyword-batch-size 20 \
+  --pages 5 \
+  --detail-limit 100 \
+  --report-top-n 200 \
+  --keyword-delay 1
+python scripts/export_demo_data_from_db.py --limit 500
 ```
 
 ## 주요 기능
