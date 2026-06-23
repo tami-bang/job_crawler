@@ -284,7 +284,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     setEmailStatus("");
     try {
       if (!api.canEmailReport() || !reportServerReady) {
-        setEmailStatus("메일 발송 서버가 아직 연결되지 않았어요. SMTP가 설정된 FastAPI 서버를 연결하면 바로 보낼 수 있어요.");
+        setEmailStatus("REPORT_API_URL과 SMTP 값이 설정된 FastAPI 서버를 연결하면 메일로 바로 발송할 수 있습니다.");
         return;
       }
 
@@ -567,7 +567,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <h3 id="email-modal-title">엑셀 결과를 이메일로 보내기</h3>
             <p>
               받을 이메일을 입력하면 현재 필터 결과를 엑셀 리포트로 정리해요.
-              {reportServerReady ? " 지금은 발송 서버가 연결되어 있어요." : " 발송 서버가 연결되면 다운로드 없이 바로 전송됩니다."}
+              {reportServerReady
+                ? " 지금은 발송 서버가 연결되어 있어요."
+                : " REPORT_API_URL, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM 값을 넣으면 메일로 바로 발송할 수 있습니다."}
             </p>
             <input
               aria-label="받을 이메일"

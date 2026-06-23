@@ -41,11 +41,17 @@ npm run dev
 
 무료 공개 데모는 [GitHub Pages](https://tami-bang.github.io/job_crawler/)에서 사용할 수 있습니다. 공개 데모는 실제 수집 DB를 변환한 정적 스냅샷을 사용하며 찜, 메모, 지원 상태는 방문자의 브라우저 `localStorage`에만 저장됩니다. 정적 데모에서도 엑셀 다운로드는 브라우저에서 바로 동작합니다.
 
-이메일 첨부 발송은 보안상 SMTP 비밀값이 필요하므로 FastAPI 백엔드가 실행 중일 때 `/api/reports/email`로 처리합니다. 공개 GitHub Pages에서 자동 발송을 쓰려면 별도 FastAPI 백엔드를 배포하고, GitHub 저장소 변수 `REPORT_API_URL`에 그 백엔드 URL을 연결합니다. 발송 서버가 연결되지 않은 상태에서는 다운로드나 메일 작성창으로 우회하지 않고, 발송 서버 연결이 필요하다는 안내를 표시합니다.
+이메일 첨부 발송은 보안상 SMTP 비밀값이 필요하므로 FastAPI 백엔드가 실행 중일 때 `/api/reports/email`로 처리합니다. 공개 GitHub Pages에서 자동 발송을 쓰려면 별도 FastAPI 백엔드를 배포하고, GitHub 저장소 변수 `REPORT_API_URL`에 그 백엔드 URL을 연결합니다. 발송 서버가 연결되지 않은 상태에서는 다운로드나 메일 작성창으로 우회하지 않고, 필요한 설정값을 안내합니다.
+
+메일로 바로 발송하려면 다음 값이 필요합니다.
 
 백엔드 환경변수:
 
 ```bash
+# 배포된 FastAPI 서버 URL은 GitHub 저장소 변수 REPORT_API_URL에 넣습니다.
+# 예: https://your-job-radar-api.onrender.com
+
+# FastAPI 서버에 넣는 SMTP 값
 JOB_RADAR_SMTP_HOST=smtp.gmail.com
 JOB_RADAR_SMTP_PORT=587
 JOB_RADAR_SMTP_USER=
@@ -53,6 +59,8 @@ JOB_RADAR_SMTP_PASSWORD=
 JOB_RADAR_SMTP_FROM=
 JOB_RADAR_SMTP_TLS=true
 ```
+
+Gmail을 사용할 경우 `JOB_RADAR_SMTP_PASSWORD`에는 계정 비밀번호가 아니라 Gmail 앱 비밀번호를 넣어야 합니다.
 
 프론트가 실제 발송 서버와 연결되었는지는 대시보드 상단의 `메일 서버 연결됨 / 메일 서버 설정 대기` 상태로 확인할 수 있습니다.
 
