@@ -22,6 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Link href="/">대시보드</Link>
             <Link href="/jobs">공고 탐색</Link>
             <Link href="/favorites">관심공고</Link>
+            <Link href="/updates">업데이트 로그</Link>
           </nav>
           <div className="systemState"><i /> {dataMode}</div>
         </header>
