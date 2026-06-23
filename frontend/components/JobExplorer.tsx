@@ -25,6 +25,7 @@ const sortLabels = {
   company_asc: "회사명 가나다순",
 } as const;
 type SortKey = keyof typeof sortLabels;
+const allowedLocationPrefixes = ["서울", "서울특별시", "경기", "경기도", "인천", "인천광역시"];
 
 function formatMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -65,6 +66,17 @@ function getDateTime(value: string | null | undefined, fallback: number) {
   return Number.isNaN(timestamp) ? fallback : timestamp;
 }
 
+function normalizeLocationOption(location: string | null) {
+  if (!location) return null;
+  const tokens = location.replace(/[(),]/g, " ").split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return null;
+  const [province, city] = tokens;
+  if (!allowedLocationPrefixes.includes(province)) return null;
+  const normalizedProvince = province.startsWith("서울") ? "서울" : province.startsWith("경기") ? "경기" : "인천";
+  if (!city || city === "외") return normalizedProvince;
+  return `${normalizedProvince} ${city}`;
+}
+
 function getMailBody(fileName: string) {
   return encodeURIComponent(
     `JobRadar 공고 분석 결과를 보냅니다.\n\nGitHub Pages 데모에서는 보안상 파일 자동 첨부가 불가해서, 방금 다운로드된 ${fileName} 파일을 첨부해주세요.`,
@@ -97,7 +109,7 @@ function buildNaverPlaceSearchUrl(destination: string) {
 export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: boolean }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
-  const [locationFilter, setLocationFilter] = useState("all");
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [detailFilter, setDetailFilter] = useState("all");
   const [scoreFilter, setScoreFilter] = useState("all");
   const [employmentFilter, setEmploymentFilter] = useState("all");
@@ -141,10 +153,18 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const employmentOptions = useMemo(() => (
     Array.from(new Set(jobs.map((job) => job.employment_type).filter(Boolean))).sort() as string[]
   ), [jobs]);
+  const locationOptions = useMemo(() => (
+    Array.from(new Set(jobs.map((job) => normalizeLocationOption(job.location)).filter(Boolean) as string[]))
+      .sort((a, b) => a.localeCompare(b, "ko"))
+  ), [jobs]);
 
   const filteredJobs = useMemo(() => (
     jobs
-      .filter((job) => locationFilter === "all" || job.location?.includes(locationFilter))
+      .filter((job) => {
+        if (selectedLocations.length === 0) return true;
+        const option = normalizeLocationOption(job.location);
+        return Boolean(option && selectedLocations.includes(option));
+      })
       .filter((job) => {
         if (detailFilter === "all") return true;
         if (detailFilter === "success") return job.detail_status === "success";
@@ -158,7 +178,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         return job.match_score === 0;
       })
       .filter((job) => employmentFilter === "all" || job.employment_type === employmentFilter)
-  ), [detailFilter, employmentFilter, jobs, locationFilter, scoreFilter]);
+  ), [detailFilter, employmentFilter, jobs, scoreFilter, selectedLocations]);
 
   const sortedJobs = useMemo(() => {
     const farFuture = 8640000000000000;
@@ -186,7 +206,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   useEffect(() => {
     setPage(1);
-  }, [detailFilter, employmentFilter, locationFilter, scoreFilter, sortBy]);
+  }, [detailFilter, employmentFilter, scoreFilter, selectedLocations, sortBy]);
 
   const jobsByDeadline = useMemo(() => {
     return filteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
@@ -271,6 +291,14 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     }
   }
 
+  function toggleLocationFilter(location: string) {
+    setSelectedLocations((previous) => (
+      previous.includes(location)
+        ? previous.filter((item) => item !== location)
+        : [...previous, location]
+    ));
+  }
+
   return (
     <section className="explorer">
       <div className="opsStrip" aria-label="운영 상태">
@@ -314,8 +342,27 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <small>공고별 버튼을 누르면 `출발지에서 도착지까지 길찾기` 검색어로 네이버지도를 새 탭에서 엽니다.</small>
       </div>
 
+      <div className="locationPanel" aria-label="지역 다중 선택 필터">
+        <div>
+          <span>지역 다중 선택</span>
+          <p>{selectedLocations.length ? `${selectedLocations.length}개 지역 선택됨` : "서울·경기·인천의 시/구 단위로 여러 지역을 선택할 수 있어요."}</p>
+        </div>
+        <div className="locationChips">
+          {locationOptions.map((location) => (
+            <button
+              type="button"
+              className={selectedLocations.includes(location) ? "active" : ""}
+              onClick={() => toggleLocationFilter(location)}
+              key={location}
+            >
+              {location}
+            </button>
+          ))}
+        </div>
+        {selectedLocations.length > 0 && <button type="button" className="clearFilter" onClick={() => setSelectedLocations([])}>지역 전체 해제</button>}
+      </div>
+
       <div className="filterPanel" aria-label="공고 조건 필터">
-        <label><span>지역</span><select value={locationFilter} onChange={(event) => setLocationFilter(event.target.value)}><option value="all">전체</option><option value="서울">서울</option><option value="경기">경기</option><option value="인천">인천</option></select></label>
         <label><span>수집 상태</span><select value={detailFilter} onChange={(event) => setDetailFilter(event.target.value)}><option value="all">전체</option><option value="success">상세완료</option><option value="pending">목록수집</option></select></label>
         <label><span>매칭 점수</span><select value={scoreFilter} onChange={(event) => setScoreFilter(event.target.value)}><option value="all">전체</option><option value="strong">85점 이상</option><option value="good">65~84점</option><option value="possible">1~64점</option><option value="unscored">미분석</option></select></label>
         <label><span>고용형태</span><select value={employmentFilter} onChange={(event) => setEmploymentFilter(event.target.value)}><option value="all">전체</option>{employmentOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
