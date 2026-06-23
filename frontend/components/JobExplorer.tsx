@@ -16,6 +16,15 @@ const statusLabel: Record<string, string> = {
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 const pageSizeOptions = [15, 50, 100];
 const originExamples = "예: 서울역, 강남역, 서울 강남구 테헤란로 123";
+const sortLabels = {
+  match_desc: "매칭 점수 높은순",
+  deadline_asc: "마감 임박순",
+  deadline_desc: "마감 여유순",
+  posted_desc: "등록 최신순",
+  posted_asc: "등록 오래된순",
+  company_asc: "회사명 가나다순",
+} as const;
+type SortKey = keyof typeof sortLabels;
 
 function formatMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -47,6 +56,13 @@ function getInitialMonth(jobs: Job[]) {
     .sort()[0];
   if (firstDeadline) return new Date(`${firstDeadline}T00:00:00`);
   return new Date();
+}
+
+function getDateTime(value: string | null | undefined, fallback: number) {
+  if (!value) return fallback;
+  const cleaned = value.replace(/[.]/g, "-").replace(/\([^)]*\)/g, "").trim();
+  const timestamp = new Date(cleaned.length === 10 ? `${cleaned}T00:00:00` : cleaned).getTime();
+  return Number.isNaN(timestamp) ? fallback : timestamp;
 }
 
 function getMailBody(fileName: string) {
@@ -85,6 +101,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [detailFilter, setDetailFilter] = useState("all");
   const [scoreFilter, setScoreFilter] = useState("all");
   const [employmentFilter, setEmploymentFilter] = useState("all");
+  const [sortBy, setSortBy] = useState<SortKey>("match_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [view, setView] = useState<"list" | "calendar">("list");
@@ -143,9 +160,33 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       .filter((job) => employmentFilter === "all" || job.employment_type === employmentFilter)
   ), [detailFilter, employmentFilter, jobs, locationFilter, scoreFilter]);
 
+  const sortedJobs = useMemo(() => {
+    const farFuture = 8640000000000000;
+    const farPast = -8640000000000000;
+    return [...filteredJobs].sort((a, b) => {
+      if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1;
+      if (sortBy === "deadline_asc") {
+        return getDateTime(a.deadline_date, farFuture) - getDateTime(b.deadline_date, farFuture);
+      }
+      if (sortBy === "deadline_desc") {
+        return getDateTime(b.deadline_date, farPast) - getDateTime(a.deadline_date, farPast);
+      }
+      if (sortBy === "posted_desc") {
+        return getDateTime(b.posted_date, farPast) - getDateTime(a.posted_date, farPast);
+      }
+      if (sortBy === "posted_asc") {
+        return getDateTime(a.posted_date, farFuture) - getDateTime(b.posted_date, farFuture);
+      }
+      if (sortBy === "company_asc") {
+        return (a.company_name || "").localeCompare(b.company_name || "", "ko");
+      }
+      return b.match_score - a.match_score || getDateTime(b.posted_date, farPast) - getDateTime(a.posted_date, farPast);
+    });
+  }, [filteredJobs, sortBy]);
+
   useEffect(() => {
     setPage(1);
-  }, [detailFilter, employmentFilter, locationFilter, scoreFilter]);
+  }, [detailFilter, employmentFilter, locationFilter, scoreFilter, sortBy]);
 
   const jobsByDeadline = useMemo(() => {
     return filteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
@@ -155,16 +196,16 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     }, {});
   }, [filteredJobs]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredJobs.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(sortedJobs.length / pageSize));
   const currentPage = Math.min(page, totalPages);
   const pagedJobs = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return filteredJobs.slice(start, start + pageSize);
-  }, [currentPage, filteredJobs, pageSize]);
+    return sortedJobs.slice(start, start + pageSize);
+  }, [currentPage, pageSize, sortedJobs]);
   const matchedCount = jobs.filter((job) => job.match_score > 0).length;
   const detailedCount = jobs.filter((job) => job.detail_status === "success").length;
-  const visibleStart = filteredJobs.length ? (currentPage - 1) * pageSize + 1 : 0;
-  const visibleEnd = Math.min(currentPage * pageSize, filteredJobs.length);
+  const visibleStart = sortedJobs.length ? (currentPage - 1) * pageSize + 1 : 0;
+  const visibleEnd = Math.min(currentPage * pageSize, sortedJobs.length);
 
   async function toggleFavorite(job: Job) {
     if (job.is_favorite) await api.unfavorite(job.id);
@@ -187,12 +228,12 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     setEmailStatus("");
     try {
       if (api.canEmailReport()) {
-        await api.emailReport(email, filteredJobs);
+        await api.emailReport(email, sortedJobs);
         setEmailStatus("엑셀 리포트를 이메일로 보냈어요.");
         return;
       }
 
-      const file = downloadWorkbook(filteredJobs);
+      const file = downloadWorkbook(sortedJobs);
       window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent("JobRadar 공고 분석 결과")}&body=${getMailBody(file.name)}`;
       setEmailStatus("정적 데모라 자동 첨부 대신 엑셀을 다운로드하고 메일 작성창을 열었어요.");
     } catch {
@@ -255,8 +296,8 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
           />
         </label>
         <button className="scanButton" onClick={() => void loadJobs(search)}>SCAN DATA</button>
-        <button className="ghostButton" onClick={() => downloadWorkbook(filteredJobs)} disabled={filteredJobs.length === 0}>엑셀 받기</button>
-        <button className="ghostButton accent" onClick={() => setShowEmailModal(true)} disabled={filteredJobs.length === 0}>이메일로 보내기</button>
+        <button className="ghostButton" onClick={() => downloadWorkbook(sortedJobs)} disabled={sortedJobs.length === 0}>엑셀 받기</button>
+        <button className="ghostButton accent" onClick={() => setShowEmailModal(true)} disabled={sortedJobs.length === 0}>이메일로 보내기</button>
         <span className="resultCount">{filteredJobs.length.toString().padStart(2, "0")} / {jobs.length.toString().padStart(2, "0")} RESULTS</span>
       </div>
 
@@ -278,6 +319,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <label><span>수집 상태</span><select value={detailFilter} onChange={(event) => setDetailFilter(event.target.value)}><option value="all">전체</option><option value="success">상세완료</option><option value="pending">목록수집</option></select></label>
         <label><span>매칭 점수</span><select value={scoreFilter} onChange={(event) => setScoreFilter(event.target.value)}><option value="all">전체</option><option value="strong">85점 이상</option><option value="good">65~84점</option><option value="possible">1~64점</option><option value="unscored">미분석</option></select></label>
         <label><span>고용형태</span><select value={employmentFilter} onChange={(event) => setEmploymentFilter(event.target.value)}><option value="all">전체</option>{employmentOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+        <label><span>정렬</span><select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortKey)}>{Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       </div>
 
       <div className="explorerControls">
@@ -300,7 +342,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <>
           <div className="tableHeader">
             <span>표시 {visibleStart}-{visibleEnd} / 필터 결과 {filteredJobs.length} / 전체 {jobs.length}</span>
-            <span>점수 높은 순 · 관심공고 우선</span>
+            <span>{sortLabels[sortBy]} · 관심공고 우선</span>
           </div>
           <div className="jobList">
             {pagedJobs.map((job, index) => (
@@ -316,6 +358,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     <span>{job.location || "지역 미정"}</span>
                     <span>{job.career || "경력 무관"}</span>
                     <span>{job.employment_type || "고용형태 미정"}</span>
+                    <span>등록 {job.posted_date || "미정"}</span>
                     <span>{job.deadline_date || job.deadline || "마감일 미정"}</span>
                   </div>
                   <div className="commuteLine">

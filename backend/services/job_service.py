@@ -74,6 +74,7 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
             jp.career,
             jp.education,
             jp.employment_type,
+            jp.posted_date,
             jp.deadline,
             jp.deadline_date,
             jp.detail_url,

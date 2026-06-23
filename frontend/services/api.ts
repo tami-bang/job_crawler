@@ -5,6 +5,7 @@ export type Job = {
   location: string | null;
   career: string | null;
   employment_type: string | null;
+  posted_date: string | null;
   deadline: string | null;
   deadline_date: string | null;
   detail_url: string | null;
