@@ -26,6 +26,7 @@ const sortLabels = {
   company_asc: "회사명 가나다순",
 } as const;
 type SortKey = keyof typeof sortLabels;
+type ExplorerView = "list" | "calendar" | "expired";
 const allowedLocationPrefixes = ["서울", "서울특별시", "경기", "경기도", "인천", "인천광역시"];
 
 function formatMonth(date: Date) {
@@ -84,9 +85,19 @@ function formatPostedDate(value: string | null) {
 }
 
 function formatDeadlineDate(deadlineDate: string | null, deadline: string | null) {
+  if (isAlwaysOpen(deadline)) return "상시채용";
   const parsed = parseDateParts(deadlineDate || deadline);
   if (!parsed) return `마감 ${deadline || "미정"}`;
   return `마감 ${parsed.year}-${parsed.month}-${parsed.day}(${parsed.weekday})`;
+}
+
+function isAlwaysOpen(deadline: string | null | undefined) {
+  return Boolean(deadline?.includes("상시"));
+}
+
+function isExpiredJob(job: Job, todayKey: string) {
+  if (isAlwaysOpen(job.deadline)) return false;
+  return Boolean(job.deadline_date && job.deadline_date < todayKey);
 }
 
 function normalizeLocationOption(location: string | null) {
@@ -141,7 +152,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [sortBy, setSortBy] = useState<SortKey>("match_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [view, setView] = useState<"list" | "calendar">("list");
+  const [view, setView] = useState<ExplorerView>("list");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
@@ -204,11 +215,22 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       })
       .filter((job) => employmentFilter === "all" || job.employment_type === employmentFilter)
   ), [detailFilter, employmentFilter, jobs, scoreFilter, selectedLocations]);
+  const todayKey = toDateKey(new Date());
+
+  const activeFilteredJobs = useMemo(() => (
+    filteredJobs.filter((job) => !isExpiredJob(job, todayKey))
+  ), [filteredJobs, todayKey]);
+
+  const expiredFilteredJobs = useMemo(() => (
+    filteredJobs.filter((job) => isExpiredJob(job, todayKey))
+  ), [filteredJobs, todayKey]);
+
+  const visibleJobs = view === "expired" ? expiredFilteredJobs : activeFilteredJobs;
 
   const sortedJobs = useMemo(() => {
     const farFuture = 8640000000000000;
     const farPast = -8640000000000000;
-    return [...filteredJobs].sort((a, b) => {
+    return [...visibleJobs].sort((a, b) => {
       if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1;
       if (sortBy === "deadline_asc") {
         return getDateTime(a.deadline_date, farFuture) - getDateTime(b.deadline_date, farFuture);
@@ -227,20 +249,19 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       }
       return b.match_score - a.match_score || getDateTime(b.posted_date, farPast) - getDateTime(a.posted_date, farPast);
     });
-  }, [filteredJobs, sortBy]);
+  }, [sortBy, visibleJobs]);
 
   useEffect(() => {
     setPage(1);
-  }, [detailFilter, employmentFilter, scoreFilter, selectedLocations, sortBy]);
+  }, [detailFilter, employmentFilter, scoreFilter, selectedLocations, sortBy, view]);
 
   const jobsByDeadline = useMemo(() => {
-    return filteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
+    return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
       if (!job.deadline_date) return acc;
       acc[job.deadline_date] = [...(acc[job.deadline_date] ?? []), job];
       return acc;
     }, {});
-  }, [filteredJobs]);
-
+  }, [activeFilteredJobs]);
   const totalPages = Math.max(1, Math.ceil(sortedJobs.length / pageSize));
   const currentPage = Math.min(page, totalPages);
   const pagedJobs = useMemo(() => {
@@ -398,6 +419,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <div className="viewSwitch" role="tablist" aria-label="공고 보기 방식">
           <button className={view === "list" ? "active" : ""} onClick={() => setView("list")}>리스트</button>
           <button className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")}>마감 달력</button>
+          <button className={view === "expired" ? "active" : ""} onClick={() => setView("expired")}>마감 {expiredFilteredJobs.length}</button>
         </div>
       </div>
 
@@ -409,12 +431,15 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       {!loading && !error && jobs.length > 0 && filteredJobs.length === 0 && (
         <div className="emptyState">현재 조건에 맞는 공고가 없어요. 필터를 조정해주세요.</div>
       )}
+      {!loading && !error && filteredJobs.length > 0 && sortedJobs.length === 0 && view !== "calendar" && (
+        <div className="emptyState">{view === "expired" ? "현재 조건에 마감된 공고가 없어요." : "현재 조건에 진행 중인 공고가 없어요."}</div>
+      )}
 
-      {!loading && !error && filteredJobs.length > 0 && view === "list" && (
+      {!loading && !error && sortedJobs.length > 0 && (view === "list" || view === "expired") && (
         <>
           <div className="tableHeader">
-            <span>표시 {visibleStart}-{visibleEnd} / 필터 결과 {filteredJobs.length} / 전체 {jobs.length}</span>
-            <span>{sortLabels[sortBy]} · 관심공고 우선</span>
+            <span>표시 {visibleStart}-{visibleEnd} / {view === "expired" ? "마감 공고" : "진행 공고"} {sortedJobs.length} / 필터 결과 {filteredJobs.length}</span>
+            <span>{view === "expired" ? "오늘 이전 마감" : sortLabels[sortBy]} · 관심공고 우선</span>
           </div>
           <div className="jobList">
             {pagedJobs.map((job, index) => (
@@ -430,7 +455,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     <span>{job.location || "지역 미정"}</span>
                     <span>{job.career || "경력 무관"}</span>
                     <span>{job.employment_type || "고용형태 미정"}</span>
-                    <span>{formatPostedDate(job.posted_date)}</span>
+                    {!isAlwaysOpen(job.deadline) && <span>{formatPostedDate(job.posted_date)}</span>}
                     <span>{formatDeadlineDate(job.deadline_date, job.deadline)}</span>
                   </div>
                   <div className="commuteLine">
@@ -525,9 +550,15 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             {getCalendarDays(calendarMonth).map((day, index) => {
               const dateKey = day ? toDateKey(day) : "";
               const dayJobs = dateKey ? jobsByDeadline[dateKey] ?? [] : [];
+              const isToday = dateKey === todayKey;
               return (
-                <div className={`calendarCell ${dayJobs.length ? "hasJobs" : ""}`} key={`${dateKey}-${index}`}>
-                  {day && <span className="dayNumber">{day.getDate()}</span>}
+                <div className={`calendarCell ${dayJobs.length ? "hasJobs" : ""} ${isToday ? "today" : ""}`} key={`${dateKey}-${index}`}>
+                  {day && (
+                    <span className="dayNumber">
+                      {day.getDate()}
+                      {isToday && <b>TODAY</b>}
+                    </span>
+                  )}
                   {dayJobs.slice(0, 3).map((job) => (
                     <a className="deadlinePill" href={job.detail_url ?? "#"} target="_blank" rel="noreferrer" key={job.id}>
                       <b>{job.match_score}</b> {job.company_name || "회사 미상"}
