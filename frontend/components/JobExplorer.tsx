@@ -138,10 +138,6 @@ function buildNaverRouteSearchUrl(origin: string, destination: string) {
   return `https://map.naver.com/p/directions/${start}/${goal}/-/transit?c=13.00,0,0,0,dh`;
 }
 
-function buildNaverPlaceSearchUrl(destination: string) {
-  return `https://map.naver.com/p/search/${encodeURIComponent(destination.trim())}`;
-}
-
 export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: boolean }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
@@ -385,7 +381,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             onBlur={() => originAddress.trim() && validateOriginForSearch()}
           />
         </label>
-        <small>공고별 `경로 확인하기`는 네이버지도 대중교통 길찾기 화면으로 열립니다.</small>
+        <small>공고별 `네이버지도 열기`는 출발지와 도착지를 넣은 대중교통 길찾기 화면으로 열립니다.</small>
       </div>
 
       <div className="locationPanel" aria-label="지역 다중 선택 필터">
@@ -462,19 +458,12 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     <span>이동경로: {originAddress ? `${originAddress} → ${getDestination(job)}` : "출발지 입력 후 확인"}</span>
                     <div className="mapLinks">
                       <a
-                        href={buildNaverPlaceSearchUrl(getDestination(job))}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        네이버지도 열기 ↗
-                      </a>
-                      <a
                         href={buildNaverRouteSearchUrl(originAddress, getDestination(job))}
                         target="_blank"
                         rel="noreferrer"
                         onClick={(event) => handleRouteClick(event, job)}
                       >
-                        경로 확인하기 ↗
+                        네이버지도 열기 ↗
                       </a>
                     </div>
                   </div>
