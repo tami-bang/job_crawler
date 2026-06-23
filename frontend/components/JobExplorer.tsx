@@ -381,7 +381,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             onBlur={() => originAddress.trim() && validateOriginForSearch()}
           />
         </label>
-        <small>공고별 `네이버지도 열기`는 출발지와 도착지를 넣은 대중교통 길찾기 화면으로 열립니다.</small>
+        <small>네이버지도에서 출발지·도착지 후보를 선택하면 대중교통 경로가 표시됩니다.</small>
       </div>
 
       <div className="locationPanel" aria-label="지역 다중 선택 필터">
@@ -465,6 +465,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                       >
                         네이버지도 열기 ↗
                       </a>
+                      <small>후보 선택 후 길찾기</small>
                     </div>
                   </div>
                   <div className="keywords">
