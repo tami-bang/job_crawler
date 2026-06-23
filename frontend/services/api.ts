@@ -9,6 +9,7 @@ export type Job = {
   deadline_date: string | null;
   detail_url: string | null;
   skill_candidates: string | null;
+  detail_status?: string | null;
   match_score: number;
   recommendation_level: string | null;
   matched_keywords: string[];
@@ -88,12 +89,15 @@ export const api = {
   stats: async () => {
     if (!STATIC_DEMO) return request<Stats>("/api/stats");
     const jobs = await getDemoJobs();
+    const matchedJobs = jobs.filter((job) => job.match_score > 0);
     return {
       total_jobs: jobs.length,
-      detailed_jobs: jobs.length,
-      matched_jobs: jobs.length,
+      detailed_jobs: jobs.filter((job) => job.detail_status === "success").length,
+      matched_jobs: matchedJobs.length,
       favorite_jobs: jobs.filter((job) => job.is_favorite).length,
-      average_score: Math.round(jobs.reduce((sum, job) => sum + job.match_score, 0) / jobs.length),
+      average_score: matchedJobs.length
+        ? Math.round(matchedJobs.reduce((sum, job) => sum + job.match_score, 0) / matchedJobs.length)
+        : null,
     };
   },
   jobs: async (search = "", favorite = false) => {
