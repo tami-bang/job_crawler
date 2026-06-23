@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 
 from backend.services.report_service import build_jobs_xlsx, validate_email_address
+from backend.services.map_service import format_duration
 from crawler.report import export_match_report, export_xlsx_match_report, get_report_fieldnames
 
 
@@ -55,6 +56,10 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(validate_email_address("tami@example.com"), "tami@example.com")
         with self.assertRaises(ValueError):
             validate_email_address("not-an-email")
+
+    def test_format_duration(self):
+        self.assertEqual(format_duration(0), "00시간 00분")
+        self.assertEqual(format_duration(75), "01시간 15분")
 
 
 if __name__ == "__main__":

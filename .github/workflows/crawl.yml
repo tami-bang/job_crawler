@@ -6,11 +6,11 @@ on:
       keyword_batch_size:
         description: "이번 실행에서 처리할 검색 키워드 수"
         required: true
-        default: "5"
+        default: "20"
       pages:
         description: "키워드별 수집 페이지 수"
         required: true
-        default: "1"
+        default: "5"
       detail_limit:
         description: "상세 내용을 수집할 최대 공고 수"
         required: true
@@ -18,7 +18,7 @@ on:
       report_top_n:
         description: "리포트에 포함할 최대 공고 수"
         required: true
-        default: "50"
+        default: "200"
 
 permissions:
   contents: read
@@ -63,6 +63,9 @@ jobs:
             --report-top-n "$REPORT_TOP_N" \
             --keyword-delay 2
 
+      - name: 공개 데모 데이터 스냅샷 생성
+        run: python scripts/export_demo_data_from_db.py --limit 500
+
       - name: 실제 수집 결과 검증
         run: |
           JOB_COUNT=$(python -c "import sqlite3; conn = sqlite3.connect('data/job_radar.db'); print(conn.execute('SELECT COUNT(*) FROM job_postings').fetchone()[0])")
@@ -79,6 +82,7 @@ jobs:
           name: jobkorea-result-${{ github.run_number }}
           path: |
             data/
+            frontend/services/demo-data.ts
             crawler.log
           if-no-files-found: warn
           retention-days: 14

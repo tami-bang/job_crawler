@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.db import initialize_api_database
 from backend.routes.favorites import router as favorites_router
 from backend.routes.jobs import router as jobs_router
+from backend.routes.maps import router as maps_router
 from backend.routes.reports import router as reports_router
 from backend.services.job_service import get_stats
 
@@ -38,6 +39,7 @@ app.add_middleware(
 app.include_router(jobs_router)
 app.include_router(favorites_router)
 app.include_router(reports_router)
+app.include_router(maps_router)
 
 
 @app.get("/api/health")

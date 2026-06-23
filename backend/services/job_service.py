@@ -5,7 +5,16 @@ from pathlib import Path
 from backend.db import open_database
 
 
-FAVORITE_STATUSES = {"saved", "planned", "applied", "excluded"}
+FAVORITE_STATUSES = {
+    "saved",
+    "planned",
+    "applied",
+    "document_passed",
+    "first_passed",
+    "second_passed",
+    "final_passed",
+    "excluded",
+}
 
 
 def _parse_list(value):

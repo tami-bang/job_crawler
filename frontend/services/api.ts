@@ -28,6 +28,14 @@ export type Stats = {
   average_score: number | null;
 };
 
+export type CommuteEstimate = {
+  available: boolean;
+  duration_minutes: number | null;
+  label: string;
+  map_url: string | null;
+  reason?: string | null;
+};
+
 type FavoriteState = Record<number, { memo: string; status: string }>;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
@@ -86,6 +94,47 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   canEmailReport: () => !STATIC_DEMO || Boolean(REPORT_API_URL),
+  reportStatus: async () => {
+    if (STATIC_DEMO && !REPORT_API_URL) return { ready: false };
+    const baseUrl = REPORT_API_URL || API_URL;
+    const response = await fetch(`${baseUrl}/api/reports/status`, { cache: "no-store" });
+    if (!response.ok) return { ready: false };
+    return response.json() as Promise<{ ready: boolean }>;
+  },
+  mapStatus: async () => {
+    if (STATIC_DEMO && !REPORT_API_URL) return { ready: false };
+    const baseUrl = REPORT_API_URL || API_URL;
+    const response = await fetch(`${baseUrl}/api/maps/status`, { cache: "no-store" });
+    if (!response.ok) return { ready: false };
+    return response.json() as Promise<{ ready: boolean }>;
+  },
+  commuteEstimate: async (origin: string, destination: string) => {
+    const mapUrl = `https://map.naver.com/p/search/${encodeURIComponent(destination)}`;
+    if (STATIC_DEMO && !REPORT_API_URL) {
+      return {
+        available: false,
+        duration_minutes: null,
+        label: "지도 API 설정 필요",
+        map_url: mapUrl,
+        reason: "정적 데모에는 네이버지도 API 키를 저장할 수 없습니다.",
+      } satisfies CommuteEstimate;
+    }
+    const baseUrl = REPORT_API_URL || API_URL;
+    const response = await fetch(`${baseUrl}/api/maps/commute-time`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ origin, destination }),
+    });
+    if (!response.ok) {
+      return {
+        available: false,
+        duration_minutes: null,
+        label: "계산 실패",
+        map_url: mapUrl,
+      } satisfies CommuteEstimate;
+    }
+    return response.json() as Promise<CommuteEstimate>;
+  },
   stats: async () => {
     if (!STATIC_DEMO) return request<Stats>("/api/stats");
     const jobs = await getDemoJobs();
@@ -102,18 +151,18 @@ export const api = {
   },
   jobs: async (search = "", favorite = false) => {
     if (STATIC_DEMO) return { items: await getDemoJobs(search, favorite) };
-    return request<{ items: Job[] }>(`/api/jobs?search=${encodeURIComponent(search)}&favorite=${favorite}`);
+    return request<{ items: Job[] }>(`/api/jobs?search=${encodeURIComponent(search)}&favorite=${favorite}&limit=500`);
   },
   favorite: async (jobId: number) => {
     if (STATIC_DEMO) {
       const favorites = readFavorites();
-      favorites[jobId] = { memo: "", status: "saved" };
+      favorites[jobId] = { memo: "", status: "planned" };
       writeFavorites(favorites);
       return getDemoJob(jobId);
     }
     return request<Job>(`/api/jobs/${jobId}/favorite`, {
       method: "POST",
-      body: JSON.stringify({ memo: "", status: "saved" }),
+      body: JSON.stringify({ memo: "", status: "planned" }),
     });
   },
   unfavorite: async (jobId: number) => {
