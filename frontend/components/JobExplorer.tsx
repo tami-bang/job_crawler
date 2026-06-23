@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { api, CommuteEstimate, Job } from "@/services/api";
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { api, Job } from "@/services/api";
 import { downloadWorkbook } from "@/services/export-xlsx";
 
 const statusLabel: Record<string, string> = {
@@ -63,6 +63,21 @@ function validateOriginAddress(value: string) {
   return "";
 }
 
+function getDestination(job: Job) {
+  return job.location || job.company_name || job.title;
+}
+
+function buildNaverRouteSearchUrl(origin: string, destination: string) {
+  const query = origin.trim()
+    ? `${origin.trim()}에서 ${destination.trim()}까지 길찾기`
+    : `${destination.trim()} 길찾기`;
+  return `https://map.naver.com/p/search/${encodeURIComponent(query)}`;
+}
+
+function buildNaverPlaceSearchUrl(destination: string) {
+  return `https://map.naver.com/p/search/${encodeURIComponent(destination.trim())}`;
+}
+
 export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: boolean }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
@@ -81,10 +96,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [emailStatus, setEmailStatus] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [reportServerReady, setReportServerReady] = useState(false);
-  const [mapServerReady, setMapServerReady] = useState(false);
   const [originAddress, setOriginAddress] = useState("");
-  const [commuteEstimates, setCommuteEstimates] = useState<Record<number, CommuteEstimate>>({});
-  const [commuteLoading, setCommuteLoading] = useState(false);
   const [noticeModal, setNoticeModal] = useState<{ title: string; message: string; hint?: string } | null>(null);
 
   const loadJobs = useCallback(async (term = "") => {
@@ -107,9 +119,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     api.reportStatus()
       .then((status) => setReportServerReady(status.ready))
       .catch(() => setReportServerReady(false));
-    api.mapStatus()
-      .then((status) => setMapServerReady(status.ready))
-      .catch(() => setMapServerReady(false));
   }, []);
 
   const employmentOptions = useMemo(() => (
@@ -193,7 +202,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     }
   }
 
-  async function calculateCommutes() {
+  function validateOriginForSearch() {
     const validationMessage = validateOriginAddress(originAddress);
     if (validationMessage) {
       setNoticeModal({
@@ -201,28 +210,23 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         message: validationMessage,
         hint: originExamples,
       });
-      return;
+      return false;
     }
-    if (!mapServerReady) {
+    return true;
+  }
+
+  function handleRouteClick(event: MouseEvent<HTMLAnchorElement>, job: Job) {
+    const destination = getDestination(job).trim();
+    if (!destination) {
+      event.preventDefault();
       setNoticeModal({
-        title: "네이버지도 API 연결이 필요해요",
-        message: "예상소요시간을 실제로 계산하려면 FastAPI 백엔드에 네이버지도 API 키와 공개 백엔드 URL을 연결해야 합니다.",
-        hint: "필요 값: NAVER_MAPS_CLIENT_ID, NAVER_MAPS_CLIENT_SECRET, NEXT_PUBLIC_REPORT_API_URL",
+        title: "도착지 정보가 부족해요",
+        message: "공고에 지역이나 회사명이 없어 네이버지도 검색어를 만들 수 없습니다.",
       });
       return;
     }
-    setCommuteLoading(true);
-    try {
-      const entries = await Promise.all(
-        pagedJobs.map(async (job) => {
-          const destination = job.location || job.company_name || job.title;
-          const estimate = await api.commuteEstimate(originAddress, destination);
-          return [job.id, estimate] as const;
-        }),
-      );
-      setCommuteEstimates((previous) => ({ ...previous, ...Object.fromEntries(entries) }));
-    } finally {
-      setCommuteLoading(false);
+    if (!validateOriginForSearch()) {
+      event.preventDefault();
     }
   }
 
@@ -236,9 +240,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <span className={reportServerReady ? "ready" : "muted"}>
           {reportServerReady ? "메일 서버 연결됨" : "메일 서버 설정 대기"}
         </span>
-        <span className={mapServerReady ? "ready" : "muted"}>
-          {mapServerReady ? "지도 API 연결됨" : "지도 API 설정 대기"}
-        </span>
+        <span className="ready">네이버지도 검색 연결</span>
       </div>
 
       <div className="toolbar">
@@ -258,20 +260,17 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <span className="resultCount">{filteredJobs.length.toString().padStart(2, "0")} / {jobs.length.toString().padStart(2, "0")} RESULTS</span>
       </div>
 
-      <div className="commutePanel" aria-label="네이버지도 예상 소요시간">
+      <div className="commutePanel" aria-label="네이버지도 경로 검색">
         <label>
           <span>출발지 주소</span>
           <input
             placeholder={originExamples}
             value={originAddress}
             onChange={(event) => setOriginAddress(event.target.value)}
-            onKeyDown={(event) => event.key === "Enter" && void calculateCommutes()}
+            onBlur={() => originAddress.trim() && validateOriginForSearch()}
           />
         </label>
-        <button className="ghostButton" onClick={() => void calculateCommutes()} disabled={!originAddress.trim() || commuteLoading || pagedJobs.length === 0}>
-          {commuteLoading ? "계산 중..." : "예상소요시간 함께 보기"}
-        </button>
-        <small>{mapServerReady ? "필터 결과에 네이버지도 기준 예상 이동시간을 함께 표시합니다." : "네이버지도 API 키를 연결하면 실제 예상 시간이 표시됩니다."}</small>
+        <small>공고별 버튼을 누르면 `출발지에서 도착지까지 길찾기` 검색어로 네이버지도를 새 탭에서 엽니다.</small>
       </div>
 
       <div className="filterPanel" aria-label="공고 조건 필터">
@@ -320,16 +319,24 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     <span>{job.deadline_date || job.deadline || "마감일 미정"}</span>
                   </div>
                   <div className="commuteLine">
-                    <span>예상소요시간: {commuteEstimates[job.id]?.label ?? (originAddress ? "계산 전" : "출발지 입력")}</span>
-                    {(commuteEstimates[job.id]?.map_url || job.location) && (
+                    <span>이동경로: {originAddress ? `${originAddress} → ${getDestination(job)}` : "출발지 입력 후 확인"}</span>
+                    <div className="mapLinks">
                       <a
-                        href={commuteEstimates[job.id]?.map_url ?? `https://map.naver.com/p/search/${encodeURIComponent(job.location ?? "")}`}
+                        href={buildNaverPlaceSearchUrl(getDestination(job))}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        네이버지도 ↗
+                        네이버지도 열기 ↗
                       </a>
-                    )}
+                      <a
+                        href={buildNaverRouteSearchUrl(originAddress, getDestination(job))}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(event) => handleRouteClick(event, job)}
+                      >
+                        경로 확인하기 ↗
+                      </a>
+                    </div>
                   </div>
                   <div className="keywords">
                     {job.matched_keywords.slice(0, 5).map((keyword) => <span key={keyword}>#{keyword}</span>)}
