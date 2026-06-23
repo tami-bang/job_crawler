@@ -111,12 +111,6 @@ function normalizeLocationOption(location: string | null) {
   return `${normalizedProvince} ${city}`;
 }
 
-function getMailBody(fileName: string) {
-  return encodeURIComponent(
-    `JobRadar 공고 분석 결과를 보냅니다.\n\nGitHub Pages 데모에서는 보안상 파일 자동 첨부가 불가해서, 방금 다운로드된 ${fileName} 파일을 첨부해주세요.`,
-  );
-}
-
 function validateOriginAddress(value: string) {
   const trimmed = value.trim();
   if (trimmed.length < 2) return "출발지를 2글자 이상 입력해주세요.";
@@ -289,15 +283,13 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     setEmailSending(true);
     setEmailStatus("");
     try {
-      if (api.canEmailReport()) {
-        await api.emailReport(email, sortedJobs);
-        setEmailStatus("엑셀 리포트를 이메일로 보냈어요.");
+      if (!api.canEmailReport() || !reportServerReady) {
+        setEmailStatus("메일 발송 서버가 아직 연결되지 않았어요. SMTP가 설정된 FastAPI 서버를 연결하면 바로 보낼 수 있어요.");
         return;
       }
 
-      const file = downloadWorkbook(sortedJobs);
-      window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent("JobRadar 공고 분석 결과")}&body=${getMailBody(file.name)}`;
-      setEmailStatus("정적 데모라 자동 첨부 대신 엑셀을 다운로드하고 메일 작성창을 열었어요.");
+      await api.emailReport(email, sortedJobs);
+      setEmailStatus("엑셀 리포트를 이메일로 보냈어요.");
     } catch {
       setEmailStatus("발송 중 문제가 생겼어요. 잠시 후 다시 시도해주세요.");
     } finally {
@@ -570,7 +562,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <h3 id="email-modal-title">엑셀 결과를 이메일로 보내기</h3>
             <p>
               받을 이메일을 입력하면 현재 필터 결과를 엑셀 리포트로 정리해요.
-              {reportServerReady ? " 지금은 발송 서버가 연결되어 있어요." : " 발송 서버 설정 전에는 엑셀 다운로드와 메일 작성창으로 대체됩니다."}
+              {reportServerReady ? " 지금은 발송 서버가 연결되어 있어요." : " 발송 서버가 연결되면 다운로드 없이 바로 전송됩니다."}
             </p>
             <input
               aria-label="받을 이메일"
