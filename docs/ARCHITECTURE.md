@@ -35,9 +35,9 @@ FastAPI backend (:8000)
 SQLite data/job_radar.db
 ```
 
-- `frontend/`: 통계, 공고 검색, 관심공고와 지원 상태 화면
-- `backend/routes/`: 공고·관심공고 HTTP 인터페이스
-- `backend/services/`: SQL 조회와 관심공고 비즈니스 규칙
+- `frontend/`: 통계, 공고 검색, 리스트/마감 달력, 엑셀 다운로드, 관심공고와 지원 상태 화면
+- `backend/routes/`: 공고·관심공고·리포트 이메일 HTTP 인터페이스
+- `backend/services/`: SQL 조회, 관심공고 비즈니스 규칙, XLSX 리포트 이메일 발송
 - `crawler/database.py`: 크롤러와 웹 API가 공유하는 스키마 초기화
 - 웹 API는 수집을 실행하지 않고 저장된 데이터와 샘플 데이터만 사용합니다.
 
