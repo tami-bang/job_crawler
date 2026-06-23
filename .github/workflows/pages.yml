@@ -40,6 +40,7 @@ jobs:
       - name: 정적 데모 빌드
         env:
           NEXT_PUBLIC_STATIC_DEMO: "true"
+          NEXT_PUBLIC_REPORT_API_URL: ${{ vars.REPORT_API_URL }}
         run: npm run build
       - name: 배포 파일 업로드
         uses: actions/upload-pages-artifact@v3

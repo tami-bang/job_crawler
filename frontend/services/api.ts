@@ -6,6 +6,7 @@ export type Job = {
   career: string | null;
   employment_type: string | null;
   deadline: string | null;
+  deadline_date: string | null;
   detail_url: string | null;
   skill_candidates: string | null;
   match_score: number;
@@ -30,6 +31,7 @@ type FavoriteState = Record<number, { memo: string; status: string }>;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 const STATIC_DEMO = process.env.NEXT_PUBLIC_STATIC_DEMO === "true";
+const REPORT_API_URL = process.env.NEXT_PUBLIC_REPORT_API_URL?.replace(/\/$/, "") ?? "";
 const FAVORITES_KEY = "job-radar-demo-favorites";
 
 async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
@@ -82,6 +84,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  canEmailReport: () => !STATIC_DEMO || Boolean(REPORT_API_URL),
   stats: async () => {
     if (!STATIC_DEMO) return request<Stats>("/api/stats");
     const jobs = await getDemoJobs();
@@ -129,5 +132,29 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify({ memo, status }),
     });
+  },
+  emailReport: async (email: string, jobs: Job[]) => {
+    const baseUrl = REPORT_API_URL || API_URL;
+    const response = await fetch(`${baseUrl}/api/reports/email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        jobs: jobs.map((job) => ({
+          score: job.match_score,
+          company: job.company_name ?? "",
+          title: job.title,
+          location: job.location ?? "",
+          career: job.career ?? "",
+          employment_type: job.employment_type ?? "",
+          deadline: job.deadline_date || job.deadline || "",
+          matched_keywords: job.matched_keywords.join(", "),
+          reason: job.positive_reasons.join(" · "),
+          url: job.detail_url ?? "",
+        })),
+      }),
+    });
+    if (!response.ok) throw new Error("이메일 발송에 실패했습니다.");
+    return response.json() as Promise<{ sent: boolean }>;
   },
 };

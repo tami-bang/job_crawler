@@ -10,12 +10,12 @@ JobKorea list page 수집
 -> 상세 페이지 수집
 -> 규칙 기반 매칭 분석
 -> 콘솔 리포트 출력
--> CSV export
+-> CSV/XLSX export
 ```
 
 ## 웹 대시보드
 
-저장된 SQLite 데이터를 FastAPI와 Next.js 화면에서 탐색할 수 있습니다. 대시보드에서는 전체·상세·분석·관심공고 수를 확인하고, 공고 검색·찜하기·메모·지원 상태 관리를 할 수 있습니다.
+저장된 SQLite 데이터를 FastAPI와 Next.js 화면에서 탐색할 수 있습니다. 대시보드에서는 전체·상세·분석·관심공고 수를 확인하고, 공고 검색·찜하기·메모·지원 상태 관리, 리스트형 결과 확인, 마감 달력 확인, 엑셀 다운로드를 할 수 있습니다.
 
 데이터가 없는 개발 환경에서는 샘플 공고를 생성합니다.
 
@@ -39,7 +39,17 @@ npm run dev
 
 브라우저에서 `http://localhost:3000`을 열면 됩니다. API 문서는 `http://localhost:8000/docs`에서 확인할 수 있습니다.
 
-무료 공개 데모는 [GitHub Pages](https://tami-bang.github.io/job_crawler/)에서 사용할 수 있습니다. 공개 데모는 샘플 데이터만 사용하며 찜, 메모, 지원 상태는 방문자의 브라우저 `localStorage`에만 저장됩니다.
+무료 공개 데모는 [GitHub Pages](https://tami-bang.github.io/job_crawler/)에서 사용할 수 있습니다. 공개 데모는 샘플 데이터만 사용하며 찜, 메모, 지원 상태는 방문자의 브라우저 `localStorage`에만 저장됩니다. 정적 데모에서도 엑셀 다운로드는 브라우저에서 바로 동작합니다.
+
+이메일 첨부 발송은 보안상 SMTP 비밀값이 필요하므로 FastAPI 백엔드가 실행 중일 때 `/api/reports/email`로 처리합니다. 공개 GitHub Pages에서 자동 발송을 쓰려면 별도 백엔드 URL을 `REPORT_API_URL` 저장소 변수에 연결하고 다음 환경변수를 설정합니다.
+
+```bash
+JOB_RADAR_SMTP_HOST=
+JOB_RADAR_SMTP_PORT=587
+JOB_RADAR_SMTP_USER=
+JOB_RADAR_SMTP_PASSWORD=
+JOB_RADAR_SMTP_FROM=
+```
 
 ## 수동 수집 실행
 
