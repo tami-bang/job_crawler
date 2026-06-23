@@ -88,7 +88,7 @@ export default function UpdatesPage() {
 
   return (
     <section className="pageSection">
-      <div className="eyebrow"><span>04</span> PATCH NOTES</div>
+      <div className="eyebrow"><span>03</span> PATCH NOTES</div>
       <h1 className="pageTitle">매일 조금씩,<br /><em>쓰는 도구</em>로 다듬기.</h1>
       <div className="sectionHeading updateHeading">
         <div>

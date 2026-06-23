@@ -21,6 +21,18 @@ export default function SiteFooter() {
   );
   const mailtoUrl = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
 
+  function closeModal() {
+    setOpen(false);
+    setName("");
+    setSender("");
+    setMessage("");
+  }
+
+  function openMailApp() {
+    window.location.href = mailtoUrl;
+    closeModal();
+  }
+
   return (
     <footer className="siteFooter">
       <div>
@@ -33,9 +45,9 @@ export default function SiteFooter() {
       </div>
 
       {open && (
-        <div className="modalBackdrop" role="presentation" onMouseDown={() => setOpen(false)}>
+        <div className="modalBackdrop" role="presentation" onMouseDown={closeModal}>
           <div className="emailModal contactModal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title" onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modalClose" aria-label="닫기" onClick={() => setOpen(false)}>×</button>
+            <button className="modalClose" aria-label="닫기" onClick={closeModal}>×</button>
             <span className="modalKicker">CONTACT</span>
             <h3 id="contact-modal-title">메일 보내기</h3>
             <div className="contactFields">
@@ -43,7 +55,7 @@ export default function SiteFooter() {
               <input aria-label="회신 이메일" placeholder="회신 이메일" type="email" value={sender} onChange={(event) => setSender(event.target.value)} />
               <textarea aria-label="문의 내용" placeholder="문의 내용을 입력하세요" value={message} onChange={(event) => setMessage(event.target.value)} />
             </div>
-            <a className="scanButton wide contactSubmit" href={mailtoUrl} onClick={() => setOpen(false)}>메일 앱 열기</a>
+            <button className="scanButton wide contactSubmit" type="button" onClick={openMailApp}>메일 앱 열기</button>
             <small>기본 메일 앱에서 작성창이 열립니다.</small>
           </div>
         </div>

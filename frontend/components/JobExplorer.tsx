@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { api, Job } from "@/services/api";
 import { downloadWorkbook } from "@/services/export-xlsx";
 
@@ -51,6 +51,28 @@ const baseLocationOptions = [
   "인천 강화군", "인천 계양구", "인천 남동구", "인천 동구", "인천 미추홀구", "인천 부평구", "인천 서구", "인천 연수구", "인천 옹진군", "인천 중구",
 ];
 const VIEWED_JOBS_KEY = "job-radar-viewed-jobs";
+const snapshotNoiseLines = new Set([
+  "회원가입/로그인",
+  "기업 서비스",
+  "JOB 찾기",
+  "합격축하금",
+  "공채정보",
+  "신입·인턴",
+  "기업·연봉",
+  "콘텐츠",
+  "취업톡톡",
+  "상세요강",
+  "접수기간∙방법",
+  "기업정보",
+  "추천공고",
+  "채용정보에 잘못된 내용이 있을 경우",
+  "문의",
+  "해주세요.",
+  "로그인",
+  "TOP",
+  "궁금해요",
+  "지도보기",
+]);
 
 function formatMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -176,6 +198,55 @@ function buildSnapshotFallback(job: Job) {
     : "저장된 상세 텍스트가 아직 없습니다. 다음 상세 수집 때 원문 스냅샷을 다시 보강합니다.";
 }
 
+function cleanSnapshotLines(text: string) {
+  return text
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter((line) => line && !snapshotNoiseLines.has(line) && !line.includes("로그인하고 비슷한 조건"));
+}
+
+function readAfterLabel(lines: string[], label: string) {
+  const index = lines.findIndex((line) => line === label);
+  if (index < 0) return "";
+  const values = [];
+  for (const line of lines.slice(index + 1)) {
+    if (["모집인원", "고용형태", "직급/직책", "급여", "근무시간", "근무지주소", "지원자격", "경력", "학력", "스킬", "우대조건", "기본우대", "접수기간 · 방법", "남은기간", "시작일", "마감일", "기업 정보", "기업정보 더보기"].includes(line)) break;
+    values.push(line);
+  }
+  return values.join(" ");
+}
+
+function buildSnapshotRows(title: string, body: string) {
+  const lines = cleanSnapshotLines(body);
+  const rows = [
+    ["공고명", title],
+    ["모집분야", readAfterLabel(lines, "모집분야")],
+    ["고용형태", readAfterLabel(lines, "고용형태")],
+    ["근무시간", readAfterLabel(lines, "근무시간")],
+    ["근무지", readAfterLabel(lines, "근무지주소")],
+    ["경력", readAfterLabel(lines, "경력")],
+    ["학력", readAfterLabel(lines, "학력")],
+    ["스킬", readAfterLabel(lines, "스킬")],
+    ["우대조건", readAfterLabel(lines, "기본우대") || readAfterLabel(lines, "우대조건")],
+    ["시작일", readAfterLabel(lines, "시작일")],
+    ["마감일", readAfterLabel(lines, "마감일")],
+  ].filter(([, value]) => value);
+  return rows.length ? rows : [["저장 내용", lines.slice(0, 24).join(" / ")]];
+}
+
+function buildEmailReportMailto(email: string, jobs: Job[]) {
+  const subject = encodeURIComponent(`JobRadar 공고 ${jobs.length}건`);
+  const body = encodeURIComponent([
+    "JobRadar 필터 결과입니다.",
+    "",
+    ...jobs.slice(0, 20).map((job, index) => (
+      `${index + 1}. [${job.match_score}] ${job.company_name || "회사 미상"} - ${job.title}\n${job.detail_url || ""}`
+    )),
+    jobs.length > 20 ? `\n외 ${jobs.length - 20}건` : "",
+  ].filter(Boolean).join("\n"));
+  return `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+}
+
 function readViewedJobs() {
   if (typeof window === "undefined") return new Set<number>();
   try {
@@ -210,21 +281,28 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [emailStatus, setEmailStatus] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [reportServerReady, setReportServerReady] = useState(false);
+  const [searchFeedback, setSearchFeedback] = useState("");
   const [originAddress, setOriginAddress] = useState("");
   const [noticeModal, setNoticeModal] = useState<{ title: string; message: string; hint?: string } | null>(null);
   const [snapshotModal, setSnapshotModal] = useState<{ title: string; body: string } | null>(null);
   const [viewedJobs, setViewedJobs] = useState<Set<number>>(() => new Set());
 
-  const loadJobs = useCallback(async (term = "") => {
+  const loadJobs = useCallback(async (term = "", source: "initial" | "search" = "initial") => {
     setLoading(true);
+    if (source === "search") setSearchFeedback("검색 중...");
     try {
       const result = await api.jobs(term, favoriteOnly);
       setJobs(result.items);
       setPage(1);
       setCalendarMonth(new Date());
       setError("");
+      if (source === "search") {
+        setSearchFeedback(`검색 완료 · ${result.items.length}건`);
+        window.setTimeout(() => setSearchFeedback(""), 1800);
+      }
     } catch {
       setError("API에 연결할 수 없습니다. 백엔드 실행 상태를 확인해주세요.");
+      if (source === "search") setSearchFeedback("검색 실패");
     } finally {
       setLoading(false);
     }
@@ -352,7 +430,8 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     setEmailStatus("");
     try {
       if (!api.canEmailReport() || !reportServerReady) {
-        setEmailStatus("메일 발송 서버가 아직 연결되지 않았어요. 서버가 연결되면 이 버튼으로 바로 발송됩니다.");
+        window.location.href = buildEmailReportMailto(email, sortedJobs);
+        setEmailStatus("메일 앱 작성창을 열었어요. 서버가 연결되면 첨부 리포트 자동 발송으로 전환됩니다.");
         return;
       }
 
@@ -363,6 +442,16 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     } finally {
       setEmailSending(false);
     }
+  }
+
+  function handleSearch() {
+    void loadJobs(search, "search");
+  }
+
+  function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    handleSearch();
   }
 
   function validateOriginForSearch() {
@@ -478,10 +567,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             placeholder="공고명, 회사, 기술 스택 검색"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            onKeyDown={(event) => event.key === "Enter" && void loadJobs(search)}
+            onKeyDown={handleSearchKeyDown}
           />
         </label>
-        <button className="scanButton" onClick={() => void loadJobs(search)}>SCAN DATA</button>
+        <button className={`scanButton ${searchFeedback ? "searching" : ""}`} onClick={handleSearch}>{searchFeedback || "검색"}</button>
         <button className="ghostButton" onClick={() => downloadWorkbook(sortedJobs)} disabled={sortedJobs.length === 0}>엑셀 받기</button>
         <button className="ghostButton accent" onClick={() => setShowEmailModal(true)} disabled={sortedJobs.length === 0}>이메일로 보내기</button>
         <span className="resultCount">{filteredJobs.length.toString().padStart(2, "0")} / {jobs.length.toString().padStart(2, "0")} RESULTS</span>
@@ -524,7 +613,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         {renderFilterChips("매칭 점수", scoreFilters, Object.entries(scoreFilterLabels) as Array<[ScoreFilterKey, string]>, setScoreFilters)}
         {renderFilterChips("경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
         {renderFilterChips("고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
-        <label><span>정렬</span><select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortKey)}>{Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       </div>
       <p className="filterNote">상세대기는 목록 카드만 저장된 상태입니다. 상세 수집이 완료되면 직무 내용, 자격요건, 저장 스냅샷까지 함께 확인할 수 있어요.</p>
 
@@ -552,7 +640,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <>
           <div className="tableHeader">
             <span>표시 {visibleStart}-{visibleEnd} / {view === "expired" ? "마감 공고" : "진행 공고"} {sortedJobs.length} / 필터 결과 {filteredJobs.length}</span>
-            <span>{view === "expired" ? "오늘 이전 마감" : sortLabels[sortBy]} · 관심공고 우선</span>
+            <label className="tableSort"><span>{view === "expired" ? "오늘 이전 마감" : "정렬"}</span><select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortKey)}>{Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><b>관심공고 우선</b></label>
           </div>
           <div className="jobList">
             {pagedJobs.map((job, index) => (
@@ -736,7 +824,14 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <button className="modalClose" aria-label="닫기" onClick={() => setSnapshotModal(null)}>×</button>
             <span className="modalKicker">SAVED SNAPSHOT</span>
             <h3 id="snapshot-modal-title">{snapshotModal.title}</h3>
-            <pre>{snapshotModal.body}</pre>
+            <div className="snapshotTable">
+              {buildSnapshotRows(snapshotModal.title, snapshotModal.body).map(([label, value]) => (
+                <div className="snapshotRow" key={label}>
+                  <strong>{label}</strong>
+                  <span>{value}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
