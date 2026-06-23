@@ -79,7 +79,17 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
             jp.deadline,
             jp.deadline_date,
             jp.detail_url,
-            CASE WHEN ? THEN jp.raw_detail_text ELSE NULL END AS raw_detail_text,
+            CASE WHEN ? THEN COALESCE(
+                NULLIF(jp.raw_detail_text, ''),
+                NULLIF(TRIM(
+                    COALESCE('주요업무' || CHAR(10) || NULLIF(jp.main_tasks, '') || CHAR(10) || CHAR(10), '') ||
+                    COALESCE('자격요건' || CHAR(10) || NULLIF(jp.qualifications, '') || CHAR(10) || CHAR(10), '') ||
+                    COALESCE('우대사항' || CHAR(10) || NULLIF(jp.preferred_conditions, '') || CHAR(10) || CHAR(10), '') ||
+                    COALESCE('복지/혜택' || CHAR(10) || NULLIF(jp.benefits, ''), '')
+                ), ''),
+                NULLIF(jp.description_text, ''),
+                NULLIF(jp.raw_summary_text, '')
+            ) ELSE NULL END AS raw_detail_text,
             jp.reopen_count,
             jp.skill_candidates,
             jp.detail_status,

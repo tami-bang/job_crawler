@@ -1,7 +1,12 @@
 import argparse
 import json
 import sqlite3
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from crawler.database import init_database
 
 
 def parse_json_list(value):
@@ -20,6 +25,7 @@ def is_always_open_deadline(value):
 
 
 def load_jobs(db_path, limit):
+    init_database(db_path)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
@@ -35,6 +41,14 @@ def load_jobs(db_path, limit):
             jp.deadline,
             jp.deadline_date,
             jp.detail_url,
+            jp.raw_detail_text,
+            jp.main_tasks,
+            jp.qualifications,
+            jp.preferred_conditions,
+            jp.benefits,
+            jp.description_text,
+            jp.raw_summary_text,
+            jp.reopen_count,
             jp.skill_candidates,
             jp.detail_status,
             COALESCE(jmr.match_score, jmr.score, 0) AS match_score,
@@ -70,6 +84,7 @@ def serialize_job(index, row):
         positive_reasons = [
             "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
         ]
+    snapshot_text = build_snapshot_text(row)
 
     return {
         "id": index,
@@ -82,6 +97,8 @@ def serialize_job(index, row):
         "deadline": row["deadline"] or row["deadline_date"] or "마감일 미정",
         "deadline_date": None if is_always_open_deadline(row["deadline"]) else (row["deadline_date"] or None),
         "detail_url": row["detail_url"] or None,
+        "raw_detail_text": snapshot_text,
+        "reopen_count": row["reopen_count"] or 0,
         "skill_candidates": row["skill_candidates"] or "",
         "detail_status": row["detail_status"] or None,
         "match_score": score,
@@ -93,6 +110,28 @@ def serialize_job(index, row):
         "favorite_memo": None,
         "favorite_status": None,
     }
+
+
+def build_snapshot_text(row):
+    raw_detail = row["raw_detail_text"]
+    if raw_detail:
+        return raw_detail
+
+    sections = [
+        ("주요업무", row["main_tasks"]),
+        ("자격요건", row["qualifications"]),
+        ("우대사항", row["preferred_conditions"]),
+        ("복지/혜택", row["benefits"]),
+    ]
+    section_text = "\n\n".join(
+        f"{label}\n{text.strip()}"
+        for label, text in sections
+        if text and text.strip()
+    )
+    if section_text:
+        return section_text
+
+    return row["description_text"] or row["raw_summary_text"] or None
 
 
 def write_demo_data(jobs, output_path, db_path):

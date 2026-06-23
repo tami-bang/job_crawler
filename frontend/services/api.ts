@@ -101,6 +101,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  reportApiConfigured: () => Boolean(REPORT_API_URL) || !STATIC_DEMO,
   canEmailReport: () => !STATIC_DEMO || Boolean(REPORT_API_URL),
   reportStatus: async () => {
     if (STATIC_DEMO && !REPORT_API_URL) return { ready: false };

@@ -25,7 +25,19 @@ const sortLabels = {
   posted_asc: "등록 오래된순",
   company_asc: "회사명 가나다순",
 } as const;
+const detailFilterLabels = {
+  success: "상세완료",
+  pending: "상세대기",
+} as const;
+const scoreFilterLabels = {
+  strong: "85점 이상",
+  good: "65~84점",
+  possible: "1~64점",
+  unscored: "미분석",
+} as const;
 type SortKey = keyof typeof sortLabels;
+type DetailFilterKey = keyof typeof detailFilterLabels;
+type ScoreFilterKey = keyof typeof scoreFilterLabels;
 type ExplorerView = "list" | "calendar" | "expired";
 const allowedLocationPrefixes = ["서울", "서울특별시", "경기", "경기도", "인천", "인천광역시"];
 const baseLocationOptions = [
@@ -148,6 +160,22 @@ function buildNaverRouteSearchUrl(origin: string, destination: string) {
   return `https://map.naver.com/p/directions/${start}/${goal}/-/transit?c=13.00,0,0,0,dh`;
 }
 
+function buildSnapshotFallback(job: Job) {
+  const lines = [
+    job.company_name ? `회사: ${job.company_name}` : "",
+    job.location ? `지역: ${job.location}` : "",
+    job.career ? `경력: ${job.career}` : "",
+    job.employment_type ? `고용형태: ${job.employment_type}` : "",
+    job.skill_candidates ? `기술/키워드: ${job.skill_candidates}` : "",
+    job.positive_reasons.length ? `매칭 근거: ${job.positive_reasons.join(" / ")}` : "",
+    job.detail_url ? `원문 URL: ${job.detail_url}` : "",
+  ].filter(Boolean);
+
+  return lines.length
+    ? lines.join("\n")
+    : "저장된 상세 텍스트가 아직 없습니다. 다음 상세 수집 때 원문 스냅샷을 다시 보강합니다.";
+}
+
 function readViewedJobs() {
   if (typeof window === "undefined") return new Set<number>();
   try {
@@ -166,10 +194,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const [detailFilter, setDetailFilter] = useState("all");
-  const [scoreFilter, setScoreFilter] = useState("all");
-  const [employmentFilter, setEmploymentFilter] = useState("all");
-  const [careerFilter, setCareerFilter] = useState("all");
+  const [detailFilters, setDetailFilters] = useState<DetailFilterKey[]>([]);
+  const [scoreFilters, setScoreFilters] = useState<ScoreFilterKey[]>([]);
+  const [employmentFilters, setEmploymentFilters] = useState<string[]>([]);
+  const [careerFilters, setCareerFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortKey>("match_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -193,7 +221,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       const result = await api.jobs(term, favoriteOnly);
       setJobs(result.items);
       setPage(1);
-      setCalendarMonth(getInitialMonth(result.items));
+      setCalendarMonth(new Date());
       setError("");
     } catch {
       setError("API에 연결할 수 없습니다. 백엔드 실행 상태를 확인해주세요.");
@@ -229,20 +257,23 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         return Boolean(option && selectedLocations.includes(option));
       })
       .filter((job) => {
-        if (detailFilter === "all") return true;
-        if (detailFilter === "success") return job.detail_status === "success";
-        return job.detail_status !== "success";
+        if (detailFilters.length === 0) return true;
+        return detailFilters.some((filter) => (
+          filter === "success" ? job.detail_status === "success" : job.detail_status !== "success"
+        ));
       })
       .filter((job) => {
-        if (scoreFilter === "all") return true;
-        if (scoreFilter === "strong") return job.match_score >= 85;
-        if (scoreFilter === "good") return job.match_score >= 65 && job.match_score < 85;
-        if (scoreFilter === "possible") return job.match_score > 0 && job.match_score < 65;
-        return job.match_score === 0;
+        if (scoreFilters.length === 0) return true;
+        return scoreFilters.some((filter) => {
+          if (filter === "strong") return job.match_score >= 85;
+          if (filter === "good") return job.match_score >= 65 && job.match_score < 85;
+          if (filter === "possible") return job.match_score > 0 && job.match_score < 65;
+          return job.match_score === 0;
+        });
       })
-      .filter((job) => careerFilter === "all" || job.career === careerFilter)
-      .filter((job) => employmentFilter === "all" || job.employment_type === employmentFilter)
-  ), [careerFilter, detailFilter, employmentFilter, jobs, scoreFilter, selectedLocations]);
+      .filter((job) => careerFilters.length === 0 || Boolean(job.career && careerFilters.includes(job.career)))
+      .filter((job) => employmentFilters.length === 0 || Boolean(job.employment_type && employmentFilters.includes(job.employment_type)))
+  ), [careerFilters, detailFilters, employmentFilters, jobs, scoreFilters, selectedLocations]);
   const todayKey = toDateKey(new Date());
 
   const activeFilteredJobs = useMemo(() => (
@@ -281,7 +312,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   useEffect(() => {
     setPage(1);
-  }, [careerFilter, detailFilter, employmentFilter, scoreFilter, selectedLocations, sortBy, view]);
+  }, [careerFilters, detailFilters, employmentFilters, scoreFilters, selectedLocations, sortBy, view]);
 
   const jobsByDeadline = useMemo(() => {
     return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
@@ -297,8 +328,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     const start = (currentPage - 1) * pageSize;
     return sortedJobs.slice(start, start + pageSize);
   }, [currentPage, pageSize, sortedJobs]);
-  const matchedCount = jobs.filter((job) => job.match_score > 0).length;
-  const detailedCount = jobs.filter((job) => job.detail_status === "success").length;
   const visibleStart = sortedJobs.length ? (currentPage - 1) * pageSize + 1 : 0;
   const visibleEnd = Math.min(currentPage * pageSize, sortedJobs.length);
 
@@ -323,7 +352,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     setEmailStatus("");
     try {
       if (!api.canEmailReport() || !reportServerReady) {
-        setEmailStatus("REPORT_API_URL과 SMTP 값이 설정된 FastAPI 서버를 연결하면 메일로 바로 발송할 수 있습니다.");
+        setEmailStatus("메일 발송 서버가 아직 연결되지 않았어요. 서버가 연결되면 이 버튼으로 바로 발송됩니다.");
         return;
       }
 
@@ -385,7 +414,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       const detail = await api.job(job.id);
       setSnapshotModal({
         title: `${job.company_name || "회사 미상"} · ${job.title}`,
-        body: detail.raw_detail_text || "저장된 상세 스냅샷이 아직 없습니다. 상세 수집이 완료된 공고부터 이곳에서 원문 핵심 텍스트를 볼 수 있어요.",
+        body: detail.raw_detail_text || buildSnapshotFallback(detail),
       });
     } catch {
       setSnapshotModal({
@@ -401,6 +430,42 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         ? previous.filter((item) => item !== location)
         : [...previous, location]
     ));
+  }
+
+  function toggleValue<T extends string>(value: T, setter: (update: (previous: T[]) => T[]) => void) {
+    setter((previous) => (
+      previous.includes(value)
+        ? previous.filter((item) => item !== value)
+        : [...previous, value]
+    ));
+  }
+
+  function renderFilterChips<T extends string>(
+    label: string,
+    selected: T[],
+    entries: Array<[T, string]>,
+    setter: (update: (previous: T[]) => T[]) => void,
+  ) {
+    return (
+      <div className="filterGroup">
+        <div>
+          <span>{label}</span>
+          {selected.length > 0 && <button type="button" onClick={() => setter(() => [])}>전체</button>}
+        </div>
+        <div className="filterChips">
+          {entries.map(([value, text]) => (
+            <button
+              type="button"
+              className={selected.includes(value) ? "active" : ""}
+              onClick={() => toggleValue(value, setter)}
+              key={value}
+            >
+              {text}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -432,7 +497,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             onBlur={() => originAddress.trim() && validateOriginForSearch()}
           />
         </label>
-        <small>출발지와 도착지 후보 선택 후 대중교통 경로가 표시됩니다.</small>
       </div>
 
       <div className="locationPanel" aria-label="지역 다중 선택 필터">
@@ -456,10 +520,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       </div>
 
       <div className="filterPanel" aria-label="공고 조건 필터">
-        <label><span>수집 상태</span><select value={detailFilter} onChange={(event) => setDetailFilter(event.target.value)}><option value="all">전체</option><option value="success">상세완료</option><option value="pending">상세대기</option></select></label>
-        <label><span>매칭 점수</span><select value={scoreFilter} onChange={(event) => setScoreFilter(event.target.value)}><option value="all">전체</option><option value="strong">85점 이상</option><option value="good">65~84점</option><option value="possible">1~64점</option><option value="unscored">미분석</option></select></label>
-        <label><span>경력</span><select value={careerFilter} onChange={(event) => setCareerFilter(event.target.value)}><option value="all">전체</option>{careerOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
-        <label><span>고용형태</span><select value={employmentFilter} onChange={(event) => setEmploymentFilter(event.target.value)}><option value="all">전체</option>{employmentOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+        {renderFilterChips("수집 상태", detailFilters, Object.entries(detailFilterLabels) as Array<[DetailFilterKey, string]>, setDetailFilters)}
+        {renderFilterChips("매칭 점수", scoreFilters, Object.entries(scoreFilterLabels) as Array<[ScoreFilterKey, string]>, setScoreFilters)}
+        {renderFilterChips("경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
+        {renderFilterChips("고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
         <label><span>정렬</span><select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortKey)}>{Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       </div>
       <p className="filterNote">상세대기는 목록 카드만 저장된 상태입니다. 상세 수집이 완료되면 직무 내용, 자격요건, 저장 스냅샷까지 함께 확인할 수 있어요.</p>
@@ -635,7 +699,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
               받을 이메일을 입력하면 현재 필터 결과를 엑셀 리포트로 정리해요.
               {reportServerReady
                 ? " 지금은 발송 서버가 연결되어 있어요."
-                : " REPORT_API_URL, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM 값을 넣으면 메일로 바로 발송할 수 있습니다."}
+                : " 지금은 발송 서버 연결을 확인할 수 없어요."}
             </p>
             <input
               aria-label="받을 이메일"
