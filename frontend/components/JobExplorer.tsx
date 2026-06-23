@@ -449,15 +449,20 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                   <div className="commuteLine">
                     <span>이동경로: {originAddress ? `${originAddress} → ${getDestination(job)}` : "출발지 입력 후 확인"}</span>
                     <div className="mapLinks">
-                      <a
-                        href={buildNaverRouteSearchUrl(originAddress, getDestination(job))}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(event) => handleRouteClick(event, job)}
-                      >
-                        네이버지도 열기 ↗
-                      </a>
-                      <small>후보 선택 후 길찾기</small>
+                      <div className="mapTooltipWrap">
+                        <a
+                          href={buildNaverRouteSearchUrl(originAddress, getDestination(job))}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-describedby={`map-help-${job.id}`}
+                          onClick={(event) => handleRouteClick(event, job)}
+                        >
+                          네이버지도 열기 ↗
+                        </a>
+                        <small className="mapTooltip" id={`map-help-${job.id}`} role="tooltip">
+                          네이버지도 길찾기창에 입력한 출발지와 공고 주소가 들어가 있어요. 출발지 입력칸에서 Enter를 눌러 후보를 선택하고, 도착지도 후보를 적용한 뒤 길찾기를 누르면 대중교통 경로가 나옵니다.
+                        </small>
+                      </div>
                     </div>
                   </div>
                   <div className="keywords">
