@@ -16,6 +16,7 @@ const statusLabel: Record<string, string> = {
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 const pageSizeOptions = [15, 50, 100];
 const originExamples = "예: 서울역, 강남역, 서울 강남구 테헤란로 123";
+const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
 const sortLabels = {
   match_desc: "매칭 점수 높은순",
   deadline_asc: "마감 임박순",
@@ -66,6 +67,28 @@ function getDateTime(value: string | null | undefined, fallback: number) {
   return Number.isNaN(timestamp) ? fallback : timestamp;
 }
 
+function parseDateParts(value: string | null | undefined) {
+  if (!value) return null;
+  const match = value.match(/(\d{4})[.-](\d{2})[.-](\d{2})/);
+  if (!match) return null;
+  const [, year, month, day] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  if (Number.isNaN(date.getTime())) return null;
+  return { year, month, day, weekday: weekdays[date.getDay()] };
+}
+
+function formatPostedDate(value: string | null) {
+  const parsed = parseDateParts(value);
+  if (!parsed) return "등록 미정";
+  return `등록 ${parsed.year}.${parsed.month}.${parsed.day}(${parsed.weekday})`;
+}
+
+function formatDeadlineDate(deadlineDate: string | null, deadline: string | null) {
+  const parsed = parseDateParts(deadlineDate || deadline);
+  if (!parsed) return `마감 ${deadline || "미정"}`;
+  return `마감 ${parsed.year}-${parsed.month}-${parsed.day}(${parsed.weekday})`;
+}
+
 function normalizeLocationOption(location: string | null) {
   if (!location) return null;
   const tokens = location.replace(/[(),]/g, " ").split(/\s+/).filter(Boolean);
@@ -96,10 +119,9 @@ function getDestination(job: Job) {
 }
 
 function buildNaverRouteSearchUrl(origin: string, destination: string) {
-  const query = origin.trim()
-    ? `${origin.trim()}에서 ${destination.trim()}까지 길찾기`
-    : `${destination.trim()} 길찾기`;
-  return `https://map.naver.com/p/search/${encodeURIComponent(query)}`;
+  const start = `,,${encodeURIComponent(origin.trim())},,`;
+  const goal = `,,${encodeURIComponent(destination.trim())},,`;
+  return `https://map.naver.com/p/directions/${start}/${goal}/-/transit?c=13.00,0,0,0,dh`;
 }
 
 function buildNaverPlaceSearchUrl(destination: string) {
@@ -339,7 +361,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             onBlur={() => originAddress.trim() && validateOriginForSearch()}
           />
         </label>
-        <small>공고별 버튼을 누르면 `출발지에서 도착지까지 길찾기` 검색어로 네이버지도를 새 탭에서 엽니다.</small>
+        <small>공고별 `경로 확인하기`는 네이버지도 대중교통 길찾기 화면으로 열립니다.</small>
       </div>
 
       <div className="locationPanel" aria-label="지역 다중 선택 필터">
@@ -405,8 +427,8 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     <span>{job.location || "지역 미정"}</span>
                     <span>{job.career || "경력 무관"}</span>
                     <span>{job.employment_type || "고용형태 미정"}</span>
-                    <span>등록 {job.posted_date || "미정"}</span>
-                    <span>{job.deadline_date || job.deadline || "마감일 미정"}</span>
+                    <span>{formatPostedDate(job.posted_date)}</span>
+                    <span>{formatDeadlineDate(job.deadline_date, job.deadline)}</span>
                   </div>
                   <div className="commuteLine">
                     <span>이동경로: {originAddress ? `${originAddress} → ${getDestination(job)}` : "출발지 입력 후 확인"}</span>
