@@ -97,7 +97,12 @@ function isAlwaysOpen(deadline: string | null | undefined) {
 
 function isExpiredJob(job: Job, todayKey: string) {
   if (isAlwaysOpen(job.deadline)) return false;
-  return Boolean(job.deadline_date && job.deadline_date < todayKey);
+  return Boolean(getEffectiveDeadlineDate(job) && getEffectiveDeadlineDate(job)! < todayKey);
+}
+
+function getEffectiveDeadlineDate(job: Job) {
+  if (isAlwaysOpen(job.deadline)) return null;
+  return job.deadline_date;
 }
 
 function normalizeLocationOption(location: string | null) {
@@ -223,10 +228,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     return [...visibleJobs].sort((a, b) => {
       if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1;
       if (sortBy === "deadline_asc") {
-        return getDateTime(a.deadline_date, farFuture) - getDateTime(b.deadline_date, farFuture);
+        return getDateTime(getEffectiveDeadlineDate(a), farFuture) - getDateTime(getEffectiveDeadlineDate(b), farFuture);
       }
       if (sortBy === "deadline_desc") {
-        return getDateTime(b.deadline_date, farPast) - getDateTime(a.deadline_date, farPast);
+        return getDateTime(getEffectiveDeadlineDate(b), farPast) - getDateTime(getEffectiveDeadlineDate(a), farPast);
       }
       if (sortBy === "posted_desc") {
         return getDateTime(b.posted_date, farPast) - getDateTime(a.posted_date, farPast);
@@ -247,8 +252,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   const jobsByDeadline = useMemo(() => {
     return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
-      if (!job.deadline_date) return acc;
-      acc[job.deadline_date] = [...(acc[job.deadline_date] ?? []), job];
+      const deadlineDate = getEffectiveDeadlineDate(job);
+      if (!deadlineDate) return acc;
+      acc[deadlineDate] = [...(acc[deadlineDate] ?? []), job];
       return acc;
     }, {});
   }, [activeFilteredJobs]);

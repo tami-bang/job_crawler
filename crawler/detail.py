@@ -13,7 +13,7 @@ from crawler.database import (
     init_database,
     start_crawl_run,
 )
-from crawler.parser import normalize_deadline_date
+from crawler.parser import is_always_open_deadline, normalize_deadline_date
 
 
 SECTION_LABELS = {
@@ -213,7 +213,7 @@ def parse_job_detail(html):
         "skill_candidates": _extract_skill_candidates(lines),
         "posted_date": posted_date,
         "deadline": deadline,
-        "deadline_date": normalize_deadline_date(deadline),
+        "deadline_date": "" if is_always_open_deadline(deadline) else normalize_deadline_date(deadline),
         "location": extract_structured_location(structured),
         "career": _normalize_structured_text(structured.get("experienceRequirements")),
         "education": _normalize_structured_text(structured.get("educationRequirements")),
@@ -234,6 +234,7 @@ def save_raw_detail_page(conn, crawl_run_id, url, html, source="jobkorea"):
 
 
 def update_job_detail(conn, job_posting_id, parsed):
+    should_clear_deadline_date = is_always_open_deadline(parsed.get("deadline"))
     conn.execute(
         """
         UPDATE job_postings
@@ -247,7 +248,10 @@ def update_job_detail(conn, job_posting_id, parsed):
             skill_candidates = ?,
             posted_date = COALESCE(NULLIF(?, ''), posted_date),
             deadline = COALESCE(NULLIF(?, ''), deadline),
-            deadline_date = COALESCE(NULLIF(?, ''), deadline_date),
+            deadline_date = CASE
+                WHEN ? THEN NULL
+                ELSE COALESCE(NULLIF(?, ''), deadline_date)
+            END,
             location = COALESCE(NULLIF(?, ''), location),
             career = COALESCE(NULLIF(?, ''), career),
             education = COALESCE(NULLIF(?, ''), education),
@@ -268,6 +272,7 @@ def update_job_detail(conn, job_posting_id, parsed):
             parsed["skill_candidates"],
             parsed["posted_date"],
             parsed["deadline"],
+            should_clear_deadline_date,
             parsed["deadline_date"],
             parsed["location"],
             parsed["career"],
@@ -448,6 +453,8 @@ def extract_detail_deadline(soup):
 
 def extract_deadline_from_text(text):
     patterns = [
+        r"마감일\s*[:：]?\s*(상시채용|상시|채용시|채용 시)",
+        r"(상시채용|상시|채용시|채용 시)",
         r"마감일\s*[:：]?\s*(\d{4}[.-]\d{2}[.-]\d{2})",
         r"(\d{4}[.-]\d{2}[.-]\d{2})",
         r"(~\s*\d{2}[./]\d{2}\s*\([^)]+\))",

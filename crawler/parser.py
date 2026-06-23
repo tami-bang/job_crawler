@@ -222,7 +222,9 @@ def _parse_jobkorea_next_data_object(raw_object, base_url=None):
 
     location = _normalize_jobkorea_location(_get_next_data_text(data, "localName"))
     deadline = _get_next_data_text(data, "applyCloseDisplayText")
-    deadline_date = normalize_deadline_date(_get_next_data_text(data, "applyCloseDate") or deadline)
+    deadline_date = "" if is_always_open_deadline(deadline) else normalize_deadline_date(
+        _get_next_data_text(data, "applyCloseDate") or deadline
+    )
     company = _get_next_data_text(data, "companyName")
     career = _get_next_data_text(data, "careerName")
     education = _get_next_data_text(data, "educationName")
@@ -268,6 +270,8 @@ def normalize_deadline_date(value, today=None):
     text = str(value or "").strip()
     if not text:
         return ""
+    if is_always_open_deadline(text):
+        return ""
 
     today = today or date.today()
     normalized = text.replace(".", "-").replace("/", "-")
@@ -286,6 +290,11 @@ def normalize_deadline_date(value, today=None):
     if month < today.month - 1:
         year += 1
     return _format_date_parts(year, month, day)
+
+
+def is_always_open_deadline(value):
+    text = str(value or "").strip().lower()
+    return any(keyword in text for keyword in ("상시", "수시채용", "채용시", "채용 시"))
 
 
 def _format_date_parts(year, month, day):

@@ -3227,6 +3227,162 @@ export const demoJobs: Job[] = [
   },
   {
     "id": 81,
+    "title": "클라우드 운영 개발자",
+    "company_name": "Cloud Canvas",
+    "location": "서울 마포구",
+    "career": "경력 2년 이상",
+    "employment_type": "정규직",
+    "posted_date": null,
+    "deadline": "상시채용",
+    "deadline_date": null,
+    "detail_url": "https://example.com/jobs/6",
+    "skill_candidates": "AWS, Linux, Terraform",
+    "detail_status": "success",
+    "match_score": 0,
+    "recommendation_level": "unscored",
+    "matched_keywords": [
+      "JobKorea"
+    ],
+    "positive_reasons": [
+      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
+    ],
+    "negative_reasons": [],
+    "is_favorite": false,
+    "favorite_memo": null,
+    "favorite_status": null
+  },
+  {
+    "id": 82,
+    "title": "주니어 풀스택 개발자",
+    "company_name": "Pixel Route",
+    "location": "인천 연수구",
+    "career": "신입·경력",
+    "employment_type": "정규직",
+    "posted_date": null,
+    "deadline": "상시채용",
+    "deadline_date": null,
+    "detail_url": "https://example.com/jobs/5",
+    "skill_candidates": "Next.js, FastAPI, Docker",
+    "detail_status": "success",
+    "match_score": 0,
+    "recommendation_level": "unscored",
+    "matched_keywords": [
+      "JobKorea"
+    ],
+    "positive_reasons": [
+      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
+    ],
+    "negative_reasons": [],
+    "is_favorite": false,
+    "favorite_memo": null,
+    "favorite_status": null
+  },
+  {
+    "id": 83,
+    "title": "서비스 자동화 엔지니어",
+    "company_name": "Mono Systems",
+    "location": "서울 영등포구",
+    "career": "경력 무관",
+    "employment_type": "정규직",
+    "posted_date": null,
+    "deadline": "상시채용",
+    "deadline_date": null,
+    "detail_url": "https://example.com/jobs/4",
+    "skill_candidates": "Python, Selenium, CI/CD",
+    "detail_status": "success",
+    "match_score": 0,
+    "recommendation_level": "unscored",
+    "matched_keywords": [
+      "JobKorea"
+    ],
+    "positive_reasons": [
+      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
+    ],
+    "negative_reasons": [],
+    "is_favorite": false,
+    "favorite_memo": null,
+    "favorite_status": null
+  },
+  {
+    "id": 84,
+    "title": "React 기반 프론트엔드 개발자",
+    "company_name": "Nouveau Lab",
+    "location": "경기 성남시",
+    "career": "신입",
+    "employment_type": "정규직",
+    "posted_date": null,
+    "deadline": "상시채용",
+    "deadline_date": null,
+    "detail_url": "https://example.com/jobs/3",
+    "skill_candidates": "React, TypeScript, Next.js",
+    "detail_status": "success",
+    "match_score": 0,
+    "recommendation_level": "unscored",
+    "matched_keywords": [
+      "JobKorea"
+    ],
+    "positive_reasons": [
+      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
+    ],
+    "negative_reasons": [],
+    "is_favorite": false,
+    "favorite_memo": null,
+    "favorite_status": null
+  },
+  {
+    "id": 85,
+    "title": "데이터 플랫폼 엔지니어",
+    "company_name": "Orbit Works",
+    "location": "서울 성동구",
+    "career": "경력 1년 이상",
+    "employment_type": "정규직",
+    "posted_date": null,
+    "deadline": "상시채용",
+    "deadline_date": null,
+    "detail_url": "https://example.com/jobs/2",
+    "skill_candidates": "Python, Airflow, AWS, SQL",
+    "detail_status": "success",
+    "match_score": 0,
+    "recommendation_level": "unscored",
+    "matched_keywords": [
+      "JobKorea"
+    ],
+    "positive_reasons": [
+      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
+    ],
+    "negative_reasons": [],
+    "is_favorite": false,
+    "favorite_memo": null,
+    "favorite_status": null
+  },
+  {
+    "id": 86,
+    "title": "Python FastAPI 백엔드 개발자",
+    "company_name": "Layer Nine",
+    "location": "서울 강남구",
+    "career": "신입·경력 2년",
+    "employment_type": "정규직",
+    "posted_date": null,
+    "deadline": "상시채용",
+    "deadline_date": null,
+    "detail_url": "https://example.com/jobs/1",
+    "skill_candidates": "Python, FastAPI, PostgreSQL, Docker",
+    "detail_status": "success",
+    "match_score": 0,
+    "recommendation_level": "unscored",
+    "matched_keywords": [
+      "JobKorea"
+    ],
+    "positive_reasons": [
+      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
+    ],
+    "negative_reasons": [],
+    "is_favorite": false,
+    "favorite_memo": null,
+    "favorite_status": null
+  },
+  {
+    "id": 87,
     "title": "[병역특례 전문연구요원] (주)일루넥스 인공지능, 빅데이터 분석 분야 채용",
     "company_name": "㈜일루넥스",
     "location": "경기 고양시 덕양구 향기로 180 (향동동)",
@@ -3252,7 +3408,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 82,
+    "id": 88,
     "title": "[SW헬스케어] IT개발팀 경력모집",
     "company_name": "㈜에스더블유헬스케어",
     "location": "인천 서구 가재울로 109  (가좌동) 11층",
@@ -3278,7 +3434,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 83,
+    "id": 89,
     "title": "[퍼플페퍼] 기술본부 채용",
     "company_name": "㈜퍼플페퍼",
     "location": "서울 마포구 와우산로17길 19-18 (서교동, 아지오빌딩)",
@@ -3304,7 +3460,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 84,
+    "id": 90,
     "title": "타나베파마코리아 주사제 제조담당자/QA(품질보증)/ 대구그룹 MR 채용",
     "company_name": "타나베파마코리아㈜",
     "location": "경기도 화성시 향남읍 제약공단2길 80",
@@ -3330,7 +3486,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 85,
+    "id": 91,
     "title": "㈜백조씽크[서울/음성] 각 분야별 직원 채용",
     "company_name": "백조씽크",
     "location": "서울 동대문구 청계천로 463 (용두동) 백조씽크 본사",
@@ -3356,7 +3512,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 86,
+    "id": 92,
     "title": "사내 업무 자동화 담당자 계약직 채용(정규직 전환) AI 툴 SaaS활용",
     "company_name": "체리시",
     "location": "서울 구로구 디지털로 288 (구로동, 대륭포스트타워1차) 907호",
@@ -3382,7 +3538,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 87,
+    "id": 93,
     "title": "AI 업무자동화 프로토타이핑 담당자",
     "company_name": "㈜알라딘커뮤니케이션",
     "location": "서울 중구 서소문로 89-31 (순화동, 알라딘빌딩) (주) 알라딘커뮤니케이션",
@@ -3408,7 +3564,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 88,
+    "id": 94,
     "title": "파이썬 코어 및 로컬 AI 최적화 엔지니어 (엔진리스 자동화 시스템 구축)",
     "company_name": "㈜비에스피엔지니어링",
     "location": "경기 평택시 고덕면 도시지원1길 19 (해창리) 고덕STV 722호",
@@ -3434,7 +3590,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 89,
+    "id": 95,
     "title": "검색추천제품팀 리더",
     "company_name": "㈜카카오스타일",
     "location": "경기도 성남시 분당구 판교역로 235  (삼평동)",
@@ -3460,7 +3616,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 90,
+    "id": 96,
     "title": "데이터 파이프라인 유지관리 ,  BigQuery, Airfow, GA4, Appsflyer, Looker",
     "company_name": "㈜파인만소프트",
     "location": "서울 송파구 중대로 80 (문정동, 문정프라자) 2",
@@ -3486,7 +3642,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 91,
+    "id": 97,
     "title": "AI 엔지니어",
     "company_name": "㈜에스원삼성그룹",
     "location": "서울 중구 세종대로7길 25 (순화동, 에프엔타워순화(FNTOWERSUNHWA)) 에스원 빌딩",
@@ -3512,7 +3668,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 92,
+    "id": 98,
     "title": "데이터 엔지니어 (Data Engineer, 3년 이상)",
     "company_name": "㈜아이지아이코리아",
     "location": "서울 종로구 세종로 77-6 정부서울청사 본관",
@@ -3538,7 +3694,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 93,
+    "id": 99,
     "title": "[재택근무] 데이터 엔지니어",
     "company_name": "㈜코니바이에린",
     "location": "서울 성동구 독서당로 171 (옥수동) 4층, Konny",
@@ -3564,7 +3720,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 94,
+    "id": 100,
     "title": "[프리랜서][강서] LLM / NL2SQL 데이터 엔지니어",
     "company_name": "용컴에스넷㈜",
     "location": "서울 강서구 공항대로 165 (마곡동) -",
@@ -3590,7 +3746,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 95,
+    "id": 101,
     "title": "데이터엔지니어 인원을 모집합니다.(빅데이터/데이터파이프라인/ETL 등)",
     "company_name": "㈜세종데이터시스템",
     "location": "서울 강남구 테헤란로 423 (삼성동, 현대타워) 9층 926",
@@ -3616,7 +3772,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 96,
+    "id": 102,
     "title": "Data Analytics Engineer - 테크코어 (데이터 가치화)",
     "company_name": "(주)당근마켓",
     "location": "서울특별시 서초구 강남대로 465  (서초동)",
@@ -3642,7 +3798,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 97,
+    "id": 103,
     "title": "AIR 부문 AI 전문 Engineer 채용 (경력)",
     "company_name": "메가존클라우드㈜",
     "location": "경기 과천시 과천대로7길 74 (갈현동, 메가존산학연센터)",
@@ -3668,7 +3824,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 98,
+    "id": 104,
     "title": "개발자 통합 채용 - 웹 프론트엔드 개발",
     "company_name": "아토머스㈜",
     "location": "서울특별시 강남구 영동대로96길 20  (삼성동)",
@@ -3694,7 +3850,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 99,
+    "id": 105,
     "title": "[플랫폼본부] 게임웹개발실 웹 프론트엔드 엔지니어 (계약직)",
     "company_name": "㈜넥슨",
     "location": "경기 성남시 분당구 판교로256번길 7 (삼평동) 넥슨코리아",
@@ -3720,7 +3876,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 100,
+    "id": 106,
     "title": "[메이플스토리 월드] 웹 프론트엔드 개발자 (계약직)",
     "company_name": "㈜넥슨",
     "location": "경기 성남시 분당구 판교로256번길 7 (삼평동) 넥슨코리아",
@@ -3731,162 +3887,6 @@ export const demoJobs: Job[] = [
     "deadline_date": "2026-04-28",
     "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49072367?Oem_Code=C1&logpath=1&stext=%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C&listno=18&sc=630",
     "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 101,
-    "title": "클라우드 운영 개발자",
-    "company_name": "Cloud Canvas",
-    "location": "서울 마포구",
-    "career": "경력 2년 이상",
-    "employment_type": "정규직",
-    "posted_date": null,
-    "deadline": "상시채용",
-    "deadline_date": "2026-07-22",
-    "detail_url": "https://example.com/jobs/6",
-    "skill_candidates": "AWS, Linux, Terraform",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 102,
-    "title": "주니어 풀스택 개발자",
-    "company_name": "Pixel Route",
-    "location": "인천 연수구",
-    "career": "신입·경력",
-    "employment_type": "정규직",
-    "posted_date": null,
-    "deadline": "상시채용",
-    "deadline_date": "2026-07-22",
-    "detail_url": "https://example.com/jobs/5",
-    "skill_candidates": "Next.js, FastAPI, Docker",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 103,
-    "title": "서비스 자동화 엔지니어",
-    "company_name": "Mono Systems",
-    "location": "서울 영등포구",
-    "career": "경력 무관",
-    "employment_type": "정규직",
-    "posted_date": null,
-    "deadline": "상시채용",
-    "deadline_date": "2026-07-22",
-    "detail_url": "https://example.com/jobs/4",
-    "skill_candidates": "Python, Selenium, CI/CD",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 104,
-    "title": "React 기반 프론트엔드 개발자",
-    "company_name": "Nouveau Lab",
-    "location": "경기 성남시",
-    "career": "신입",
-    "employment_type": "정규직",
-    "posted_date": null,
-    "deadline": "상시채용",
-    "deadline_date": "2026-07-22",
-    "detail_url": "https://example.com/jobs/3",
-    "skill_candidates": "React, TypeScript, Next.js",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 105,
-    "title": "데이터 플랫폼 엔지니어",
-    "company_name": "Orbit Works",
-    "location": "서울 성동구",
-    "career": "경력 1년 이상",
-    "employment_type": "정규직",
-    "posted_date": null,
-    "deadline": "상시채용",
-    "deadline_date": "2026-07-22",
-    "detail_url": "https://example.com/jobs/2",
-    "skill_candidates": "Python, Airflow, AWS, SQL",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 106,
-    "title": "Python FastAPI 백엔드 개발자",
-    "company_name": "Layer Nine",
-    "location": "서울 강남구",
-    "career": "신입·경력 2년",
-    "employment_type": "정규직",
-    "posted_date": null,
-    "deadline": "상시채용",
-    "deadline_date": "2026-07-22",
-    "detail_url": "https://example.com/jobs/1",
-    "skill_candidates": "Python, FastAPI, PostgreSQL, Docker",
     "detail_status": "success",
     "match_score": 0,
     "recommendation_level": "unscored",

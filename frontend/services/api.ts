@@ -44,6 +44,11 @@ const STATIC_DEMO = process.env.NEXT_PUBLIC_STATIC_DEMO === "true";
 const REPORT_API_URL = process.env.NEXT_PUBLIC_REPORT_API_URL?.replace(/\/$/, "") ?? "";
 const FAVORITES_KEY = "job-radar-demo-favorites";
 
+function getReportDeadline(job: Job) {
+  if (job.deadline?.includes("상시")) return job.deadline;
+  return job.deadline_date || job.deadline || "";
+}
+
 async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
   const { demoJobs } = await import("./demo-data");
   const favorites = readFavorites();
@@ -201,7 +206,7 @@ export const api = {
           location: job.location ?? "",
           career: job.career ?? "",
           employment_type: job.employment_type ?? "",
-          deadline: job.deadline_date || job.deadline || "",
+          deadline: getReportDeadline(job),
           matched_keywords: job.matched_keywords.join(", "),
           reason: job.positive_reasons.join(" · "),
           url: job.detail_url ?? "",

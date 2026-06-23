@@ -3,7 +3,7 @@ import hashlib
 import json
 
 from crawler.database import DEFAULT_DB_PATH, get_connection, init_database
-from crawler.parser import normalize_deadline_date, normalize_url
+from crawler.parser import is_always_open_deadline, normalize_deadline_date, normalize_url
 
 
 def save_job_list_items(jobs, crawl_run_id, db_path=DEFAULT_DB_PATH, source="jobkorea"):
@@ -154,7 +154,7 @@ def _insert_job_posting(conn, job, company_id, source, duplicate_key):
             _clean_text(job.get("employment_type")),
             _clean_text(job.get("salary")),
             _clean_text(job.get("deadline")),
-            _clean_text(job.get("deadline_date")) or normalize_deadline_date(job.get("deadline")),
+            _resolve_deadline_date(job),
             "active",
             _clean_text(job.get("raw_text")),
         ),
@@ -198,7 +198,7 @@ def _update_job_posting(conn, job_posting_id, job, company_id):
             _clean_text(job.get("employment_type")),
             _clean_text(job.get("salary")),
             _clean_text(job.get("deadline")),
-            _clean_text(job.get("deadline_date")) or normalize_deadline_date(job.get("deadline")),
+            _resolve_deadline_date(job),
             _clean_text(job.get("raw_text")),
             job_posting_id,
         ),
@@ -256,7 +256,7 @@ def _get_changed_fields(existing, job, company_id):
         "summary_text": _clean_text(job.get("raw_text")),
         "salary_text": _clean_text(job.get("salary")),
         "deadline": _clean_text(job.get("deadline")),
-        "deadline_date": _clean_text(job.get("deadline_date")) or normalize_deadline_date(job.get("deadline")),
+        "deadline_date": _resolve_deadline_date(job),
     }
 
     changed = {}
@@ -304,6 +304,13 @@ def _normalize_key(value):
     return " ".join(_clean_text(value).lower().split())
 
 
+def _resolve_deadline_date(job):
+    deadline = _clean_text(job.get("deadline"))
+    if is_always_open_deadline(deadline):
+        return None
+    return _clean_text(job.get("deadline_date")) or normalize_deadline_date(deadline)
+
+
 def backfill_deadline_dates(db_path=DEFAULT_DB_PATH):
     init_database(db_path)
     updated = 0
@@ -319,6 +326,8 @@ def backfill_deadline_dates(db_path=DEFAULT_DB_PATH):
         ).fetchall()
 
         for row in rows:
+            if is_always_open_deadline(row["deadline"]):
+                continue
             deadline_date = normalize_deadline_date(row["deadline"])
             if not deadline_date:
                 continue

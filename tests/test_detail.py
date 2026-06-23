@@ -64,6 +64,14 @@ class JobKoreaDetailTests(unittest.TestCase):
 
         self.assertEqual(result["location"], "서울 강남구 테헤란로 1")
 
+    def test_always_open_deadline_does_not_create_deadline_date(self):
+        html = "<html><body><div>마감일 상시채용</div></body></html>"
+
+        result = parse_job_detail(html)
+
+        self.assertEqual(result["deadline"], "상시채용")
+        self.assertEqual(result["deadline_date"], "")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -24,6 +24,11 @@ function columnLetter(index: number) {
   return result;
 }
 
+function getReportDeadline(job: Job) {
+  if (job.deadline?.includes("상시")) return job.deadline;
+  return job.deadline_date || job.deadline || "";
+}
+
 function makeSheet(rows: (string | number)[][]) {
   const body = rows.map((row, rowIndex) => {
     const cells = row.map((value, columnIndex) => {
@@ -52,7 +57,7 @@ export function createJobsWorkbook(jobs: Job[]) {
       job.location ?? "",
       job.career ?? "",
       job.employment_type ?? "",
-      job.deadline_date || job.deadline || "",
+      getReportDeadline(job),
       job.matched_keywords.join(", "),
       job.positive_reasons.join(" · "),
       job.detail_url ?? "",

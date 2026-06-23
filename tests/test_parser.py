@@ -21,6 +21,9 @@ class ParserTests(unittest.TestCase):
         today = date(2026, 12, 20)
         self.assertEqual(normalize_deadline_date("01/15(목)", today=today), "2027-01-15")
 
+    def test_normalize_deadline_date_ignores_always_open(self):
+        self.assertEqual(normalize_deadline_date("상시채용"), "")
+
     def test_parse_jobkorea_fixture(self):
         html = (FIXTURE_DIR / "jobkorea_list.html").read_text(encoding="utf-8")
         selectors = {
@@ -44,4 +47,3 @@ class ParserTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

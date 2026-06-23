@@ -14,6 +14,11 @@ def parse_json_list(value):
     return parsed if isinstance(parsed, list) else [str(parsed)]
 
 
+def is_always_open_deadline(value):
+    text = str(value or "").strip().lower()
+    return any(keyword in text for keyword in ("상시", "수시채용", "채용시", "채용 시"))
+
+
 def load_jobs(db_path, limit):
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -75,7 +80,7 @@ def serialize_job(index, row):
         "employment_type": row["employment_type"] or None,
         "posted_date": row["posted_date"] or None,
         "deadline": row["deadline"] or row["deadline_date"] or "마감일 미정",
-        "deadline_date": row["deadline_date"] or None,
+        "deadline_date": None if is_always_open_deadline(row["deadline"]) else (row["deadline_date"] or None),
         "detail_url": row["detail_url"] or None,
         "skill_candidates": row["skill_candidates"] or "",
         "detail_status": row["detail_status"] or None,
