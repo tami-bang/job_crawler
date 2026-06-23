@@ -52,6 +52,39 @@ class DatabaseAndStoreTests(unittest.TestCase):
                 count = conn.execute("SELECT COUNT(*) FROM job_postings").fetchone()[0]
             self.assertEqual(count, 1)
 
+    def test_reopened_job_increments_reopen_count(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = str(Path(temp_dir) / "jobs.db")
+            init_database(db_path)
+            with sqlite3.connect(db_path) as conn:
+                run_id = conn.execute(
+                    "INSERT INTO crawl_runs (source, crawl_type) VALUES ('jobkorea', 'list')"
+                ).lastrowid
+
+            job = {
+                "job_id": "200",
+                "title": "AI 서비스 개발자",
+                "company": "테스트 회사",
+                "url": "https://example.com/Recruit/GI_Read/200",
+                "normalized_url": "https://example.com/Recruit/GI_Read/200",
+                "deadline": "2026-12-31",
+                "raw_text": "테스트 공고",
+            }
+
+            save_job_list_items([job], run_id, db_path=db_path)
+            with sqlite3.connect(db_path) as conn:
+                conn.execute("UPDATE job_postings SET status = 'closed' WHERE source_job_id = '200'")
+
+            result = save_job_list_items([job], run_id, db_path=db_path)
+
+            self.assertEqual(result["updated"], 1)
+            with sqlite3.connect(db_path) as conn:
+                row = conn.execute(
+                    "SELECT status, reopen_count FROM job_postings WHERE source_job_id = '200'"
+                ).fetchone()
+            self.assertEqual(row[0], "active")
+            self.assertEqual(row[1], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

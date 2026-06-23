@@ -11,6 +11,8 @@ export type Job = {
   detail_url: string | null;
   skill_candidates: string | null;
   detail_status?: string | null;
+  raw_detail_text?: string | null;
+  reopen_count?: number;
   match_score: number;
   recommendation_level: string | null;
   matched_keywords: string[];
@@ -158,6 +160,10 @@ export const api = {
   jobs: async (search = "", favorite = false) => {
     if (STATIC_DEMO) return { items: await getDemoJobs(search, favorite) };
     return request<{ items: Job[] }>(`/api/jobs?search=${encodeURIComponent(search)}&favorite=${favorite}&limit=500`);
+  },
+  job: async (jobId: number) => {
+    if (STATIC_DEMO) return getDemoJob(jobId);
+    return request<Job>(`/api/jobs/${jobId}`);
   },
   favorite: async (jobId: number) => {
     if (STATIC_DEMO) {

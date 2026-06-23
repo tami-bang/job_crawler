@@ -39,7 +39,8 @@ def _serialize_job(row):
 
 def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=None):
     where = ["1 = 1"]
-    params = []
+    include_raw_detail = 1 if job_id is not None else 0
+    params = [include_raw_detail]
 
     if search:
         term = f"%{search.strip()}%"
@@ -78,6 +79,8 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
             jp.deadline,
             jp.deadline_date,
             jp.detail_url,
+            CASE WHEN ? THEN jp.raw_detail_text ELSE NULL END AS raw_detail_text,
+            jp.reopen_count,
             jp.skill_candidates,
             jp.detail_status,
             c.name AS company_name,

@@ -83,9 +83,14 @@ def upsert_job_posting(conn, job, company_id, crawl_run_id, source):
         _insert_history(conn, job_posting_id, crawl_run_id, "new", job, content_hash, {})
         return "new"
 
+    was_inactive = existing["status"] and existing["status"] != "active"
     changed_fields = _get_changed_fields(existing, job, company_id)
     job_posting_id = existing["id"]
-    _update_job_posting(conn, job_posting_id, job, company_id)
+    _update_job_posting(conn, job_posting_id, job, company_id, increment_reopen=was_inactive)
+
+    if was_inactive:
+        _insert_history(conn, job_posting_id, crawl_run_id, "reopened", job, content_hash, changed_fields)
+        return "updated"
 
     if changed_fields:
         _insert_history(conn, job_posting_id, crawl_run_id, "changed", job, content_hash, changed_fields)
@@ -162,7 +167,7 @@ def _insert_job_posting(conn, job, company_id, source, duplicate_key):
     return cursor.lastrowid
 
 
-def _update_job_posting(conn, job_posting_id, job, company_id):
+def _update_job_posting(conn, job_posting_id, job, company_id, increment_reopen=False):
     conn.execute(
         """
         UPDATE job_postings
@@ -180,6 +185,7 @@ def _update_job_posting(conn, job_posting_id, job, company_id):
             deadline = ?,
             deadline_date = ?,
             status = 'active',
+            reopen_count = reopen_count + ?,
             raw_summary_text = ?,
             last_seen_at = CURRENT_TIMESTAMP,
             updated_at = CURRENT_TIMESTAMP,
@@ -199,6 +205,7 @@ def _update_job_posting(conn, job_posting_id, job, company_id):
             _clean_text(job.get("salary")),
             _clean_text(job.get("deadline")),
             _resolve_deadline_date(job),
+            1 if increment_reopen else 0,
             _clean_text(job.get("raw_text")),
             job_posting_id,
         ),

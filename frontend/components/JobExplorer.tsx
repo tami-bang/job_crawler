@@ -28,6 +28,17 @@ const sortLabels = {
 type SortKey = keyof typeof sortLabels;
 type ExplorerView = "list" | "calendar" | "expired";
 const allowedLocationPrefixes = ["서울", "서울특별시", "경기", "경기도", "인천", "인천광역시"];
+const baseLocationOptions = [
+  "서울 강남구", "서울 강동구", "서울 강북구", "서울 강서구", "서울 관악구", "서울 광진구", "서울 구로구", "서울 금천구",
+  "서울 노원구", "서울 도봉구", "서울 동대문구", "서울 동작구", "서울 마포구", "서울 서대문구", "서울 서초구", "서울 성동구",
+  "서울 성북구", "서울 송파구", "서울 양천구", "서울 영등포구", "서울 용산구", "서울 은평구", "서울 종로구", "서울 중구", "서울 중랑구",
+  "경기 가평군", "경기 고양시", "경기 과천시", "경기 광명시", "경기 광주시", "경기 구리시", "경기 군포시", "경기 김포시",
+  "경기 남양주시", "경기 동두천시", "경기 부천시", "경기 성남시", "경기 수원시", "경기 시흥시", "경기 안산시", "경기 안성시",
+  "경기 안양시", "경기 양주시", "경기 양평군", "경기 여주시", "경기 연천군", "경기 오산시", "경기 용인시", "경기 의왕시",
+  "경기 의정부시", "경기 이천시", "경기 파주시", "경기 평택시", "경기 포천시", "경기 하남시", "경기 화성시",
+  "인천 강화군", "인천 계양구", "인천 남동구", "인천 동구", "인천 미추홀구", "인천 부평구", "인천 서구", "인천 연수구", "인천 옹진군", "인천 중구",
+];
+const VIEWED_JOBS_KEY = "job-radar-viewed-jobs";
 
 function formatMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -137,6 +148,20 @@ function buildNaverRouteSearchUrl(origin: string, destination: string) {
   return `https://map.naver.com/p/directions/${start}/${goal}/-/transit?c=13.00,0,0,0,dh`;
 }
 
+function readViewedJobs() {
+  if (typeof window === "undefined") return new Set<number>();
+  try {
+    const parsed = JSON.parse(localStorage.getItem(VIEWED_JOBS_KEY) ?? "[]") as number[];
+    return new Set(parsed);
+  } catch {
+    return new Set<number>();
+  }
+}
+
+function isString(value: string | null | undefined): value is string {
+  return Boolean(value);
+}
+
 export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: boolean }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
@@ -144,6 +169,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [detailFilter, setDetailFilter] = useState("all");
   const [scoreFilter, setScoreFilter] = useState("all");
   const [employmentFilter, setEmploymentFilter] = useState("all");
+  const [careerFilter, setCareerFilter] = useState("all");
   const [sortBy, setSortBy] = useState<SortKey>("match_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -158,6 +184,8 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [reportServerReady, setReportServerReady] = useState(false);
   const [originAddress, setOriginAddress] = useState("");
   const [noticeModal, setNoticeModal] = useState<{ title: string; message: string; hint?: string } | null>(null);
+  const [snapshotModal, setSnapshotModal] = useState<{ title: string; body: string } | null>(null);
+  const [viewedJobs, setViewedJobs] = useState<Set<number>>(() => new Set());
 
   const loadJobs = useCallback(async (term = "") => {
     setLoading(true);
@@ -175,6 +203,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }, [favoriteOnly]);
 
   useEffect(() => { void loadJobs(); }, [loadJobs]);
+  useEffect(() => { setViewedJobs(readViewedJobs()); }, []);
   useEffect(() => {
     api.reportStatus()
       .then((status) => setReportServerReady(status.ready))
@@ -184,8 +213,11 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const employmentOptions = useMemo(() => (
     Array.from(new Set(jobs.map((job) => job.employment_type).filter(Boolean))).sort() as string[]
   ), [jobs]);
+  const careerOptions = useMemo(() => (
+    Array.from(new Set(jobs.map((job) => job.career).filter(isString))).sort((a, b) => a.localeCompare(b, "ko"))
+  ), [jobs]);
   const locationOptions = useMemo(() => (
-    Array.from(new Set(jobs.map((job) => normalizeLocationOption(job.location)).filter(Boolean) as string[]))
+    Array.from(new Set([...baseLocationOptions, ...(jobs.map((job) => normalizeLocationOption(job.location)).filter(Boolean) as string[])]))
       .sort((a, b) => a.localeCompare(b, "ko"))
   ), [jobs]);
 
@@ -208,8 +240,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         if (scoreFilter === "possible") return job.match_score > 0 && job.match_score < 65;
         return job.match_score === 0;
       })
+      .filter((job) => careerFilter === "all" || job.career === careerFilter)
       .filter((job) => employmentFilter === "all" || job.employment_type === employmentFilter)
-  ), [detailFilter, employmentFilter, jobs, scoreFilter, selectedLocations]);
+  ), [careerFilter, detailFilter, employmentFilter, jobs, scoreFilter, selectedLocations]);
   const todayKey = toDateKey(new Date());
 
   const activeFilteredJobs = useMemo(() => (
@@ -248,7 +281,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   useEffect(() => {
     setPage(1);
-  }, [detailFilter, employmentFilter, scoreFilter, selectedLocations, sortBy, view]);
+  }, [careerFilter, detailFilter, employmentFilter, scoreFilter, selectedLocations, sortBy, view]);
 
   const jobsByDeadline = useMemo(() => {
     return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
@@ -328,6 +361,37 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     }
     if (!validateOriginForSearch()) {
       event.preventDefault();
+      return;
+    }
+    markViewed(job.id);
+  }
+
+  function markViewed(jobId: number) {
+    setViewedJobs((previous) => {
+      const next = new Set(previous);
+      next.add(jobId);
+      try {
+        localStorage.setItem(VIEWED_JOBS_KEY, JSON.stringify([...next]));
+      } catch {
+        // 브라우저 저장소가 막혀도 공고 탐색은 계속 동작합니다.
+      }
+      return next;
+    });
+  }
+
+  async function openSnapshot(job: Job) {
+    markViewed(job.id);
+    try {
+      const detail = await api.job(job.id);
+      setSnapshotModal({
+        title: `${job.company_name || "회사 미상"} · ${job.title}`,
+        body: detail.raw_detail_text || "저장된 상세 스냅샷이 아직 없습니다. 상세 수집이 완료된 공고부터 이곳에서 원문 핵심 텍스트를 볼 수 있어요.",
+      });
+    } catch {
+      setSnapshotModal({
+        title: "스냅샷을 불러오지 못했어요",
+        body: "백엔드 연결 상태를 확인한 뒤 다시 시도해주세요.",
+      });
     }
   }
 
@@ -341,17 +405,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   return (
     <section className="explorer">
-      <div className="opsStrip" aria-label="운영 상태">
-        <span><i className="liveDot" />LIVE SNAPSHOT</span>
-        <span>수집 {jobs.length.toString().padStart(2, "0")}</span>
-        <span>상세 {detailedCount.toString().padStart(2, "0")}</span>
-        <span>매칭 {matchedCount.toString().padStart(2, "0")}</span>
-        <span className={reportServerReady ? "ready" : "muted"}>
-          {reportServerReady ? "메일 서버 연결됨" : "메일 서버 설정 대기"}
-        </span>
-        <span className="ready">네이버지도 검색 연결</span>
-      </div>
-
       <div className="toolbar">
         <label className="searchBox">
           <span>⌕</span>
@@ -379,7 +432,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             onBlur={() => originAddress.trim() && validateOriginForSearch()}
           />
         </label>
-        <small>네이버지도에서 출발지·도착지 후보를 선택하면 대중교통 경로가 표시됩니다.</small>
+        <small>출발지와 도착지 후보 선택 후 대중교통 경로가 표시됩니다.</small>
       </div>
 
       <div className="locationPanel" aria-label="지역 다중 선택 필터">
@@ -403,11 +456,13 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       </div>
 
       <div className="filterPanel" aria-label="공고 조건 필터">
-        <label><span>수집 상태</span><select value={detailFilter} onChange={(event) => setDetailFilter(event.target.value)}><option value="all">전체</option><option value="success">상세완료</option><option value="pending">목록수집</option></select></label>
+        <label><span>수집 상태</span><select value={detailFilter} onChange={(event) => setDetailFilter(event.target.value)}><option value="all">전체</option><option value="success">상세완료</option><option value="pending">상세대기</option></select></label>
         <label><span>매칭 점수</span><select value={scoreFilter} onChange={(event) => setScoreFilter(event.target.value)}><option value="all">전체</option><option value="strong">85점 이상</option><option value="good">65~84점</option><option value="possible">1~64점</option><option value="unscored">미분석</option></select></label>
+        <label><span>경력</span><select value={careerFilter} onChange={(event) => setCareerFilter(event.target.value)}><option value="all">전체</option>{careerOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
         <label><span>고용형태</span><select value={employmentFilter} onChange={(event) => setEmploymentFilter(event.target.value)}><option value="all">전체</option>{employmentOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
         <label><span>정렬</span><select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortKey)}>{Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       </div>
+      <p className="filterNote">상세대기는 목록 카드만 저장된 상태입니다. 상세 수집이 완료되면 직무 내용, 자격요건, 저장 스냅샷까지 함께 확인할 수 있어요.</p>
 
       <div className="explorerControls">
         <div className="viewSwitch" role="tablist" aria-label="공고 보기 방식">
@@ -437,13 +492,17 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
           </div>
           <div className="jobList">
             {pagedJobs.map((job, index) => (
-              <article className="jobRow" key={job.id} style={{ "--delay": `${index * 25}ms` } as React.CSSProperties}>
+              <article className={`jobRow ${viewedJobs.has(job.id) ? "viewed" : ""}`} key={job.id} style={{ "--delay": `${index * 25}ms` } as React.CSSProperties}>
                 <div className="rowScore" style={{ "--score": `${job.match_score * 3.6}deg` } as React.CSSProperties}>
                   <strong>{job.match_score}</strong>
                   <small>MATCH</small>
                 </div>
                 <div className="rowMain">
-                  <span className="company">{job.company_name || "회사 미상"} <b className={`statusBadge ${job.detail_status === "success" ? "done" : "pending"}`}>{job.detail_status === "success" ? "상세완료" : "목록수집"}</b></span>
+                  <span className="company">
+                    {job.company_name || "회사 미상"}
+                    <b className={`statusBadge ${job.detail_status === "success" ? "done" : "pending"}`}>{job.detail_status === "success" ? "상세완료" : "상세대기"}</b>
+                    {Boolean(job.reopen_count) && <b className="statusBadge reopen">{job.reopen_count}번째 다시 올라온 공고</b>}
+                  </span>
                   <h3>{job.title}</h3>
                   <div className="meta">
                     <span>{job.location || "지역 미정"}</span>
@@ -505,6 +564,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     </select>
                   )}
                   {job.detail_url && <a href={job.detail_url} target="_blank" rel="noreferrer">원문 보기 ↗</a>}
+                  <button onClick={() => void openSnapshot(job)}>저장 스냅샷</button>
                 </div>
               </article>
             ))}
@@ -533,7 +593,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <div className="deadlineCalendar">
           <div className="calendarHeader">
             <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))}>←</button>
-            <strong>{formatMonth(calendarMonth)} 마감 캘린더</strong>
+            <strong>{formatMonth(calendarMonth)}</strong>
             <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}>→</button>
           </div>
           <div className="calendarWeek">
@@ -602,6 +662,17 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <p>{noticeModal.message}</p>
             {noticeModal.hint && <small>{noticeModal.hint}</small>}
             <button className="scanButton wide" onClick={() => setNoticeModal(null)}>확인</button>
+          </div>
+        </div>
+      )}
+
+      {snapshotModal && (
+        <div className="modalBackdrop" role="presentation" onMouseDown={() => setSnapshotModal(null)}>
+          <div className="emailModal snapshotModal" role="dialog" aria-modal="true" aria-labelledby="snapshot-modal-title" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modalClose" aria-label="닫기" onClick={() => setSnapshotModal(null)}>×</button>
+            <span className="modalKicker">SAVED SNAPSHOT</span>
+            <h3 id="snapshot-modal-title">{snapshotModal.title}</h3>
+            <pre>{snapshotModal.body}</pre>
           </div>
         </div>
       )}

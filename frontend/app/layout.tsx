@@ -27,7 +27,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <div className="systemState"><i /> {dataMode}</div>
         </header>
         <main>{children}</main>
-        <footer>JOB RADAR · 데이터는 로컬에서, 결정은 나답게.</footer>
+        <footer className="siteFooter">
+          <div>
+            <strong>JOB RADAR</strong>
+            <span>최근 업데이트 2026.06.24 · 지원 결정을 더 빠르게 만드는 개인 채용 레이더</span>
+          </div>
+          <div className="footerLinks">
+            <a href="https://github.com/tami-bang" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="mailto:vjihyun.bangv@gmail.com">vjihyun.bangv@gmail.com</a>
+          </div>
+        </footer>
       </body>
     </html>
   );

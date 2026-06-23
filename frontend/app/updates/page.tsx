@@ -1,4 +1,18 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 const updates = [
+  {
+    date: "2026.06.24",
+    tag: "UX TUNE",
+    title: "대시보드 탐색 흐름과 공통 필터 정리",
+    items: [
+      "대시보드 상단 공백과 불필요한 운영 배지를 줄였습니다.",
+      "경력 필터, 전체 지역 칩, 확인한 공고의 회색 표시를 공통 탐색 화면에 적용했습니다.",
+      "저장된 상세 텍스트를 스냅샷으로 볼 수 있는 흐름을 추가했습니다.",
+    ],
+  },
   {
     date: "2026.06.23",
     tag: "DATA PATCH",
@@ -62,6 +76,16 @@ const updates = [
 ];
 
 export default function UpdatesPage() {
+  const pageSizeOptions = [15, 50, 100];
+  const [pageSize, setPageSize] = useState(15);
+  const [page, setPage] = useState(1);
+  const sortedUpdates = useMemo(() => (
+    [...updates].sort((a, b) => b.date.localeCompare(a.date))
+  ), []);
+  const totalPages = Math.max(1, Math.ceil(sortedUpdates.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const visibleUpdates = sortedUpdates.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <section className="pageSection">
       <div className="eyebrow"><span>04</span> PATCH NOTES</div>
@@ -74,7 +98,7 @@ export default function UpdatesPage() {
         <p>WHAT CHANGED · WHY IT MATTERS</p>
       </div>
       <div className="updateList">
-        {updates.map((update) => (
+        {visibleUpdates.map((update) => (
           <article className="updateItem" key={`${update.date}-${update.title}`}>
             <div className="updateMeta">
               <strong>{update.date}</strong>
@@ -88,6 +112,23 @@ export default function UpdatesPage() {
             </div>
           </article>
         ))}
+      </div>
+      <div className="pagination updatePagination" aria-label="업데이트 로그 페이지네이션">
+        <button disabled={currentPage <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>←</button>
+        <strong>{currentPage} / {totalPages}</strong>
+        <button disabled={currentPage >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>→</button>
+        <label className="pageSizeSelect bottom">
+          <span>표시 개수</span>
+          <select
+            value={pageSize}
+            onChange={(event) => {
+              setPageSize(Number(event.target.value));
+              setPage(1);
+            }}
+          >
+            {pageSizeOptions.map((option) => <option key={option} value={option}>{option}개씩</option>)}
+          </select>
+        </label>
       </div>
     </section>
   );
