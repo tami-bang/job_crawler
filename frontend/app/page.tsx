@@ -4,7 +4,7 @@ import StatsPanel from "@/components/StatsPanel";
 export default function Home() {
   return (
     <>
-      <section className="hero">
+      <section className="hero dashboardHero">
         <div className="eyebrow"><span>01</span> DECISION DASHBOARD</div>
         <h1>흩어진 공고를<br /><em>지원할 이유</em>로.</h1>
         <p>자동 수집을 좇기보다, 내가 선택한 데이터에 집중합니다.<br />매칭 근거부터 지원 상태까지 한 화면에서 선명하게.</p>
