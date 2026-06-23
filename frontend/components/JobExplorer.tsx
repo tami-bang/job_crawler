@@ -15,6 +15,7 @@ const statusLabel: Record<string, string> = {
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 const pageSizeOptions = [15, 50, 100];
+const originExamples = "예: 서울역, 강남역, 서울 강남구 테헤란로 123";
 
 function formatMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -54,6 +55,14 @@ function getMailBody(fileName: string) {
   );
 }
 
+function validateOriginAddress(value: string) {
+  const trimmed = value.trim();
+  if (trimmed.length < 2) return "출발지를 2글자 이상 입력해주세요.";
+  if (!/[가-힣a-zA-Z0-9]/.test(trimmed)) return "한글 주소, 장소명, 역명 중 하나로 입력해주세요.";
+  if (/^[0-9\s-]+$/.test(trimmed)) return "숫자만으로는 위치를 찾기 어려워요. 장소명이나 도로명 주소를 함께 입력해주세요.";
+  return "";
+}
+
 export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: boolean }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
@@ -76,6 +85,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [originAddress, setOriginAddress] = useState("");
   const [commuteEstimates, setCommuteEstimates] = useState<Record<number, CommuteEstimate>>({});
   const [commuteLoading, setCommuteLoading] = useState(false);
+  const [noticeModal, setNoticeModal] = useState<{ title: string; message: string; hint?: string } | null>(null);
 
   const loadJobs = useCallback(async (term = "") => {
     setLoading(true);
@@ -184,7 +194,23 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }
 
   async function calculateCommutes() {
-    if (!originAddress.trim()) return;
+    const validationMessage = validateOriginAddress(originAddress);
+    if (validationMessage) {
+      setNoticeModal({
+        title: "출발지 주소를 확인해주세요",
+        message: validationMessage,
+        hint: originExamples,
+      });
+      return;
+    }
+    if (!mapServerReady) {
+      setNoticeModal({
+        title: "네이버지도 API 연결이 필요해요",
+        message: "예상소요시간을 실제로 계산하려면 FastAPI 백엔드에 네이버지도 API 키와 공개 백엔드 URL을 연결해야 합니다.",
+        hint: "필요 값: NAVER_MAPS_CLIENT_ID, NAVER_MAPS_CLIENT_SECRET, NEXT_PUBLIC_REPORT_API_URL",
+      });
+      return;
+    }
     setCommuteLoading(true);
     try {
       const entries = await Promise.all(
@@ -236,7 +262,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <label>
           <span>출발지 주소</span>
           <input
-            placeholder="예: 서울역, 집 주소, 가까운 지하철역"
+            placeholder={originExamples}
             value={originAddress}
             onChange={(event) => setOriginAddress(event.target.value)}
             onKeyDown={(event) => event.key === "Enter" && void calculateCommutes()}
@@ -415,6 +441,19 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
               {emailSending ? "보내는 중..." : "엑셀 리포트 보내기"}
             </button>
             {emailStatus && <small>{emailStatus}</small>}
+          </div>
+        </div>
+      )}
+
+      {noticeModal && (
+        <div className="modalBackdrop" role="presentation" onMouseDown={() => setNoticeModal(null)}>
+          <div className="emailModal noticeModal" role="alertdialog" aria-modal="true" aria-labelledby="notice-modal-title" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modalClose" aria-label="닫기" onClick={() => setNoticeModal(null)}>×</button>
+            <span className="modalKicker">CHECK REQUIRED</span>
+            <h3 id="notice-modal-title">{noticeModal.title}</h3>
+            <p>{noticeModal.message}</p>
+            {noticeModal.hint && <small>{noticeModal.hint}</small>}
+            <button className="scanButton wide" onClick={() => setNoticeModal(null)}>확인</button>
           </div>
         </div>
       )}

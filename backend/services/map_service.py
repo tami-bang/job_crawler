@@ -89,14 +89,22 @@ def build_naver_map_url(destination: str) -> str:
 
 
 def get_naver_key_id(required: bool = True) -> str:
-    value = os.getenv("NAVER_MAPS_CLIENT_ID") or os.getenv("NCP_MAPS_API_KEY_ID")
+    value = (
+        os.getenv("NAVER_MAPS_CLIENT_ID")
+        or os.getenv("NCP_MAPS_API_KEY_ID")
+        or os.getenv("X_NCP_APIGW_API_KEY_ID")
+    )
     if required and not value:
         raise MapConfigError("네이버지도 API Key ID가 설정되지 않았습니다.")
     return value or ""
 
 
 def get_naver_key(required: bool = True) -> str:
-    value = os.getenv("NAVER_MAPS_CLIENT_SECRET") or os.getenv("NCP_MAPS_API_KEY")
+    value = (
+        os.getenv("NAVER_MAPS_CLIENT_SECRET")
+        or os.getenv("NCP_MAPS_API_KEY")
+        or os.getenv("X_NCP_APIGW_API_KEY")
+    )
     if required and not value:
         raise MapConfigError("네이버지도 API Key가 설정되지 않았습니다.")
     return value or ""
