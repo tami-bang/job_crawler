@@ -111,6 +111,9 @@ function validateOriginAddress(value: string) {
   if (trimmed.length < 2) return "출발지를 2글자 이상 입력해주세요.";
   if (!/[가-힣a-zA-Z0-9]/.test(trimmed)) return "한글 주소, 장소명, 역명 중 하나로 입력해주세요.";
   if (/^[0-9\s-]+$/.test(trimmed)) return "숫자만으로는 위치를 찾기 어려워요. 장소명이나 도로명 주소를 함께 입력해주세요.";
+  if (/로|길/.test(trimmed) && !/(서울|경기|경기도|인천|시|군|구)/.test(trimmed)) {
+    return "도로명만 입력하면 네이버지도에서 위치가 흔들릴 수 있어요. 예: 경기 안산시 단원구 지곡로 52 처럼 시/구까지 함께 입력해주세요.";
+  }
   return "";
 }
 
@@ -119,8 +122,8 @@ function getDestination(job: Job) {
 }
 
 function buildNaverRouteSearchUrl(origin: string, destination: string) {
-  const start = `,,${encodeURIComponent(origin.trim())},,`;
-  const goal = `,,${encodeURIComponent(destination.trim())},,`;
+  const start = `,,${encodeURIComponent(origin.trim())},,ADDRESS_POI`;
+  const goal = `,,${encodeURIComponent(destination.trim())},,ADDRESS_POI`;
   return `https://map.naver.com/p/directions/${start}/${goal}/-/transit?c=13.00,0,0,0,dh`;
 }
 
