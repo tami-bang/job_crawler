@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from pathlib import Path
 
 from backend.db import open_database
@@ -29,12 +30,53 @@ def _parse_list(value):
 
 def _serialize_job(row):
     item = dict(row)
+    item.pop("location_filter_text", None)
     item["match_score"] = round(item.get("match_score") or 0)
     item["matched_keywords"] = _parse_list(item.pop("matched_keywords_json", None))
     item["positive_reasons"] = _parse_list(item.pop("positive_reasons_json", None))
     item["negative_reasons"] = _parse_list(item.pop("negative_reasons_json", None))
     item["is_favorite"] = bool(item.get("favorite_id"))
     return item
+
+
+def _extract_work_location_text(row):
+    parts = [row["location"] or ""]
+    raw_detail_text = row["location_filter_text"] or row["raw_detail_text"] or ""
+    if raw_detail_text:
+        lines = [line.strip() for line in raw_detail_text.splitlines()]
+        collecting = False
+        collected = []
+        for line in lines:
+            if line == "근무지주소":
+                collecting = True
+                continue
+            if collecting and line in {"지도보기", "인근지하철", "지원자격", "스킬", "우대조건"}:
+                if line != "지도보기":
+                    break
+                continue
+            if collecting and line:
+                collected.append(line)
+        parts.extend(collected)
+    return "\n".join(parts)
+
+
+def _location_token_pattern(location):
+    if location == "세종":
+        return r"(^|\n)\s*세종(?:시|\s|$)"
+    return rf"(^|\n)\s*{re.escape(location)}(?:\s|$)"
+
+
+def _is_allowed_by_hard_location(row, hard_filters):
+    if not hard_filters.get("strict_location_only"):
+        return True
+
+    allowed_locations = hard_filters.get("locations") or []
+    exclude_locations = hard_filters.get("exclude_locations") or []
+    location_text = _extract_work_location_text(row)
+
+    if allowed_locations and not any(re.search(_location_token_pattern(location), location_text) for location in allowed_locations):
+        return False
+    return not any(re.search(_location_token_pattern(location), location_text) for location in exclude_locations)
 
 
 def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=None):
@@ -56,14 +98,7 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
         params.append(job_id)
 
     hard_filters = _load_hard_filters()
-    if hard_filters.get("strict_location_only") and hard_filters.get("locations"):
-        location_clauses = []
-        for location in hard_filters["locations"]:
-            location_clauses.append("jp.location LIKE ?")
-            params.append(f"%{location}%")
-        where.append(f"({' OR '.join(location_clauses)})")
-
-    params.append(max(1, min(limit, 500)))
+    params.append(max(1, min(limit * 4, 500)))
     sql = f"""
         WITH latest_profile AS (
             SELECT id FROM user_profiles ORDER BY updated_at DESC, id DESC LIMIT 1
@@ -90,6 +125,7 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
                 NULLIF(jp.description_text, ''),
                 NULLIF(jp.raw_summary_text, '')
             ) ELSE NULL END AS raw_detail_text,
+            jp.raw_detail_text AS location_filter_text,
             jp.reopen_count,
             jp.skill_candidates,
             jp.detail_status,
@@ -119,7 +155,8 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
 
     with open_database() as conn:
         rows = conn.execute(sql, params).fetchall()
-    return [_serialize_job(row) for row in rows]
+    filtered_rows = [row for row in rows if _is_allowed_by_hard_location(row, hard_filters)]
+    return [_serialize_job(row) for row in filtered_rows[:limit]]
 
 
 def get_job(job_id):

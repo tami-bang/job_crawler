@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 import sqlite3
 import sys
 from pathlib import Path
@@ -22,6 +23,50 @@ def parse_json_list(value):
 def is_always_open_deadline(value):
     text = str(value or "").strip().lower()
     return any(keyword in text for keyword in ("상시", "수시채용", "채용시", "채용 시"))
+
+
+def load_hard_filters():
+    try:
+        return json.loads(Path("config/user_preferences.json").read_text(encoding="utf-8")).get("hard_filters", {})
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def location_token_pattern(location):
+    if location == "세종":
+        return r"(^|\n)\s*세종(?:시|\s|$)"
+    return rf"(^|\n)\s*{re.escape(location)}(?:\s|$)"
+
+
+def extract_work_location_text(row):
+    parts = [row["location"] or ""]
+    raw_detail_text = row["raw_detail_text"] or ""
+    if raw_detail_text:
+        lines = [line.strip() for line in raw_detail_text.splitlines()]
+        collecting = False
+        for line in lines:
+            if line == "근무지주소":
+                collecting = True
+                continue
+            if collecting and line in {"지도보기", "인근지하철", "지원자격", "스킬", "우대조건"}:
+                if line != "지도보기":
+                    break
+                continue
+            if collecting and line:
+                parts.append(line)
+    return "\n".join(parts)
+
+
+def is_allowed_by_hard_location(row, hard_filters):
+    if not hard_filters.get("strict_location_only"):
+        return True
+
+    location_text = extract_work_location_text(row)
+    allowed_locations = hard_filters.get("locations") or []
+    exclude_locations = hard_filters.get("exclude_locations") or []
+    if allowed_locations and not any(re.search(location_token_pattern(location), location_text) for location in allowed_locations):
+        return False
+    return not any(re.search(location_token_pattern(location), location_text) for location in exclude_locations)
 
 
 def load_jobs(db_path, limit):
@@ -156,8 +201,9 @@ def main():
     parser.add_argument("--limit", type=int, default=500)
     args = parser.parse_args()
 
-    rows = load_jobs(args.db, args.limit)
-    jobs = [serialize_job(index, row) for index, row in enumerate(rows, start=1)]
+    hard_filters = load_hard_filters()
+    rows = [row for row in load_jobs(args.db, args.limit * 4) if is_allowed_by_hard_location(row, hard_filters)]
+    jobs = [serialize_job(index, row) for index, row in enumerate(rows[:args.limit], start=1)]
     write_demo_data(jobs, Path(args.output), args.db)
     print(f"[INFO] demo data exported: jobs={len(jobs)} output={args.output}")
 

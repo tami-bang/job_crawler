@@ -1293,88 +1293,6 @@ export const demoJobs: Job[] = [
   },
   {
     "id": 30,
-    "title": "프론트엔드 엔지니어",
-    "company_name": "㈜에이블리코퍼레이션",
-    "location": "대한민국 서울특별시 서초구 강남대로 465 교보강남타워 6층, 9층",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.06.16(화)",
-    "deadline": "2026.07.25",
-    "deadline_date": "2026-07-25",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49249609?Oem_Code=C1&logpath=1&stext=%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C&listno=1&sc=630",
-    "raw_detail_text": "㈜에이블리코퍼레이션 채용 - 프론트엔드 엔지니어 | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n㈜에이블리코퍼레이션\n프론트엔드 엔지니어\n상세요강\n접수기간∙방법\n기업정보\n추천공고\n잡아바 추천 TOP 기업 온라인 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n프론트엔드 엔지니어\n모집인원\n0\n명\n고용형태\n정규직\n급여\n회사 내규에 따름\n근무지주소\n대한민국 서울특별시 서초구 강남대로 465 교보강남타워 6층, 9층\n지도보기\n지원자격\n경력\n경력\n(2년이상)\n학력\n학력무관\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.06.16(화)\n마감일\n2026.07.25(토)\n기업 정보\n기업정보 더보기\n사원수\n301 ~ 500명 이하\n기업구분\n중견기업 (비상장)\n산업(업종)\n백화점·유통·도소매\n지도보기\n위치\n서울 서초구 강남대로 465 (서초동, 교보생명보험(주)서초사옥) 6층, 9층",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 82,
-    "recommendation_level": "good",
-    "matched_keywords": [
-      "프론트엔드개발자",
-      "서울",
-      "학력무관",
-      "정규직",
-      "AI",
-      "프론트엔드"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "JobKorea 희망 직무 '프론트엔드개발자' 일치: +15점",
-      "근무지역 '서울' 일치: +18점",
-      "학력 '학력무관' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점",
-      "2순위 프론트엔드/웹개발 관련 키워드 '프론트엔드' 일치: +13점"
-    ],
-    "negative_reasons": [
-      "경력 희망 조건(신입, 경력무관, 1~3년, 경력1년, 경력2년, 경력3년, 경력1년↑, 경력2년↑, 경력3년↑)과 일치하는 값을 확인하지 못했습니다: -10점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 31,
-    "title": "[SS사업본부/개발팀] 개발자 채용 (프론트엔드)",
-    "company_name": "하이텍앤솔㈜",
-    "location": "경기도 하남시 초광산단서로 7  (초이동)",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.05.22(금)",
-    "deadline": "2026.06.23",
-    "deadline_date": "2026-06-23",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49363709?Oem_Code=C1&logpath=1&stext=%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C&listno=6&sc=630",
-    "raw_detail_text": "하이텍앤솔㈜ 채용 - [SS사업본부/개발팀] 개발자 채용 (프론트엔드) | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n하이텍앤솔㈜\n[SS사업본부/개발팀] 개발자 채용 (프론트엔드)\n상세요강\n접수기간∙방법\n기업정보\n추천공고\nIT 개발자 전문 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n프론트엔드\n모집인원\n○\n명\n급여\n회사 내규에 따름\n근무지주소\n경기도 하남시 초광산단서로 7 (초이동)\n지도보기\n지원자격\n경력\n경력\n학력\n대졸이상\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.05.22(금)\n마감일\n2026.06.23(화)\n기업 정보\n기업정보 더보기\n사원수\n51 ~ 300명 이하\n기업구분\n중소기업 (-)\n산업(업종)\n전기용 기계.장비 및 관련 기자재 도매업\n위치\n경기 하남시 초광산단서로 7 (초이동) -",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 82,
-    "recommendation_level": "good",
-    "matched_keywords": [
-      "프론트엔드개발자",
-      "경기",
-      "대졸",
-      "정규직",
-      "AI",
-      "프론트엔드"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "JobKorea 희망 직무 '프론트엔드개발자' 일치: +15점",
-      "근무지역 '경기' 일치: +18점",
-      "학력 '대졸' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점",
-      "2순위 프론트엔드/웹개발 관련 키워드 '프론트엔드' 일치: +13점"
-    ],
-    "negative_reasons": [
-      "경력 희망 조건(신입, 경력무관, 1~3년, 경력1년, 경력2년, 경력3년, 경력1년↑, 경력2년↑, 경력3년↑)과 일치하는 값을 확인하지 못했습니다: -10점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 32,
     "title": "[NE능률] 프론트엔드 개발자 채용 (Front-end Engineer)",
     "company_name": "㈜NE능률",
     "location": "서울 마포구 월드컵북로 396 (상암동, 누리꿈스퀘어) 비즈니스타워 10층",
@@ -1415,48 +1333,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 33,
-    "title": "[SS사업본부/개발팀] 개발자 채용 (프론트엔드/펌웨어)",
-    "company_name": "하이텍앤솔㈜",
-    "location": "경기도 하남시 초광산단서로 7  (초이동)",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.05.22(금)",
-    "deadline": "2026.06.23",
-    "deadline_date": "2026-06-23",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49363683?Oem_Code=C1&logpath=1&stext=%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C&listno=11&sc=630",
-    "raw_detail_text": "하이텍앤솔㈜ 채용 - [SS사업본부/개발팀] 개발자 채용 (프론트엔드/펌웨어) | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n하이텍앤솔㈜\n[SS사업본부/개발팀] 개발자 채용 (프론트엔드/펌웨어)\n상세요강\n접수기간∙방법\n기업정보\n추천공고\nIT 개발자 전문 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n프론트엔드, 펌웨어\n모집인원\n○\n명\n급여\n회사 내규에 따름\n근무지주소\n경기도 하남시 초광산단서로 7 (초이동)\n지도보기\n지원자격\n경력\n경력\n학력\n대졸이상\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.05.22(금)\n마감일\n2026.06.23(화)\n기업 정보\n기업정보 더보기\n사원수\n51 ~ 300명 이하\n기업구분\n중소기업 (-)\n산업(업종)\n전기용 기계.장비 및 관련 기자재 도매업\n위치\n경기 하남시 초광산단서로 7 (초이동) -",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 82,
-    "recommendation_level": "good",
-    "matched_keywords": [
-      "프론트엔드개발자",
-      "경기",
-      "대졸",
-      "정규직",
-      "AI",
-      "프론트엔드"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "JobKorea 희망 직무 '프론트엔드개발자' 일치: +15점",
-      "근무지역 '경기' 일치: +18점",
-      "학력 '대졸' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점",
-      "2순위 프론트엔드/웹개발 관련 키워드 '프론트엔드' 일치: +13점"
-    ],
-    "negative_reasons": [
-      "경력 희망 조건(신입, 경력무관, 1~3년, 경력1년, 경력2년, 경력3년, 경력1년↑, 경력2년↑, 경력3년↑)과 일치하는 값을 확인하지 못했습니다: -10점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 34,
+    "id": 31,
     "title": "Angular 프론트엔드 개발자 모집",
     "company_name": "㈜모아데이타",
     "location": "경기 성남시 수정구 달래내로 46 (시흥동) 810호 (시흥동,성남글로벌융합센터)",
@@ -1497,7 +1374,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 35,
+    "id": 32,
     "title": "프론트엔드 개발",
     "company_name": "㈜와탭랩스",
     "location": "서울 서초구 서초대로77길 17 (서초동, BLOCK77) 13층 1303호",
@@ -1538,7 +1415,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 36,
+    "id": 33,
     "title": "[퍼플아카데미] AI 활용 앱 웹 프론트엔드",
     "company_name": "㈜퍼플아카데미",
     "location": "서울 양천구 목동동로 233-1 (목동, 드림타워) 7층",
@@ -1579,7 +1456,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 37,
+    "id": 34,
     "title": "시니어 프론트엔드 개발",
     "company_name": "㈜와탭랩스",
     "location": "서울 서초구 서초대로77길 17 (서초동, BLOCK77) 13층 1303호(스파크플러스강남4호점)",
@@ -1620,7 +1497,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 38,
+    "id": 35,
     "title": "UI/UX 테스트 자동화 솔루션 엔지니어",
     "company_name": "㈜플래티어",
     "location": "서울 송파구 법원로9길 26 (문정동, 에이치비지니스파크) D동 6층",
@@ -1663,7 +1540,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 39,
+    "id": 36,
     "title": "[국비/Unreal 공인교육기관] 언리얼엔진5 부트캠프 엔지니어 교육생 모집",
     "company_name": "㈜몬스테라텍",
     "location": "서울 서초구 서초대로74길 33  (서초동, 비트빌) 4층",
@@ -1700,7 +1577,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 40,
+    "id": 37,
     "title": "[AI 스타트업] 데이터 엔지니어",
     "company_name": "서치라이트에이아이㈜",
     "location": "서울 마포구 마포대로 122 (공덕동, 신용보증기금빌딩) 13층 프론트원",
@@ -1741,99 +1618,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 41,
-    "title": "2026 인재 채용 공고",
-    "company_name": "랜드소프트㈜",
-    "location": "서울특별시 서초구 서래로 37  (반포동) 2층ㆍ3층",
-    "career": "신입·경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.06.16(화)",
-    "deadline": "2026.07.16",
-    "deadline_date": "2026-07-16",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49390245?Oem_Code=C1&logpath=1&stext=Python+%EC%9E%90%EB%8F%99%ED%99%94&listno=7&sc=630",
-    "raw_detail_text": "랜드소프트㈜ 채용 - 2026 인재 채용 공고 | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n랜드소프트㈜\n2026 인재 채용 공고\n상세요강\n접수기간∙방법\n기업정보\n추천공고\n참 괜찮은 강소기업 선정 기업\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n1. JAVA 개발자_포지션 A, 1. JAVA 개발자_포지션 B, 1. JAVA 개발자_포지션 C, 2. 공공분야 기획 PM, 3. 공공분야 개발 PM, 4. UI/UX 디자인 팀장급, 5. 모바일 APP 개발자 , 6. 유니티Unity 개발자, 7. AI 개발자, 8. 웹서비스·콘텐츠 구축 기획자, 9. 기술 영업, 10. 품질관리 팀장급, 11. 품질관리, 12. 공공부문 SI 제안 팀장 및 팀원\n모집인원\n○○\n명\n고용형태\n정규직\n(수습 기간 적용)\n급여\n회사 내규에 따름\n근무지주소\n서울특별시 서초구 서래로 37 (반포동) 2층ㆍ3층\n지도보기\n인근지하철\n지원자격\n경력\n신입·경력\n(직무별 상이, 상세요강 참고)\n학력\n학력무관\n스킬\n우대조건\n기본우대\n유관업무 경험자(인턴·알바), 석사학위 수여자\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.06.16(화)\n마감일\n2026.07.16(목)\n기업 정보\n기업정보 더보기\n사원수\n51 ~ 300명 이하\n기업구분\n중소기업 (비상장)\n산업(업종)\n솔루션·SI·CRM·ERP\n지도보기\n위치\n서울 서초구 서래로 37 (반포동) 2,3층\n⏱️\n유연근무제\n🏫\n임직원 교육비\n🍰\n카페테리아\n💸\n장기근속 포상\n🍹\n자유로운 휴가문화\n🧧\n명절선물/명절상여",
-    "reopen_count": 0,
-    "skill_candidates": "1. JAVA 개발자_포지션 A, 1. JAVA 개발자_포지션 B, 1. JAVA 개발자_포지션 C, 2. 공공분야 기획 PM, 3. 공공분야 개발 PM, 4. UI/UX 디자인 팀장급, 5. 모바일 APP 개발자 , 6. 유니티Unity 개발자, 7. AI 개발자, 8. 웹서비스·콘텐츠 구축 기획자, 9. 기술 영업, 10. 품질관리 팀장급, 11. 품질관리, 12. 공공부문 SI 제안 팀장 및 팀원",
-    "detail_status": "success",
-    "match_score": 80,
-    "recommendation_level": "good",
-    "matched_keywords": [
-      "PM",
-      "서울",
-      "신입",
-      "학력무관",
-      "정규직",
-      "AI",
-      "웹서비스",
-      "품질",
-      "기획",
-      "영업"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "낮은 우선순위 직무 'PM' 확인: +3점",
-      "근무지역 '서울' 일치: +18점",
-      "경력 '신입' 일치: +16점",
-      "학력 '학력무관' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점",
-      "2순위 풀스택/웹서비스 관련 키워드 '웹서비스' 일치: +12점",
-      "QA 경험 활용 관련 키워드 '품질' 일치: +5점"
-    ],
-    "negative_reasons": [
-      "감점 키워드(major) '영업' 감지: -25점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 42,
-    "title": "[세라젬] 부문별 경력직 채용",
-    "company_name": "㈜세라젬",
-    "location": "서울특별시 강남구 테헤란로 231  (역삼동) 센터필드 WEST동",
-    "career": "신입·경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.06.10(수)",
-    "deadline": "2026.06.28",
-    "deadline_date": "2026-06-28",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49351471?Oem_Code=C1&logpath=1&stext=Python+%EC%9E%90%EB%8F%99%ED%99%94&listno=8&sc=630",
-    "raw_detail_text": "㈜세라젬 채용 - [세라젬] 부문별 경력직 채용 | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n㈜세라젬\n[세라젬] 부문별 경력직 채용\n상세요강\n접수기간∙방법\n기업정보\n추천공고\nIT 개발자 전문 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\nB2G 영업, 유통 영업, 구독채권 및 외주거래처 관리, A/S 운영지원, 영업지원, 전략기획, 서비스기획, 플랫폼 기획, 교육 과정 개발 및 강의, HRM, 컴플라이언스, 점포개발, 물류운영, 제/상품 구매, 제품기구설계 및 상품개발 PM, 전장회로개발, 인증관리, 연구기획, 전략 MD, 뷰티 MD, AI Native UX/UI 디자인, 제품디자인, 생산기획, 생산운영, 생산기술_설비, 생산기술_회로, AI 프로젝트 PL, 인프라 운영_네트워크, 인프라 운영_시스템, 데이터 분석 및 기획, 정보보안 솔루션 운영/관리, 제품보증, 상품보증, 기구설계\n모집인원\n○\n명\n고용형태\n정규직\n(수습 3개월)\n급여\n회사 내규에 따름\n근무시간\n주5일(월~금)\n근무지주소\n서울특별시 강남구 테헤란로 231 (역삼동) 센터필드 WEST동\n지도보기\n경기도 과천시 과천대로2길 54 (갈현동) 그라운드브이\n지도보기\n충남 천안시 서북구 성거읍 정자1길 10 (오색당리, 세라젬)\n지도보기\n인근지하철\n지원자격\n경력\n신입·경력\n(직무별 상이, 상세요강 참고)\n학력\n고졸이상\n(\n직무별 상이, 상세요강 참고\n)\n스킬\n우대조건\n기본우대\n장애인, 영어가능자, 중국어가능자, 운전가능자, 유관업무 경험자(인턴·알바), 보훈대상자, 관련 학과 전공자, 관련 자격증 보유자, 유관업무 경력자\n자격증\n우대전공\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.06.10(수)\n마감일\n2026.06.28(일)\n기업 정보\n기업정보 더보기\n사원수\n501 ~ 1,000명 이하\n기업구분\n중견기업 (비상장)\n산업(업종)\n그 외 기타 의료용 기기 제조업\n지도보기\n위치\n충남 천안시 서북구 정자1길 10 (오색당리, 세라젬) 세라젬\n🏆\n우수사원 포상제도\n👏\n임직원 할인\n💳\n복지포인트\n💸\n장기근속 포상\n🚙\n교통비\n🧧\n명절선물/명절상여",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 80,
-    "recommendation_level": "good",
-    "matched_keywords": [
-      "서비스기획",
-      "서울",
-      "신입",
-      "고졸",
-      "정규직",
-      "AI",
-      "플랫폼",
-      "영업"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "낮은 우선순위 직무 '서비스기획' 확인: +3점",
-      "근무지역 '서울' 일치: +18점",
-      "경력 '신입' 일치: +16점",
-      "학력 '고졸' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점",
-      "2순위 풀스택/웹서비스 관련 키워드 '플랫폼' 일치: +12점",
-      "보조 관심 PM/서비스기획 관련 키워드 '서비스기획' 일치: +3점"
-    ],
-    "negative_reasons": [
-      "감점 키워드(major) '영업' 감지: -25점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 43,
+    "id": 38,
     "title": "제조기술파트-장비 자동화 S/W 개발",
     "company_name": "㈜페코텍",
     "location": "서울 성동구 동일로 169 (성수동2가) 페코텍글로벌허브",
@@ -1874,7 +1659,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 44,
+    "id": 39,
     "title": "[에코마케팅] 클라우드 보안 엔지니어 경력 채용",
     "company_name": "㈜에코마케팅",
     "location": "서울 송파구 올림픽로35다길 42  (신천동) 에코마케팅",
@@ -1915,7 +1700,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 45,
+    "id": 40,
     "title": "AI 챗봇 데이터 전처리 및 QA 데이터 구축 담당자(파견)",
     "company_name": "㈜스피링크",
     "location": "서울 영등포구 여의대로 24 (여의도동, 에프케이아이타워)",
@@ -1956,7 +1741,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 46,
+    "id": 41,
     "title": "[빌메이트] 서비스 운영 및 기획 담당자",
     "company_name": "기웅정보통신㈜",
     "location": "서울 금천구 가산디지털2로 98 (가산동, IT캐슬) 2동 613호~617호",
@@ -1997,7 +1782,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 47,
+    "id": 42,
     "title": "2026년 하반기 현대글로비스 신입채용(수시)",
     "company_name": "현대글로비스㈜현대자동차그룹",
     "location": "서울 성동구 왕십리로 83-21 (성수동1가, 아크로서울포레스트)",
@@ -2038,7 +1823,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 48,
+    "id": 43,
     "title": "㈜디팜스테크 각 부문 신입/경력 채용",
     "company_name": "디팜스테크",
     "location": "경기 군포시 군포첨단산업1로 47 (부곡동)",
@@ -2086,48 +1871,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 49,
-    "title": "[웍스피어] 전략기획 (인턴)",
-    "company_name": "웍스피어(유)",
-    "location": "대한민국 서울특별시 서초구 서초대로 301, 동익성봉빌딩",
-    "career": "경력무관",
-    "employment_type": "인턴",
-    "posted_date": "2026.06.15(월)",
-    "deadline": "2026.07.06",
-    "deadline_date": "2026-07-06",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49362273?Oem_Code=C1&logpath=1&stext=%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94&listno=9&sc=630",
-    "raw_detail_text": "웍스피어(유) 채용 - [웍스피어] 전략기획 (인턴) | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n웍스피어(유)\n[웍스피어] 전략기획 (인턴)\n상세요강\n접수기간∙방법\n기업정보\n추천공고\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n웍스피어 전략기획 인턴\n모집인원\n0\n명\n고용형태\n인턴\n급여\n회사 내규에 따름\n근무지주소\n대한민국 서울특별시 서초구 서초대로 301, 동익성봉빌딩\n지도보기\n지원자격\n경력\n경력무관\n학력\n학력무관\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.06.15(월)\n마감일\n2026.07.06(월)\n이 기업의 취업 전략\n합격자소서\n인적성·면접 후기\n직무 인터뷰\n잡코리아에 입사해야 하는 이유와 입사 후 어떤 공헌을 할 수 있는지 기술해주세요.\n2019\n년\n상반기\n신입\n\"잡코리아만의 킬러콘텐츠를 발굴하겠습니다\"\n\n잡코리아는 더 좋은 일자리와 인재의 매칭을 통해 사회적 문제인 취업난을 해소하고, 희망찬 미래를 만들려는 비전을 가지고 있습니다. 그런 비전이 엿보이듯 잡코리아는 각 분야 현직자들의 인터뷰, 취업 꿀팁 등 체계적인 취업 콘텐츠와 잡코리아 러닝 과정을 제공하며 업\n성장 과정\n2016\n년\n하반기\n신입\n사교성이 좋고 사람들과의 관계에서는 문제가 있지 않았지만, 집안 환경에 의해 내적으로 불우한 어린 시절을 겪으며 보냈습니다. 고난이나 어려움에 부딪혔을 경우 이겨내는 방법을 찾지 못하고 정체성에 대한 혼란 등 어려운 시절을 겪고 있었을 때 고등학교 2학년쯤에 심리 상담을 받으며 정체성을 찾고 자존감을 키우는\n기업 정보\n기업정보 더보기\n사원수\n501 ~ 1,000명 이하\n기업구분\n중견기업 (비상장)\n산업(업종)\n포털·컨텐츠·커뮤니티\n지도보기\n위치\n서울 서초구 서초동 1692-1 동익성봉빌딩 16~18층\n⭐\n11173명 이상 찜한 기업\n👀\n적극 채용중\n📜\n설립 31년차\n🏢\n중견기업\n📈\n매출 성장",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 79,
-    "recommendation_level": "good",
-    "matched_keywords": [
-      "서울",
-      "경력무관",
-      "학력무관",
-      "인턴",
-      "AI",
-      "기획"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "근무지역 '서울' 일치: +18점",
-      "경력 '경력무관' 일치: +16점",
-      "학력 '학력무관' 일치: +10점",
-      "고용형태 '인턴' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점",
-      "보조 관심 PM/서비스기획 관련 키워드 '기획' 일치: +3점"
-    ],
-    "negative_reasons": [
-      "AI·개발·데이터 계열 직무를 확인하지 못했습니다: -15점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 50,
+    "id": 44,
     "title": "(주)블루트렌드 AI 업무자동화, 경영지원",
     "company_name": "㈜블루트렌드",
     "location": "경기 성남시 수정구 위례광장로 19 (창곡동, 아이페리온) 1202호",
@@ -2168,7 +1912,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 51,
+    "id": 45,
     "title": "설계팀 설계업무(자동차 자동화라인)",
     "company_name": "진성기계㈜",
     "location": "경기 의왕시 오전동 150-24  2층",
@@ -2209,7 +1953,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 52,
+    "id": 46,
     "title": "경기청년 일자리 매치업 2차 채용공고",
     "company_name": "(재)경기도일자리재단",
     "location": "경기 남양주시 외 14",
@@ -2250,7 +1994,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 53,
+    "id": 47,
     "title": "KB데이타시스템 IT분야 경력직원 모집",
     "company_name": "㈜KB데이타시스템KB금융그룹",
     "location": "서울 마포구 마포대로 78 (도화동, 자람빌딩)",
@@ -2289,46 +2033,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 54,
-    "title": "데이터 엔지니어(Back & Pipeline) 채용(경력)",
-    "company_name": "나이스인베스팅㈜",
-    "location": "서울특별시 영등포구 은행로 30  (여의도동)",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.05.22(금)",
-    "deadline": "2026.07.31",
-    "deadline_date": "2026-07-31",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49233386?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0+%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8&listno=13&sc=630",
-    "raw_detail_text": "나이스인베스팅㈜ 채용 - 데이터 엔지니어(Back & Pipeline) 채용(경력) | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n나이스인베스팅㈜\n데이터 엔지니어(Back & Pipeline) 채용(경력)\n상세요강\n접수기간∙방법\n기업정보\n추천공고\nIT 개발자 전문 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n데이터 엔지니어\n모집인원\n○\n명\n고용형태\n정규직\n급여\n회사 내규에 따름\n근무지주소\n서울특별시 영등포구 은행로 30 (여의도동)\n지도보기\n지원자격\n경력\n경력\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.05.22(금)\n마감일\n2026.07.31(금)\n채용 시 마감\n기업 정보\n기업정보 더보기\n사원수\n50명 이하\n기업구분\n중소기업 (-)\n산업(업종)\n데이터베이스 및 온라인정보 제공업\n위치\n서울 영등포구 은행로 30 (여의도동, 중소기업중앙회) -",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 79,
-    "recommendation_level": "good",
-    "matched_keywords": [
-      "데이터엔지니어",
-      "서울",
-      "학력무관",
-      "정규직",
-      "AI"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "JobKorea 희망 직무 '데이터엔지니어' 일치: +15점",
-      "근무지역 '서울' 일치: +18점",
-      "학력 '학력무관' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점"
-    ],
-    "negative_reasons": [
-      "경력 희망 조건(신입, 경력무관, 1~3년, 경력1년, 경력2년, 경력3년, 경력1년↑, 경력2년↑, 경력3년↑)과 일치하는 값을 확인하지 못했습니다: -10점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 55,
+    "id": 48,
     "title": "[일동제약그룹] 2026년 6월 수시채용",
     "company_name": "일동제약",
     "location": "서울 서초구 바우뫼로27길 2 (양재동, 일동홀딩스(주)사옥) 일동제약",
@@ -2369,7 +2074,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 56,
+    "id": 49,
     "title": "[NHN PAYCO] 데이터 엔지니어",
     "company_name": "엔에이치엔페이코㈜",
     "location": "서울 구로구 디지털로26길 72 (구로동, NHNKCP) 3층",
@@ -2408,7 +2113,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 57,
+    "id": 50,
     "title": "청라 카드사 정보계 SM",
     "company_name": "㈜크레디트라인",
     "location": "서울 영등포구 경인로 775 (문래동3가, 에이스하이테크시티) 2-1701",
@@ -2447,7 +2152,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 58,
+    "id": 51,
     "title": "금융권.AI다크팩토리구축/고급/을지로/07-12/필수(보험,금융권)등 상세참조",
     "company_name": "㈜조인아이티",
     "location": "서울 중구 을지로 42 (을지로1가, 을지로입구역2호선)",
@@ -2486,7 +2191,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 59,
+    "id": 52,
     "title": "제조/공공 부문 AX 솔루션 Data Architect",
     "company_name": "엑센솔루션",
     "location": "서울 금천구 가산디지털2로 169-16 (가산동) 하우스디가산퍼스타 1207~1214호",
@@ -2525,7 +2230,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 60,
+    "id": 53,
     "title": "[세무법인다승] 신입 세무대리인 채용 / 취업축하금 50만 지원",
     "company_name": "세무법인 다승",
     "location": "서울 성동구 광나루로 144 (성수동1가, 더스페이스타워) 1410호",
@@ -2564,7 +2269,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 61,
+    "id": 54,
     "title": "2026년 엘티소재 경력 및 신입사원 채용",
     "company_name": "LT소재㈜",
     "location": "경기 용인시 처인구 남사읍 당하로 113-19 (북리) LT소재 본사",
@@ -2603,7 +2308,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 62,
+    "id": 55,
     "title": "[코드이움 노원학원] 로봇코딩, 파이썬, OA, 3D 강사 모집 (초중고 대상)",
     "company_name": "코드이움노원학원",
     "location": "서울 노원구 중계로 225 (중계동, 청구3차아파트) 청구상가307호",
@@ -2642,7 +2347,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 63,
+    "id": 56,
     "title": "[GS리테일] 플랫폼SU MD본부 상품 트렌드 기획 담당 경력사원 채용",
     "company_name": "GS리테일GS그룹",
     "location": "서울 강남구 논현로 508 (역삼동, GS강남타워)",
@@ -2687,7 +2392,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 64,
+    "id": 57,
     "title": "2026 하반기 부문별 채용",
     "company_name": "강운공업",
     "location": "인천 미추홀구 주염로73번길 17 (주안동, 강운공업) 강운공업㈜",
@@ -2732,7 +2437,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 65,
+    "id": 58,
     "title": "프로젝트계약직 경력사원 채용(사업, 설계, 시공, 현장운영, 안전/보건, 품질)",
     "company_name": "삼성이앤에이(주)삼성그룹",
     "location": "서울 강동구 상일로6길 26 (상일동, 삼성엔지니어링) GEC",
@@ -2774,7 +2479,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 66,
+    "id": 59,
     "title": "[대웅] 웰다 AX Engineer 경력직",
     "company_name": "㈜대웅제약",
     "location": "서울 강남구 봉은사로114길 12 (삼성동, 대웅제약빌딩)",
@@ -2814,7 +2519,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 67,
+    "id": 60,
     "title": "2026년 스튜디오 초이스 경력직 공개 채용",
     "company_name": "스튜디오 초이스㈜",
     "location": "서울 마포구 상암산로 76 (상암동, YTN 뉴스퀘어) 15층 스튜디오초이스",
@@ -2854,7 +2559,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 68,
+    "id": 61,
     "title": "㈜삼양인터내셔날 경영지원부문 전산팀(정규직) 모집",
     "company_name": "㈜삼양인터내셔날GS그룹",
     "location": "서울 종로구 재동 84-2 보헌빌딩 3층 삼양인터내셔날",
@@ -2895,7 +2600,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 69,
+    "id": 62,
     "title": "[회계법인리파인드] 기장 경력직 공개 채용",
     "company_name": "회계법인리파인드",
     "location": "서울 강남구 강남대로140길 18 (논현동, 크레아빌딩) 3층",
@@ -2933,7 +2638,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 70,
+    "id": 63,
     "title": "지노키오 BM 총괄 /Growth Lead 채용공고",
     "company_name": "㈜마인드코브",
     "location": "서울 강동구 진황도로 153 (둔촌동) 3층",
@@ -2971,7 +2676,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 71,
+    "id": 64,
     "title": "(주)신세계푸드 이천공장 오산공장(전기 및 공조냉동) 천안공장(공조냉동) 공무관리 경력사원 모집",
     "company_name": "신세계푸드신세계그룹",
     "location": "경기 이천시 외 14",
@@ -3009,45 +2714,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 72,
-    "title": "(삼성SDS분사社) 비젠트로㈜ 하반기 채용공고",
-    "company_name": "비젠트로주식회사",
-    "location": "경기도 성남시 분당구 대왕판교로 660 에이동 1007호(삼평동, 유스페이스1)",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.06.16(화)",
-    "deadline": "2026.06.26",
-    "deadline_date": "2026-06-26",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49389099?Oem_Code=C1&logpath=1&stext=ETL&listno=5&sc=630",
-    "raw_detail_text": "비젠트로주식회사 채용 - (삼성SDS분사社) 비젠트로㈜ 하반기 채용공고 | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n비젠트로주식회사\n(삼성SDS분사社) 비젠트로㈜ 하반기 채용공고\n상세요강\n접수기간∙방법\n기업정보\n추천공고\n가족친화인증기업 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\nUNIERP 개선 및 지원, HR 컨설턴트\n모집인원\n○\n명\n고용형태\n정규직\n급여\n회사 내규에 따름\n근무시간\n주5일(월~금)\n09:00 ~ 18:00\n근무지주소\n경기도 성남시 분당구 대왕판교로 660 에이동 1007호(삼평동, 유스페이스1)\n지도보기\n인근지하철\n지원자격\n경력\n경력\n(4년이상, 직무별 상이 / 상세요강 참고)\n학력\n학력무관\n스킬\n우대조건\n기본우대\n유관업무 경험자(인턴·알바)\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.06.16(화)\n마감일\n2026.06.26(금)\n기업 정보\n기업정보 더보기\n사원수\n51 ~ 300명 이하\n기업구분\n중소기업 (비상장)\n산업(업종)\n솔루션·SI·CRM·ERP\n지도보기\n위치\n경기도 성남시 분당구 대왕판교로 660 에이동 1007호(삼평동, 유스페이스1)\n🎲\n사내 동호회\n💵\n성과급\n⛱️\n휴양시설\n🏆\n우수사원 포상제도",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 52,
-    "recommendation_level": "possible",
-    "matched_keywords": [
-      "경기",
-      "학력무관",
-      "정규직",
-      "AI"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "근무지역 '경기' 일치: +18점",
-      "학력 '학력무관' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점"
-    ],
-    "negative_reasons": [
-      "AI·개발·데이터 계열 직무를 확인하지 못했습니다: -15점",
-      "경력 희망 조건(신입, 경력무관, 1~3년, 경력1년, 경력2년, 경력3년, 경력1년↑, 경력2년↑, 경력3년↑)과 일치하는 값을 확인하지 못했습니다: -10점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 73,
+    "id": 65,
     "title": "Power BI 개발자",
     "company_name": "㈜에이엔에이치코리아",
     "location": "서울 구로구 디지털로33길 27  (구로동)  197-5 삼성IT밸리 402호",
@@ -3085,7 +2752,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 74,
+    "id": 66,
     "title": "각 분야 경력 채용 (AX/경영관리/영업/PM/설계/PLC/통역)-2차",
     "company_name": "㈜윤성에프앤씨",
     "location": "경기 안성시 문터길 72-23 (마정리) 윤성에프앤씨",
@@ -3128,7 +2795,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 75,
+    "id": 67,
     "title": "2026년 해커스 교육그룹 수시 채용",
     "company_name": "㈜해커스어학원",
     "location": "서울 서초구 서초4동 1316-15 현대성우빌딩 1층, 2층,",
@@ -3175,7 +2842,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 76,
+    "id": 68,
     "title": "전사 디지털전환 및 AI업무자동화 담당자",
     "company_name": "㈜달콤한고래들",
     "location": "서울 강서구 양천로 401 (가양동, 강서한강자이타워) B동 505,506호",
@@ -3219,7 +2886,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 77,
+    "id": 69,
     "title": "2026년도 상반기 신입(인턴) 및 경력사원 채용",
     "company_name": "㈜클리오",
     "location": "서울 성동구 왕십리로 66-33 (성수동1가) 클리오사옥",
@@ -3264,7 +2931,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 78,
+    "id": 70,
     "title": "[외국계] Industrial Automation- 산업 자동화 FAE",
     "company_name": "델타일렉트로닉스코리아",
     "location": "서울 금천구 가산디지털1로 219 (가산동, 벽산디지털밸리6차) 1511호",
@@ -3306,87 +2973,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 79,
-    "title": "[웍스피어] Sales Operation Manager (3년이상)",
-    "company_name": "웍스피어(유)",
-    "location": "대한민국 서울특별시 서초구 서초대로 301, 동익성봉빌딩",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.06.16(화)",
-    "deadline": "2026.07.06",
-    "deadline_date": "2026-07-06",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49386187?Oem_Code=C1&logpath=1&stext=%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94&listno=8&sc=630",
-    "raw_detail_text": "웍스피어(유) 채용 - [웍스피어] Sales Operation Manager (3년이상) | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n웍스피어(유)\n[웍스피어] Sales Operation Manager (3년이상)\n상세요강\n접수기간∙방법\n기업정보\n추천공고\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\nSales Operation Manager\n모집인원\n0\n명\n고용형태\n정규직\n급여\n회사 내규에 따름\n근무지주소\n대한민국 서울특별시 서초구 서초대로 301, 동익성봉빌딩\n지도보기\n지원자격\n경력\n경력\n(3년이상)\n학력\n학력무관\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.06.16(화)\n마감일\n2026.07.06(월)\n이 기업의 취업 전략\n합격자소서\n인적성·면접 후기\n직무 인터뷰\n잡코리아에 입사해야 하는 이유와 입사 후 어떤 공헌을 할 수 있는지 기술해주세요.\n2019\n년\n상반기\n신입\n\"잡코리아만의 킬러콘텐츠를 발굴하겠습니다\"\n\n잡코리아는 더 좋은 일자리와 인재의 매칭을 통해 사회적 문제인 취업난을 해소하고, 희망찬 미래를 만들려는 비전을 가지고 있습니다. 그런 비전이 엿보이듯 잡코리아는 각 분야 현직자들의 인터뷰, 취업 꿀팁 등 체계적인 취업 콘텐츠와 잡코리아 러닝 과정을 제공하며 업\n성장 과정\n2016\n년\n하반기\n신입\n사교성이 좋고 사람들과의 관계에서는 문제가 있지 않았지만, 집안 환경에 의해 내적으로 불우한 어린 시절을 겪으며 보냈습니다. 고난이나 어려움에 부딪혔을 경우 이겨내는 방법을 찾지 못하고 정체성에 대한 혼란 등 어려운 시절을 겪고 있었을 때 고등학교 2학년쯤에 심리 상담을 받으며 정체성을 찾고 자존감을 키우는\n기업 정보\n기업정보 더보기\n사원수\n501 ~ 1,000명 이하\n기업구분\n중견기업 (비상장)\n산업(업종)\n포털·컨텐츠·커뮤니티\n지도보기\n위치\n서울 서초구 서초동 1692-1 동익성봉빌딩 16~18층\n⭐\n11173명 이상 찜한 기업\n👀\n적극 채용중\n📜\n설립 31년차\n🏢\n중견기업\n📈\n매출 성장",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 27,
-    "recommendation_level": "low",
-    "matched_keywords": [
-      "서울",
-      "학력무관",
-      "정규직",
-      "AI",
-      "영업"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "근무지역 '서울' 일치: +18점",
-      "학력 '학력무관' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점"
-    ],
-    "negative_reasons": [
-      "AI·개발·데이터 계열 직무를 확인하지 못했습니다: -15점",
-      "경력 희망 조건(신입, 경력무관, 1~3년, 경력1년, 경력2년, 경력3년, 경력1년↑, 경력2년↑, 경력3년↑)과 일치하는 값을 확인하지 못했습니다: -10점",
-      "감점 키워드(major) '영업' 감지: -25점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 80,
-    "title": "[웍스피어] Sales System Manager (5년이상)",
-    "company_name": "웍스피어(유)",
-    "location": "대한민국 서울특별시 서초구 서초대로 301, 동익성봉빌딩",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.06.16(화)",
-    "deadline": "2026.07.06",
-    "deadline_date": "2026-07-06",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49386178?Oem_Code=C1&logpath=1&stext=%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94&listno=10&sc=630",
-    "raw_detail_text": "웍스피어(유) 채용 - [웍스피어] Sales System Manager (5년이상) | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n웍스피어(유)\n[웍스피어] Sales System Manager (5년이상)\n상세요강\n접수기간∙방법\n기업정보\n추천공고\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n웍스피어 Sales System Manager\n모집인원\n0\n명\n고용형태\n정규직\n급여\n회사 내규에 따름\n근무지주소\n대한민국 서울특별시 서초구 서초대로 301, 동익성봉빌딩\n지도보기\n지원자격\n경력\n경력\n(5년이상)\n학력\n학력무관\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n남은기간\n시작일\n2026.06.16(화)\n마감일\n2026.07.06(월)\n이 기업의 취업 전략\n합격자소서\n인적성·면접 후기\n직무 인터뷰\n잡코리아에 입사해야 하는 이유와 입사 후 어떤 공헌을 할 수 있는지 기술해주세요.\n2019\n년\n상반기\n신입\n\"잡코리아만의 킬러콘텐츠를 발굴하겠습니다\"\n\n잡코리아는 더 좋은 일자리와 인재의 매칭을 통해 사회적 문제인 취업난을 해소하고, 희망찬 미래를 만들려는 비전을 가지고 있습니다. 그런 비전이 엿보이듯 잡코리아는 각 분야 현직자들의 인터뷰, 취업 꿀팁 등 체계적인 취업 콘텐츠와 잡코리아 러닝 과정을 제공하며 업\n성장 과정\n2016\n년\n하반기\n신입\n사교성이 좋고 사람들과의 관계에서는 문제가 있지 않았지만, 집안 환경에 의해 내적으로 불우한 어린 시절을 겪으며 보냈습니다. 고난이나 어려움에 부딪혔을 경우 이겨내는 방법을 찾지 못하고 정체성에 대한 혼란 등 어려운 시절을 겪고 있었을 때 고등학교 2학년쯤에 심리 상담을 받으며 정체성을 찾고 자존감을 키우는\n기업 정보\n기업정보 더보기\n사원수\n501 ~ 1,000명 이하\n기업구분\n중견기업 (비상장)\n산업(업종)\n포털·컨텐츠·커뮤니티\n지도보기\n위치\n서울 서초구 서초동 1692-1 동익성봉빌딩 16~18층\n⭐\n11173명 이상 찜한 기업\n👀\n적극 채용중\n📜\n설립 31년차\n🏢\n중견기업\n📈\n매출 성장",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 27,
-    "recommendation_level": "low",
-    "matched_keywords": [
-      "서울",
-      "학력무관",
-      "정규직",
-      "AI",
-      "영업"
-    ],
-    "positive_reasons": [
-      "상세 페이지 수집 완료: +5점",
-      "근무지역 '서울' 일치: +18점",
-      "학력 '학력무관' 일치: +10점",
-      "고용형태 '정규직' 일치: +16점",
-      "1순위 AI/업무자동화 개발 관련 키워드 'AI' 일치: +18점"
-    ],
-    "negative_reasons": [
-      "AI·개발·데이터 계열 직무를 확인하지 못했습니다: -15점",
-      "경력 희망 조건(신입, 경력무관, 1~3년, 경력1년, 경력2년, 경력3년, 경력1년↑, 경력2년↑, 경력3년↑)과 일치하는 값을 확인하지 못했습니다: -10점",
-      "감점 키워드(major) '영업' 감지: -25점"
-    ],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 81,
+    "id": 71,
     "title": "클라우드 운영 개발자",
     "company_name": "Cloud Canvas",
     "location": "서울 마포구",
@@ -3414,7 +3001,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 82,
+    "id": 72,
     "title": "주니어 풀스택 개발자",
     "company_name": "Pixel Route",
     "location": "인천 연수구",
@@ -3442,7 +3029,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 83,
+    "id": 73,
     "title": "서비스 자동화 엔지니어",
     "company_name": "Mono Systems",
     "location": "서울 영등포구",
@@ -3470,7 +3057,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 84,
+    "id": 74,
     "title": "React 기반 프론트엔드 개발자",
     "company_name": "Nouveau Lab",
     "location": "경기 성남시",
@@ -3498,7 +3085,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 85,
+    "id": 75,
     "title": "데이터 플랫폼 엔지니어",
     "company_name": "Orbit Works",
     "location": "서울 성동구",
@@ -3526,7 +3113,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 86,
+    "id": 76,
     "title": "Python FastAPI 백엔드 개발자",
     "company_name": "Layer Nine",
     "location": "서울 강남구",
@@ -3554,7 +3141,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 87,
+    "id": 77,
     "title": "[병역특례 전문연구요원] (주)일루넥스 인공지능, 빅데이터 분석 분야 채용",
     "company_name": "㈜일루넥스",
     "location": "경기 고양시 덕양구 향기로 180 (향동동)",
@@ -3582,7 +3169,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 88,
+    "id": 78,
     "title": "[SW헬스케어] IT개발팀 경력모집",
     "company_name": "㈜에스더블유헬스케어",
     "location": "인천 서구 가재울로 109  (가좌동) 11층",
@@ -3610,7 +3197,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 89,
+    "id": 79,
     "title": "[퍼플페퍼] 기술본부 채용",
     "company_name": "㈜퍼플페퍼",
     "location": "서울 마포구 와우산로17길 19-18 (서교동, 아지오빌딩)",
@@ -3638,63 +3225,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 90,
-    "title": "타나베파마코리아 주사제 제조담당자/QA(품질보증)/ 대구그룹 MR 채용",
-    "company_name": "타나베파마코리아㈜",
-    "location": "경기도 화성시 향남읍 제약공단2길 80",
-    "career": "신입·경력",
-    "employment_type": "정규직, 계약직",
-    "posted_date": "2026.06.09(화)",
-    "deadline": "2026.06.09",
-    "deadline_date": "2026-06-09",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49336615?Oem_Code=C1&logpath=1&stext=%EC%9E%90%EB%8F%99%ED%99%94&listno=10&sc=630",
-    "raw_detail_text": "타나베파마코리아㈜ 채용 - 타나베파마코리아 주사제 제조담당자/QA(품질보증)/ 대구그룹 MR 채용 | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n타나베파마코리아㈜\n타나베파마코리아 주사제 제조담당자/QA(품질보증)/ 대구그룹 MR 채용\n상세요강\n접수기간∙방법\n기업정보\n추천공고\nKOTRA 외투기업 채용전용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n주사제 제조 담당자, (마감)QC 담당자, QA(품질보증), 대구그룹 MR\n모집인원\n○\n명\n고용형태\n정규직\n( )\n,\n계약직\n(근무기간 1년, 육아휴직대체 / 직무별 상이)\n급여\n회사 내규에 따름\n근무지주소\n경기도 화성시 향남읍 제약공단2길 80\n지도보기\n대구광역시 동구 동대구로 489 (신천동) 대구무역회관 704호\n지도보기\n지원자격\n경력\n신입·경력\n(직무별 상이, 상세요강 참고)\n학력\n고졸이상\n(\n직무별 상이, 상세요강 참고\n)\n스킬\n우대조건\n기본우대\n일본어가능자, 영어능통자(원어민수준), 프리젠테이션 능력우수자, 관련 자격증 보유자\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n시작일\n2026.06.09(화)\n마감일\n상시채용\n기업 정보\n기업정보 더보기\n사원수\n51 ~ 300명 이하\n기업구분\n외국계(외국 투자기업) (비상장)\n산업(업종)\n제약·보건·바이오\n위치\n경기도 화성시 향남읍 제약공단2길 80 -\n🏝️\n리프레시 휴가",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 91,
-    "title": "㈜백조씽크[서울/음성] 각 분야별 직원 채용",
-    "company_name": "백조씽크",
-    "location": "서울 동대문구 청계천로 463 (용두동) 백조씽크 본사",
-    "career": "신입·경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.06.12(금)",
-    "deadline": "2026.06.12",
-    "deadline_date": "2026-06-12",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49362386?Oem_Code=C1&logpath=1&stext=%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94&listno=11&sc=630",
-    "raw_detail_text": "백조씽크 채용 - ㈜백조씽크[서울/음성] 각 분야별 직원 채용 | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n백조씽크\n㈜백조씽크[서울/음성] 각 분야별 직원 채용\n상세요강\n접수기간∙방법\n기업정보\n추천공고\n신입·인턴 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n음성_공장총괄, 음성_자재관리 팀장, 음성_품질팀 팀장, 음성_생산팀_현장, 음성_생산팀_용접사, 음성_CS팀_AS담당, 본사_B2C 영업\n모집인원\n○\n명\n고용형태\n정규직\n(수습 3개월)\n급여\n회사 내규에 따름 ((경력직의 경우, 면접후 결정))\n근무시간\n주5일(월~금)\n08:30 ~ 18:00\n(휴게시간 1시간 포함)\n근무지주소\n서울 동대문구 청계천로 463 (용두동) 백조씽크 본사\n지도보기\n충북 음성군 삼성면 대성로 353 (선정리) 백조씽크 공장\n지도보기\n인근지하철\n지원자격\n경력\n신입·경력\n(부서별 상이(상세요강 참조))\n학력\n학력무관\n(\n* 상세요강 참고\n)\n스킬\n핵심역량\n성실성\n,\n꼼꼼함\n,\n계획성\n우대조건\n기본우대\n회계프로그램 능숙자, 관련 자격증 보유자\n복리후생\n기타 복리후생\n하계휴가, 출산휴가, 생일선물, 시무식, 종무식\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n시작일\n2026.06.12(금)\n마감일\n상시채용\n기업 정보\n기업정보 더보기\n사원수\n51 ~ 300명 이하\n기업구분\n중소기업 (비상장)\n산업(업종)\n금속·재료·자재\n지도보기\n위치\n서울 동대문구 청계천로 463 (용두동) 백조빌딩\n💵\n성과급\n⛱️\n휴양시설\n🏆\n우수사원 포상제도\n🧧\n명절선물/명절상여\n💸\n장기근속수당\n🎓\n자녀교육비",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 92,
+    "id": 80,
     "title": "사내 업무 자동화 담당자 계약직 채용(정규직 전환) AI 툴 SaaS활용",
     "company_name": "체리시",
     "location": "서울 구로구 디지털로 288 (구로동, 대륭포스트타워1차) 907호",
@@ -3722,7 +3253,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 93,
+    "id": 81,
     "title": "AI 업무자동화 프로토타이핑 담당자",
     "company_name": "㈜알라딘커뮤니케이션",
     "location": "서울 중구 서소문로 89-31 (순화동, 알라딘빌딩) (주) 알라딘커뮤니케이션",
@@ -3750,7 +3281,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 94,
+    "id": 82,
     "title": "파이썬 코어 및 로컬 AI 최적화 엔지니어 (엔진리스 자동화 시스템 구축)",
     "company_name": "㈜비에스피엔지니어링",
     "location": "경기 평택시 고덕면 도시지원1길 19 (해창리) 고덕STV 722호",
@@ -3778,35 +3309,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 95,
-    "title": "검색추천제품팀 리더",
-    "company_name": "㈜카카오스타일",
-    "location": "경기도 성남시 분당구 판교역로 235  (삼평동)",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.04.30(목)",
-    "deadline": "2026.04.30",
-    "deadline_date": "2026-04-30",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49085845?Oem_Code=C1&logpath=1&stext=Python+%EC%9E%90%EB%8F%99%ED%99%94&listno=18&sc=630",
-    "raw_detail_text": "㈜카카오스타일 채용 - 검색추천제품팀 리더 | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n㈜카카오스타일\n검색추천제품팀 리더\n상세요강\n접수기간∙방법\n기업정보\n추천공고\n잡아바 추천 TOP 기업 온라인 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\nInfra\n모집인원\n○\n명\n고용형태\n정규직\n(협의)\n급여\n회사 내규에 따름\n근무지주소\n경기도 성남시 분당구 판교역로 235 (삼평동)\n지도보기\n지원자격\n경력\n경력\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n시작일\n2026.04.30(목)\n마감일\n상시채용\n이 기업의 취업 전략\n합격자소서\n인적성·면접 후기\n자유양식\n2022\n년\n상반기\n인턴\n- **미래를 위한 도약**\n- **배움과 기초**\n \n개발자가 되기로 결정한 뒤 저는 많은 공부를 한 뒤, 이에 관한 프로젝트를 시도했고 이를 통해 Spring boot에 관한 기본적인 지식을 쌓을 수 있었습니다.\n \n제가 가장 좋아하는 Spring boot 관련 개발 공부 외에도, java를 통한 알고리즘 문제 풀이를 진행하고 있\n기업 정보\n기업정보 더보기\n사원수\n501 ~ 1,000명 이하\n기업구분\n대기업 (-)\n산업(업종)\n응용 소프트웨어 개발 및 공급업\n위치\n서울 강남구 테헤란로 521 (삼성동, 파르나스타워) -",
-    "reopen_count": 0,
-    "skill_candidates": "개발자가 되기로 결정한 뒤 저는 많은 공부를 한 뒤, 이에 관한 프로젝트를 시도했고 이를 통해 Spring boot에 관한 기본적인 지식을 쌓을 수 있었습니다.\n제가 가장 좋아하는 Spring boot 관련 개발 공부 외에도, java를 통한 알고리즘 문제 풀이를 진행하고 있",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 96,
+    "id": 83,
     "title": "데이터 파이프라인 유지관리 ,  BigQuery, Airfow, GA4, Appsflyer, Looker",
     "company_name": "㈜파인만소프트",
     "location": "서울 송파구 중대로 80 (문정동, 문정프라자) 2",
@@ -3834,7 +3337,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 97,
+    "id": 84,
     "title": "AI 엔지니어",
     "company_name": "㈜에스원삼성그룹",
     "location": "서울 중구 세종대로7길 25 (순화동, 에프엔타워순화(FNTOWERSUNHWA)) 에스원 빌딩",
@@ -3862,7 +3365,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 98,
+    "id": 85,
     "title": "데이터 엔지니어 (Data Engineer, 3년 이상)",
     "company_name": "㈜아이지아이코리아",
     "location": "서울 종로구 세종로 77-6 정부서울청사 본관",
@@ -3890,7 +3393,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 99,
+    "id": 86,
     "title": "[재택근무] 데이터 엔지니어",
     "company_name": "㈜코니바이에린",
     "location": "서울 성동구 독서당로 171 (옥수동) 4층, Konny",
@@ -3918,7 +3421,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 100,
+    "id": 87,
     "title": "[프리랜서][강서] LLM / NL2SQL 데이터 엔지니어",
     "company_name": "용컴에스넷㈜",
     "location": "서울 강서구 공항대로 165 (마곡동) -",
@@ -3946,7 +3449,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 101,
+    "id": 88,
     "title": "데이터엔지니어 인원을 모집합니다.(빅데이터/데이터파이프라인/ETL 등)",
     "company_name": "㈜세종데이터시스템",
     "location": "서울 강남구 테헤란로 423 (삼성동, 현대타워) 9층 926",
@@ -3974,35 +3477,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 102,
-    "title": "Data Analytics Engineer - 테크코어 (데이터 가치화)",
-    "company_name": "(주)당근마켓",
-    "location": "서울특별시 서초구 강남대로 465  (서초동)",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.05.21(목)",
-    "deadline": "2026.05.21",
-    "deadline_date": "2026-05-21",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49229343?Oem_Code=C1&logpath=1&stext=ETL&listno=12&sc=630",
-    "raw_detail_text": "(주)당근마켓 채용 - Data Analytics Engineer - 테크코어 (데이터 가치화) | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n(주)당근마켓\nData Analytics Engineer - 테크코어 (데이터 가치화)\n상세요강\n접수기간∙방법\n기업정보\n추천공고\nIT 개발자 전문 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\nData Analytics Engineer\n모집인원\n○\n명\n고용형태\n정규직\n(협의)\n급여\n회사 내규에 따름\n근무지주소\n서울특별시 서초구 강남대로 465 (서초동)\n지도보기\n지원자격\n경력\n경력\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n시작일\n2026.05.21(목)\n마감일\n상시채용\n기업 정보\n기업정보 더보기\n사원수\n50명 이하\n기업구분\n중소기업 (-)\n산업(업종)\n모바일·APP\n위치\n서울 강남구 테헤란로4길 14 (역삼동, 미림타워) -",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 103,
+    "id": 89,
     "title": "AIR 부문 AI 전문 Engineer 채용 (경력)",
     "company_name": "메가존클라우드㈜",
     "location": "경기 과천시 과천대로7길 74 (갈현동, 메가존산학연센터)",
@@ -4030,35 +3505,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 104,
-    "title": "개발자 통합 채용 - 웹 프론트엔드 개발",
-    "company_name": "아토머스㈜",
-    "location": "서울특별시 강남구 영동대로96길 20  (삼성동)",
-    "career": "경력",
-    "employment_type": "정규직",
-    "posted_date": "2026.04.30(목)",
-    "deadline": "2026.04.30",
-    "deadline_date": "2026-04-30",
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49087028?Oem_Code=C1&logpath=1&stext=%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C&listno=2&sc=630",
-    "raw_detail_text": "아토머스㈜ 채용 - 개발자 통합 채용 - 웹 프론트엔드 개발 | 잡코리아\n회원가입/로그인\n기업 서비스\nJOB 찾기\n합격축하금\n공채정보\n신입·인턴\n기업·연봉\n콘텐츠\n취업톡톡\n아토머스㈜\n개발자 통합 채용 - 웹 프론트엔드 개발\n상세요강\n접수기간∙방법\n기업정보\n추천공고\nIT 개발자 전문 채용관\n채용정보에 잘못된 내용이 있을 경우\n문의\n해주세요.\n모집요강\n모집분야\n웹 프론트엔드 개발\n모집인원\n○\n명\n고용형태\n정규직\n급여\n회사 내규에 따름\n근무지주소\n서울특별시 강남구 영동대로96길 20 (삼성동)\n지도보기\n지원자격\n경력\n경력\n로그인\n하고 비슷한 조건의 AI추천공고를 확인해 보세요!\nTOP\n궁금해요\n접수기간 · 방법\n마감일은 기업의 사정으로 인해 조기 마감 또는 변경될 수 있습니다\n시작일\n2026.04.30(목)\n마감일\n상시채용\n기업 정보\n기업정보 더보기\n사원수\n50명 이하\n기업구분\n중소기업 (-)\n산업(업종)\n자료 처리업\n위치\n서울 강남구 영동대로96길 20 (삼성동, 대화빌딩) -",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": "success",
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 105,
+    "id": 90,
     "title": "[플랫폼본부] 게임웹개발실 웹 프론트엔드 엔지니어 (계약직)",
     "company_name": "㈜넥슨",
     "location": "경기 성남시 분당구 판교로256번길 7 (삼평동) 넥슨코리아",
@@ -4086,7 +3533,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 106,
+    "id": 91,
     "title": "[메이플스토리 월드] 웹 프론트엔드 개발자 (계약직)",
     "company_name": "㈜넥슨",
     "location": "경기 성남시 분당구 판교로256번길 7 (삼평동) 넥슨코리아",
@@ -4114,315 +3561,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 107,
-    "title": "프론트엔드 엔지니어 (부산)",
-    "company_name": "㈜더블미디어",
-    "location": "부산 해운대구",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49197850?Oem_Code=C1&logpath=1&stext=%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C&listno=7&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 프론트엔드 엔지니어 (부산) ㈜더블미디어 부산 해운대구 방송·케이블·프로덕션, 프론트엔드개발자 즉시 지원 신입",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 108,
-    "title": "(부산) 경남은행 SM DW ETL 유지보수 개발 정보계 수신",
-    "company_name": "㈜디어소프트",
-    "location": "부산 강서구",
-    "career": "경력2년↑",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49319904?Oem_Code=C1&logpath=1&stext=ETL&listno=2&sc=630",
-    "raw_detail_text": "스크랩 (부산) 경남은행 SM DW ETL 유지보수 개발 정보계 수신 ㈜디어소프트 부산 강서구 솔루션·SI·CRM·ERP, 데이터엔지니어 즉시 지원 경력2년↑",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 109,
-    "title": "수산이앤에스 원전/화력/연구개발/우주항공분야 신입/경력사원 채용",
-    "company_name": "㈜수산이앤에스",
-    "location": "울산 북구 외 14",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49339872?Oem_Code=C1&logpath=1&stext=ETL&listno=7&sc=630",
-    "raw_detail_text": "오늘 마감! 놓치지 마세요! 스크랩 수산이앤에스 원전/화력/연구개발/우주항공분야 신입/경력사원 채용 ㈜수산이앤에스 울산 북구 외 14 전기·전자·제어, 화학·에너지·환경, 백엔드개발자, 시스템엔지니어 즉시 지원 신입·경력 • 복지포인트 , 휴양시설 지원 , 휴가제도",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 110,
-    "title": "[NC AI X 미래융합교육원] 커스텀 AI 시스템 개발자 과정 부트캠프",
-    "company_name": "미래융합교육원",
-    "location": "대전 서구",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49356945?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0+%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8&listno=19&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 [NC AI X 미래융합교육원] 커스텀 AI 시스템 개발자 과정 부트캠프 미래융합교육원 대전 서구 학원·어학원·교육원, 백엔드개발자, 프론트엔드개발자, 웹개발자 즉시 지원 신입·경력 • 숙소 지원",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 111,
-    "title": "㈜대동모빌리티/㈜대동로보틱스 각 부문 정규직 채용공고",
-    "company_name": "㈜대동모빌리티",
-    "location": "대구 달성군 외 1",
-    "career": null,
-    "employment_type": "정규직",
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49374271?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0+%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8&listno=10&sc=630",
-    "raw_detail_text": "탄탄한 중견기업 스크랩 ㈜대동모빌리티/㈜대동로보틱스 각 부문 정규직 채용공고 ㈜대동모빌리티 대구 달성군 외 1 기계·기계설비, 경영·비즈니스기획, 경영지원, 사무담당자 홈페이지 지원 경력",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 112,
-    "title": "㈜ABB코리아 각 부문 채용",
-    "company_name": "㈜ABB코리아",
-    "location": "충남 천안시 외 5",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49292335?Oem_Code=C1&logpath=1&stext=%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94&listno=5&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 ㈜ABB코리아 각 부문 채용 ㈜ABB코리아 충남 천안시 외 5 전기·전자·제어, 경영·비즈니스기획, 마케팅기획, 재무담당자 홈페이지 지원 신입·경력",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 113,
-    "title": "[LS마린솔루션] 분야별 신입/경력 채용",
-    "company_name": "엘에스마린솔루션㈜KT그룹",
-    "location": "부산 동구 외 1",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49425082?Oem_Code=C1&logpath=1&stext=%EC%9E%90%EB%8F%99%ED%99%94&listno=13&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 [LS마린솔루션] 분야별 신입/경력 채용 엘에스마린솔루션㈜ KT그룹 부산 동구 외 1 건축·설비·환경, 경영·비즈니스기획, 경영지원, 사무담당자 즉시 지원 신입·경력 • 생일 이벤트 , 성과급 , 복지포인트 , 자녀 교육비 지원 , 4대보험 , 퇴직연금",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 114,
-    "title": "([주)센추리] 각 부문별 채용(기술영업, 냉기생산, 기계/전기설계)",
-    "company_name": "㈜센추리",
-    "location": "충남 아산시 외 14",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49346010?Oem_Code=C1&logpath=1&stext=%EC%9E%90%EB%8F%99%ED%99%94&listno=9&sc=630",
-    "raw_detail_text": "탄탄한 중견기업 스크랩 ([주)센추리] 각 부문별 채용(기술영업, 냉기생산, 기계/전기설계) ㈜센추리 충남 아산시 외 14 건축·설비·환경, 시스템엔지니어, 제품영업, 해외영업 즉시 지원 경력무관 • 경조사 지원 , 사내 동호회 지원 , 연차제도 , 4대보험 , 반차제도 , 퇴직연금 , 주5일제",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 115,
-    "title": "2026년 하반기 신입 공개 채용 대원강업 채용공고",
-    "company_name": "대원강업㈜",
-    "location": "충남 천안시 외 9",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49385697?Oem_Code=C1&logpath=1&stext=%EC%9E%90%EB%8F%99%ED%99%94&listno=1&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 2026년 하반기 신입 공개 채용 대원강업 채용공고 대원강업㈜ 충남 천안시 외 9 자동차·조선·철강·항공, 제품영업, 해외영업, 설치·수리기사 홈페이지 지원 신입",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 116,
-    "title": "㈜솔탑 2026년도 위성 연구소 분야 신입/경력 채용",
-    "company_name": "솔탑",
-    "location": "세종",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49192357?Oem_Code=C1&logpath=1&stext=%EC%9E%90%EB%8F%99%ED%99%94&listno=3&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 ㈜솔탑 2026년도 위성 연구소 분야 신입/경력 채용 솔탑 세종 솔루션·SI·CRM·ERP, 경영·비즈니스기획, 사무담당자, 프론트엔드개발자 즉시 지원 신입·경력 • 경조사 지원 , 명절선물/명절상여 지원 , 생일 이벤트 , 육아휴직 , 복지포인트 , 장기근속 포상제도 , 건강검진 지원 , 휴식공간 , 연차제도 , 4대보험 , 반차제도 , 퇴직연금 , 식사 지원 , 자율복장 , 출산휴가 , 자유로운 연차 사용",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 117,
-    "title": "㈜솔탑 2026년도 위성/항공/경영 분야 신입/경력 채용",
-    "company_name": "솔탑",
-    "location": "세종 외 1",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49192355?Oem_Code=C1&logpath=1&stext=%EC%9E%90%EB%8F%99%ED%99%94&listno=7&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 ㈜솔탑 2026년도 위성/항공/경영 분야 신입/경력 채용 솔탑 세종 외 1 솔루션·SI·CRM·ERP, 총무, HRD·HRM, 회계담당자 즉시 지원 신입·경력 • 경조사 지원 , 명절선물/명절상여 지원 , 생일 이벤트 , 육아휴직 , 복지포인트 , 장기근속 포상제도 , 건강검진 지원 , 휴식공간 , 연차제도 , 4대보험 , 반차제도 , 퇴직연금 , 식사 지원 , 자율복장 , 출산휴가 , 자유로운 연차 사용",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 118,
+    "id": 92,
     "title": "Java 기업 WebCMS 개발 프리랜서 채용",
     "company_name": "㈜핸드위치(HANDWICH)",
     "location": "서울 송파구",
@@ -4450,7 +3589,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 119,
+    "id": 93,
     "title": "[한국평가정보(KCS)] Data Engineer (7년 이상)",
     "company_name": "한국평가정보㈜",
     "location": "서울 강남구",
@@ -4478,7 +3617,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 120,
+    "id": 94,
     "title": "[헥토데이터] 솔루션사업실 영업 신입 및 경력직 채용",
     "company_name": "㈜헥토데이터",
     "location": "서울 강남구",
@@ -4506,7 +3645,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 121,
+    "id": 95,
     "title": "[KG파이낸셜] IT본부 스크래핑 개발자 채용",
     "company_name": "㈜케이지파이낸셜",
     "location": "서울 중구",
@@ -4534,7 +3673,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 122,
+    "id": 96,
     "title": "[개발자 채용] 서비스 운영 및 시스템 구축을 함께할 개발자",
     "company_name": "㈜모드파티",
     "location": "서울 강남구",
@@ -4562,7 +3701,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 123,
+    "id": 97,
     "title": "풀스택 / AI 개발자 채용",
     "company_name": "㈜원더스랩",
     "location": "서울 강남구",
@@ -4590,7 +3729,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 124,
+    "id": 98,
     "title": "[LOreal/삼성]외국계대기업 Data Assistant채용",
     "company_name": "보보스링크㈜",
     "location": "서울 강남구",
@@ -4618,7 +3757,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 125,
+    "id": 99,
     "title": "[업계상위대우] 2026 하반기 각 분야 채용",
     "company_name": "스타닥",
     "location": "서울 강남구 외 14",
@@ -4646,7 +3785,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 126,
+    "id": 100,
     "title": "UI/UX 기획 경력직 채용",
     "company_name": "㈜화이트스캔",
     "location": "서울 용산구",
@@ -4674,7 +3813,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 127,
+    "id": 101,
     "title": "[유니티(UNITY) 개발자] 디지털트윈 경력직 채용",
     "company_name": "㈜화이트스캔",
     "location": "서울 용산구",
@@ -4702,7 +3841,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 128,
+    "id": 102,
     "title": "제안서 작성",
     "company_name": "㈜화이트스캔",
     "location": "서울 용산구",
@@ -4730,7 +3869,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 129,
+    "id": 103,
     "title": "[사업관리] IT 사업기획/관리 채용",
     "company_name": "㈜화이트스캔",
     "location": "서울 용산구",
@@ -4758,7 +3897,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 130,
+    "id": 104,
     "title": "AI 바이브코딩 기반 웹서비스 개발자 모집",
     "company_name": "㈜이크레모스",
     "location": "인천 연수구 외 11",
@@ -4786,7 +3925,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 131,
+    "id": 105,
     "title": "[RE4DAY] AI 마케팅 자동화 엔지니어",
     "company_name": "㈜와우바이오텍",
     "location": "서울 영등포구 외 5",
@@ -4814,35 +3953,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 132,
-    "title": "(주)광성계측기 AI 데이터 수집 및 연구 지원(Research Assistant) 채용",
-    "company_name": "중소벤처기업진흥공단",
-    "location": "부산 기장군",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49197381?Oem_Code=C1&logpath=1&stext=%EC%9B%B9%ED%81%AC%EB%A1%A4%EB%A7%81&listno=4&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 (주)광성계측기 AI 데이터 수집 및 연구 지원(Research Assistant) 채용 중소벤처기업진흥공단 부산 기장군 전기·전자·제어, AI/ML엔지니어 연봉 2,600~3,500만원 홈페이지 지원 신입·경력 • 점심 식사 지원 , 육아휴직 , 출퇴근 셔틀버스 운영 , 연차제도 , 4대보험 , 퇴직금 , 자율복장 , 연차수당",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 133,
+    "id": 106,
     "title": "[중랑구] 바른 부동산 소속공인중개사 중개보조원(차량지원)",
     "company_name": "바른부동산공인중개사사무소",
     "location": "서울 중랑구",
@@ -4870,7 +3981,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 134,
+    "id": 107,
     "title": "[셀파트너랩스] 이커머스 스타트업에서 AI/데이터 사이언티스트 모집",
     "company_name": "㈜셀파트너랩스",
     "location": "서울 용산구",
@@ -4898,7 +4009,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 135,
+    "id": 108,
     "title": "[셀파트너랩스] 이커머스 스타트업에서 데이터 사이언티스트 모집",
     "company_name": "㈜셀파트너랩스",
     "location": "서울 용산구",
@@ -4926,35 +4037,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 136,
-    "title": "[아정당 부산] 자동화 개발자",
-    "company_name": "㈜아정네트웍스",
-    "location": "부산 북구",
-    "career": "경력4년↑",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49098174?Oem_Code=C1&logpath=1&stext=%EC%9B%B9%ED%81%AC%EB%A1%A4%EB%A7%81&listno=2&sc=630",
-    "raw_detail_text": "유연근무제 시행중 스크랩 [아정당 부산] 자동화 개발자 ㈜아정네트웍스 부산 북구 네트워크·통신서비스, 시스템엔지니어, 네트워크엔지니어, 데이터엔지니어 홈페이지 지원 경력4년↑ • 경조사 지원 , 명절선물/명절상여 지원 , 유연근무 , 음료/간식 지원 , 복지포인트 , 식사 지원 , 자율복장 , 사내 이벤트",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 137,
+    "id": 109,
     "title": "[굳센] E2E 테스트 자동화 엔지니어 채용",
     "company_name": "굳센",
     "location": "경기 고양시",
@@ -4982,7 +4065,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 138,
+    "id": 110,
     "title": "[여의도/최대318만/7H근무] 한국평가데이터 DB수집/웹크롤링 담당자 채용",
     "company_name": "에이스휴먼파워㈜",
     "location": "서울 영등포구 외 5",
@@ -5010,7 +4093,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 139,
+    "id": 111,
     "title": "[이노션] AI 마케팅 (GEO) PM",
     "company_name": "㈜이노션현대자동차그룹",
     "location": "서울 강남구",
@@ -5038,7 +4121,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 140,
+    "id": 112,
     "title": "[재무회계/경영관리] 경력직 채용",
     "company_name": "㈜화이트스캔",
     "location": "서울 용산구",
@@ -5066,7 +4149,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 141,
+    "id": 113,
     "title": "[유피소프트] 무인 프린트 시스템 개발자 정규직 채용(경력/대리급 이상)",
     "company_name": "㈜유피소프트",
     "location": "서울 성동구",
@@ -5094,7 +4177,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 142,
+    "id": 114,
     "title": "AI 프로젝트 RAG 설계구현",
     "company_name": "㈜우나프론트",
     "location": "경기 수원시",
@@ -5122,7 +4205,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 143,
+    "id": 115,
     "title": "[PYTHON SI 잠실] 생성형 AI서비스 구축 (7)",
     "company_name": "㈜제이투이",
     "location": "서울 송파구",
@@ -5150,7 +4233,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 144,
+    "id": 116,
     "title": "음원 DB 등록 및 운영업무(계약직)",
     "company_name": "㈜유엠에이지",
     "location": "서울 마포구",
@@ -5178,7 +4261,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 145,
+    "id": 117,
     "title": "(주)삼성화재금융서비스 보험DB운영 담당자 채용",
     "company_name": "㈜삼성화재금융서비스보험대리점",
     "location": "서울 중구",
@@ -5206,35 +4289,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 146,
-    "title": "DB손해보험 보상처리서비스 담당자(TCR) 모집",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "제주 제주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49328279?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=17&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB손해보험 보상처리서비스 담당자(TCR) 모집 DB손해보험㈜ DB그룹 제주 제주시 증권·보험·카드, 금융사무 월급 250~350만원 즉시 지원 경력무관 • 명절선물/명절상여 지원 , 자녀 교육비 지원 , 연차제도",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 147,
+    "id": 118,
     "title": "외부 크리에이터 네트워크 DB Manager(계약)",
     "company_name": "㈜샌드박스네트워크",
     "location": "서울 용산구",
@@ -5262,63 +4317,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 148,
-    "title": "DB 손해보험 제주 보상처리 담당자 구인",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "제주 제주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49220509?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=15&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB 손해보험 제주 보상처리 담당자 구인 DB손해보험㈜ DB그룹 제주 제주시 증권·보험·카드, 영업지원, 인바운드상담원, 아웃바운드상담원 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 149,
-    "title": "DB 손해보험 보상처리 담당자 구인",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "제주 제주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49220478?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=14&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB 손해보험 보상처리 담당자 구인 DB손해보험㈜ DB그룹 제주 제주시 증권·보험·카드, 영업지원, 인바운드상담원, 아웃바운드상담원 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 150,
+    "id": 119,
     "title": "KTDS 인프라운영 상황DB 운영자 모집",
     "company_name": "㈜소젠티코리아",
     "location": "서울 서초구",
@@ -5346,259 +4345,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 151,
-    "title": "DB손해보험 보상처리서비스 담당자 모집합니다",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "제주 제주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49328283?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=9&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB손해보험 보상처리서비스 담당자 모집합니다 DB손해보험㈜ DB그룹 제주 제주시 증권·보험·카드, 금융사무 월급 250~350만원 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 152,
-    "title": "학술정보 DB구축 업무",
-    "company_name": "㈜라스테크",
-    "location": "대전 유성구",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49316721?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=11&sc=630",
-    "raw_detail_text": "스크랩 학술정보 DB구축 업무 ㈜라스테크 대전 유성구 포털·컨텐츠·커뮤니티, 사무보조 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 153,
-    "title": "DB손해보험 보상처리담당자 모십니다",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "제주 제주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49264291?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=10&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB손해보험 보상처리담당자 모십니다 DB손해보험㈜ DB그룹 제주 제주시 증권·보험·카드, 금융사무, 보험설계사 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 154,
-    "title": "DB손해보험 천안지역 GA설계매니저 채용",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "충남 천안시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49379615?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=7&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB손해보험 천안지역 GA설계매니저 채용 DB손해보험㈜ DB그룹 충남 천안시 증권·보험·카드, 영업관리 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 155,
-    "title": "DB손해보험 원주 GA 설계 매니저 채용 공고",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "강원 원주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49066594?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=6&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB손해보험 원주 GA 설계 매니저 채용 공고 DB손해보험㈜ DB그룹 강원 원주시 증권·보험·카드, 보험설계사 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 156,
-    "title": "IT 엔지니어 DB 채용 (2명, Engineer / Lead Engineer)",
-    "company_name": "㈜트루인테크놀로지스",
-    "location": "대전 서구 외 1",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49379614?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=20&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 IT 엔지니어 DB 채용 (2명, Engineer / Lead Engineer) ㈜트루인테크놀로지스 대전 서구 외 1 IT컨설팅, 시스템엔지니어, DBA, 보안엔지니어 즉시 지원 신입·경력3년↑ • 경조사 지원 , 음료/간식 지원 , 장기근속 포상제도 , 사내 동호회 지원 , 상해보험 , 연차제도 , 4대보험 , 퇴직연금 , 휴가제도 , 출산휴가",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 157,
-    "title": "[ DB손해보험 ] 제주센터 아웃바운드(TM) 상담사 직원채용",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "제주 제주시",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49287031?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=2&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 [ DB손해보험 ] 제주센터 아웃바운드(TM) 상담사 직원채용 DB손해보험㈜ DB그룹 제주 제주시 증권·보험·카드, 아웃바운드상담원 월급 210~350만원 즉시 지원 신입·경력1년↑",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 158,
-    "title": "DB손해보험 콜업무 입니다.",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "제주 제주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49301860?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=5&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB손해보험 콜업무 입니다. DB손해보험㈜ DB그룹 제주 제주시 증권·보험·카드, 인바운드상담원, 고객센터관리자, 금융사무 연봉 3,500~4,500만원 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 159,
-    "title": "DB손해보험 콜업무입니다.",
-    "company_name": "DB손해보험㈜DB그룹",
-    "location": "제주 제주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49301868?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=4&sc=630",
-    "raw_detail_text": "믿고보는 대기업 스크랩 DB손해보험 콜업무입니다. DB손해보험㈜ DB그룹 제주 제주시 증권·보험·카드, 인바운드상담원, 고객센터관리자, 금융사무 연봉 3,500~4,500만원 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 160,
+    "id": 120,
     "title": "산림/환경/국토 GIS DB 구축 계약직원 모집",
     "company_name": "㈜올포랜드",
     "location": "서울 강서구",
@@ -5626,7 +4373,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 161,
+    "id": 121,
     "title": "[DB Inc.] 그룹관계사(DB손해보험) 네트워크 운영자 채용",
     "company_name": "㈜디비아이엔씨DB그룹",
     "location": "경기 용인시",
@@ -5654,7 +4401,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 162,
+    "id": 122,
     "title": "㈜올포랜드 DB구축 인력 모집(계약직)",
     "company_name": "㈜올포랜드",
     "location": "서울 강서구",
@@ -5682,35 +4429,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 163,
-    "title": "데이타베이스관리자  DBA",
-    "company_name": "㈜에스앤비",
-    "location": "대전 유성구",
-    "career": "경력3년↑",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49295296?Oem_Code=C1&logpath=1&stext=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4&listno=1&sc=630",
-    "raw_detail_text": "스크랩 데이타베이스관리자  DBA ㈜에스앤비 대전 유성구 솔루션·SI·CRM·ERP, 시스템엔지니어, DBA, IT컨설팅 즉시 지원 경력3년↑",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 164,
+    "id": 123,
     "title": "경기일보 웹사이트 디자인 및 DB관리 인턴 사원",
     "company_name": "㈜경기일보",
     "location": "경기 수원시",
@@ -5738,7 +4457,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 165,
+    "id": 124,
     "title": "[신입/경력] Database Engineer - SingleStore Presales 및 교육",
     "company_name": "에이플랫폼",
     "location": "서울 영등포구",
@@ -5766,91 +4485,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 166,
-    "title": "[인재 DB 등록] 전 직군 (경력) - 구매",
-    "company_name": "보령엘엔지터미널(주)GS그룹",
-    "location": "충남 보령시",
-    "career": null,
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49307950?Oem_Code=C1&logpath=1&stext=DB&listno=18&sc=630",
-    "raw_detail_text": "스크랩 [인재 DB 등록] 전 직군 (경력) - 구매 보령엘엔지터미널(주) GS그룹 충남 보령시 화학·에너지·환경, 구매관리자 홈페이지 지원 경력",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 167,
-    "title": "[인재 DB 등록] 전 직군 (경력) - IT",
-    "company_name": "보령엘엔지터미널(주)GS그룹",
-    "location": "충남 보령시",
-    "career": null,
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49308028?Oem_Code=C1&logpath=1&stext=DB&listno=17&sc=630",
-    "raw_detail_text": "스크랩 [인재 DB 등록] 전 직군 (경력) - IT 보령엘엔지터미널(주) GS그룹 충남 보령시 화학·에너지·환경, R&D·연구원 홈페이지 지원 경력",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 168,
-    "title": "[인재 DB 등록] 전 직군 (경력) - 총무",
-    "company_name": "보령엘엔지터미널(주)GS그룹",
-    "location": "충남 보령시",
-    "career": null,
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49307996?Oem_Code=C1&logpath=1&stext=DB&listno=12&sc=630",
-    "raw_detail_text": "스크랩 [인재 DB 등록] 전 직군 (경력) - 총무 보령엘엔지터미널(주) GS그룹 충남 보령시 화학·에너지·환경, 총무 홈페이지 지원 경력",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 169,
+    "id": 125,
     "title": "[신입/경력] Database Engineer - Customer Support Service",
     "company_name": "에이플랫폼",
     "location": "서울 영등포구",
@@ -5878,7 +4513,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 170,
+    "id": 126,
     "title": "[베리타스] 경영/기획 경력사원 채용 (SQL/파이썬/VBA/엑셀 가능자 우대)",
     "company_name": "㈜베리타스자산대부",
     "location": "서울 서초구",
@@ -5906,7 +4541,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 171,
+    "id": 127,
     "title": "강남역/Upgrade/6.22-4mm/고급/경험자or my-sql능숙자/등 상세참조/.",
     "company_name": "㈜조인아이티",
     "location": "서울 강남구",
@@ -5934,35 +4569,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 172,
-    "title": "[경력] 응용SW개발자(JAVA,JSP, SQL) 채용 공고",
-    "company_name": "지엔소프트㈜",
-    "location": "대전 유성구",
-    "career": "경력5년↑",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49390369?Oem_Code=C1&logpath=1&stext=SQL&listno=18&sc=630",
-    "raw_detail_text": "스크랩 [경력] 응용SW개발자(JAVA,JSP, SQL) 채용 공고 지엔소프트㈜ 대전 유성구 솔루션·SI·CRM·ERP, 백엔드개발자, 웹개발자, 소프트웨어개발자 즉시 지원 경력5년↑",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 173,
+    "id": 128,
     "title": "강서구 제조업체 PL-SQL 개발자 구함",
     "company_name": "㈜오픈에스티",
     "location": "서울 금천구 외 1",
@@ -5990,35 +4597,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 174,
-    "title": "건국대학교 GLOCAL(글로컬)캠퍼스 일반직원(정규직) 신규 채용 공고",
-    "company_name": "건국대학교 GLOCAL(글로컬)캠퍼스",
-    "location": "충북 충주시",
-    "career": "신입",
-    "employment_type": "정규직",
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49351719?Oem_Code=C1&logpath=1&stext=SQL&listno=15&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 건국대학교 GLOCAL(글로컬)캠퍼스 일반직원(정규직) 신규 채용 공고 건국대학교 GLOCAL(글로컬)캠퍼스 충북 충주시 학교(초·중·고·대학·특수), 사무담당자, 총무, 사무보조 홈페이지 지원 신입",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 175,
+    "id": 129,
     "title": "[ 서울 여의도] 한화 금융 My sql DBA 초급 중급 고급 즉시 투입",
     "company_name": "㈜피앤아이시스템즈",
     "location": "서울 영등포구",
@@ -6046,7 +4625,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 176,
+    "id": 130,
     "title": "SQL문 개발 및 기능정의서 비교, 정합성 체크",
     "company_name": "지에스비아이㈜",
     "location": "서울 강서구",
@@ -6074,7 +4653,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 177,
+    "id": 131,
     "title": "Angular JS, javascript, SQL 단기 운영 개발자분 모십니다.",
     "company_name": "비디소프트㈜",
     "location": "경기 의왕시",
@@ -6102,7 +4681,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 178,
+    "id": 132,
     "title": "Java-SQL-러닝플랫폼 운영-판교",
     "company_name": "메가소프트㈜",
     "location": "경기 성남시",
@@ -6130,7 +4709,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 179,
+    "id": 133,
     "title": "linux/sql/xsl/oracle 운영관리자 모집",
     "company_name": "세기정보통신㈜",
     "location": "서울 구로구",
@@ -6158,7 +4737,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 180,
+    "id": 134,
     "title": "2026년 경동물류 신입&경력 사원 모집",
     "company_name": "경동물류",
     "location": "경기 김포시 외 7",
@@ -6186,35 +4765,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 181,
-    "title": "각 부문별 경력/신입 인재영입",
-    "company_name": "(주)우아한형제들",
-    "location": "전국 외 10",
-    "career": "신입",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/47594333?Oem_Code=C1&logpath=1&stext=SQL&listno=5&sc=630",
-    "raw_detail_text": "신입 지원 가능 스크랩 각 부문별 경력/신입 인재영입 (주)우아한형제들 전국 외 10 모바일·APP, 컨설턴트, 광고영업, 영업관리 홈페이지 지원 신입·경력 • 유연근무 , 복지포인트 , 상해보험 , 리프레시 휴가 , 도서 구입비 지원",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 182,
+    "id": 135,
     "title": "[안랩] 2026년 연구소 상시채용",
     "company_name": "㈜안랩",
     "location": "경기 성남시",
@@ -6242,7 +4793,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 183,
+    "id": 136,
     "title": "AICC Full-Stack Developer(Amazone Connect 기반) 채용",
     "company_name": "메가존클라우드㈜",
     "location": "경기 과천시",
@@ -6270,7 +4821,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 184,
+    "id": 137,
     "title": "[이든앤앨리스마케팅] IT개발자 Frontend / Backend Developer 채용",
     "company_name": "㈜이든앤앨리스마케팅",
     "location": "서울 강남구",
@@ -6298,7 +4849,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 185,
+    "id": 138,
     "title": "코맥스 연구소 서버개발 채용",
     "company_name": "㈜코맥스",
     "location": "경기 성남시",
@@ -6326,7 +4877,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 186,
+    "id": 139,
     "title": "2026년 AICC SW개발 경력직 채용(계약직)",
     "company_name": "㈜케이티씨에스",
     "location": "서울 강서구",
@@ -6354,7 +4905,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 187,
+    "id": 140,
     "title": "WCS 운영/고도화 'Frontend Engineer' 경력사원 모집",
     "company_name": "CJ대한통운㈜CJ그룹",
     "location": "서울 종로구",
@@ -6382,7 +4933,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 188,
+    "id": 141,
     "title": "AX기술실 각 부문 채용 - AI/ML 모델러",
     "company_name": "㈜이노룰스",
     "location": "서울 송파구",
@@ -6410,7 +4961,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 189,
+    "id": 142,
     "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BMS SOX알고리즘설계",
     "company_name": "LG에너지솔루션",
     "location": "경기 과천시",
@@ -6438,7 +4989,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 190,
+    "id": 143,
     "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - 사이버보안",
     "company_name": "LG에너지솔루션",
     "location": "경기 과천시",
@@ -6466,35 +5017,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 191,
-    "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BMS SW 설계/검증",
-    "company_name": "LG에너지솔루션",
-    "location": "대전 유성구",
-    "career": null,
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49406433?Oem_Code=C1&logpath=1&stext=REST+API&listno=11&sc=630",
-    "raw_detail_text": "스크랩 [CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BMS SW 설계/검증 LG에너지솔루션 대전 유성구 화학·에너지·환경, 시스템엔지니어, 소프트웨어개발자, R&D·연구원 홈페이지 지원 경력",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 192,
+    "id": 144,
     "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - 시스템설계",
     "company_name": "LG에너지솔루션",
     "location": "경기 과천시",
@@ -6522,7 +5045,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 193,
+    "id": 145,
     "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BMS 진단기술개발",
     "company_name": "LG에너지솔루션",
     "location": "서울 서초구",
@@ -6550,63 +5073,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 194,
-    "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BMS 소형진단개발",
-    "company_name": "LG에너지솔루션",
-    "location": "대전 유성구",
-    "career": null,
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49406503?Oem_Code=C1&logpath=1&stext=REST+API&listno=8&sc=630",
-    "raw_detail_text": "스크랩 [CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BMS 소형진단개발 LG에너지솔루션 대전 유성구 화학·에너지·환경, 시스템엔지니어, 소프트웨어개발자, R&D·연구원 홈페이지 지원 경력",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 195,
-    "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BaaS Product Design/CX Engineering",
-    "company_name": "LG에너지솔루션",
-    "location": "대전 유성구",
-    "career": null,
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49406560?Oem_Code=C1&logpath=1&stext=REST+API&listno=7&sc=630",
-    "raw_detail_text": "스크랩 [CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BaaS Product Design/CX Engineering LG에너지솔루션 대전 유성구 화학·에너지·환경, 시스템엔지니어, 소프트웨어개발자, R&D·연구원 홈페이지 지원 경력",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 196,
+    "id": 146,
     "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집",
     "company_name": "LG에너지솔루션",
     "location": "경기 과천시 외 2",
@@ -6634,7 +5101,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 197,
+    "id": 147,
     "title": "[Salesforce 업계 1위 아이투맥스] 세일즈포스 경력 채용 (본사)",
     "company_name": "아이투맥스",
     "location": "서울 마포구",
@@ -6662,7 +5129,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 198,
+    "id": 148,
     "title": "[CTO] BMS SW/진단/서비스 솔루션/제품개발 경력 모집 - BaaS SW 설계/개발",
     "company_name": "LG에너지솔루션",
     "location": "서울 서초구",
@@ -6690,7 +5157,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 199,
+    "id": 149,
     "title": "[에티버스이피에이] Java, Spring 기반의 백엔드 개발자 (경력)",
     "company_name": "㈜이테크시스템",
     "location": "서울 중구",
@@ -6718,7 +5185,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 200,
+    "id": 150,
     "title": "[kt cs] AICC 솔루션개발 경력직 채용",
     "company_name": "케이티씨에스",
     "location": "서울 동작구 외 5",
@@ -6746,7 +5213,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 201,
+    "id": 151,
     "title": "여의도 증권사 백엔드 개발자 모집 java Rest Api",
     "company_name": "위쉬정보기술㈜",
     "location": "서울 구로구",
@@ -6774,7 +5241,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 202,
+    "id": 152,
     "title": "㈜유알피 AI 응용/ 백엔드 개발 포지션 채용",
     "company_name": "㈜유알피",
     "location": "서울 강서구",
@@ -6802,7 +5269,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 203,
+    "id": 153,
     "title": "솔루션본부 신입/경력 개발자 채용",
     "company_name": "㈜한국리서치",
     "location": "서울 강남구",
@@ -6830,7 +5297,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 204,
+    "id": 154,
     "title": "연계 시스템(ESB) 및 API 플랫폼 구축 전문가를 모십니다",
     "company_name": "㈜피칸소프트",
     "location": "서울 성동구",
@@ -6858,7 +5325,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 205,
+    "id": 155,
     "title": "캐피탈  ESP-API 전환 업무",
     "company_name": "케이원이노텍",
     "location": "서울 중구 외 1",
@@ -6886,7 +5353,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 206,
+    "id": 156,
     "title": "(주)디오 AI Platform 백엔드/API 개발",
     "company_name": "㈜디오",
     "location": "서울 강서구",
@@ -6914,7 +5381,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 207,
+    "id": 157,
     "title": "삼성역 - 웹스퀘어, 배치, API, procedure 개발자 모집",
     "company_name": "㈜플레이투게더",
     "location": "서울 강남구",
@@ -6942,7 +5409,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 208,
+    "id": 158,
     "title": "자산관리시스템 및 Apigee API 통합 운영 개발",
     "company_name": "엔지니어스토리",
     "location": "서울 강서구 외 5",
@@ -6970,7 +5437,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 209,
+    "id": 159,
     "title": "API 테크니컬라이터Technical Writer 경력직 모집",
     "company_name": "한샘글로벌㈜",
     "location": "경기 수원시",
@@ -6998,7 +5465,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 210,
+    "id": 160,
     "title": "삼성역 - 온라인/오프라인 결제 및 API 개발자 모집",
     "company_name": "㈜플레이투게더",
     "location": "서울 강남구",
@@ -7026,7 +5493,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 211,
+    "id": 161,
     "title": "SKT API개발쿠버네티스경력필수 분당수내역",
     "company_name": "㈜씨클릭",
     "location": "경기 성남시",
@@ -7054,35 +5521,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 212,
-    "title": "[어스비전 주식회사]Backend / API 개발자",
-    "company_name": "어스비전㈜",
-    "location": "전북 익산시",
-    "career": "경력3년↑",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49294523?Oem_Code=C1&logpath=1&stext=API&listno=11&sc=630",
-    "raw_detail_text": "스크랩 [어스비전 주식회사]Backend / API 개발자 어스비전㈜ 전북 익산시 건설·시공·토목·조경, 시스템엔지니어 연봉 3,800~4,200만원 즉시 지원 경력3년↑",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 213,
+    "id": 162,
     "title": "[메가존클라우드관계사] 메가존소프트 API 보안 솔루션 전문가",
     "company_name": "메가존클라우드㈜",
     "location": "경기 과천시",
@@ -7110,7 +5549,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 214,
+    "id": 163,
     "title": "상암 문화정보원 API java 개발자 모집",
     "company_name": "위쉬정보기술㈜",
     "location": "서울 구로구",
@@ -7138,7 +5577,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 215,
+    "id": 164,
     "title": "[NHN KCP] 백엔드(API) 개발 담당",
     "company_name": "엔에이치엔케이씨피㈜",
     "location": "서울 구로구",
@@ -7166,7 +5605,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 216,
+    "id": 165,
     "title": "백엔드 & API 서버 개발자 모집",
     "company_name": "파이㈜",
     "location": "경기 수원시",
@@ -7194,7 +5633,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 217,
+    "id": 166,
     "title": "Backend (Python) 개발자",
     "company_name": "씨메스로보틱스㈜",
     "location": "서울 강남구",
@@ -7222,7 +5661,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 218,
+    "id": 167,
     "title": "AI 기반 서비스 백엔드 개발자 채용 / 경력·학력 무관",
     "company_name": "㈜디알밸류",
     "location": "경기 안산시",
@@ -7250,7 +5689,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 219,
+    "id": 168,
     "title": "[정규직, 계약직, 인턴][신입, 경력]AI 개발자/ML 엔지니어 채용",
     "company_name": "㈜랩큐(LabQ)",
     "location": "서울 영등포구",
@@ -7278,7 +5717,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 220,
+    "id": 169,
     "title": "[신입/경력]AI 분석 서비스 개발자",
     "company_name": "㈜디더블유아이",
     "location": "서울 영등포구",
@@ -7306,7 +5745,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 221,
+    "id": 170,
     "title": "정교하고 실행력 있는 엔지니어 (Python)",
     "company_name": "리메세㈜",
     "location": "서울 마포구 외 1",
@@ -7334,7 +5773,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 222,
+    "id": 171,
     "title": "[아이티컨버젼스] 스마트팜 AI 연구원 신입/경력 채용",
     "company_name": "아이티컨버젼",
     "location": "서울 송파구",
@@ -7362,7 +5801,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 223,
+    "id": 172,
     "title": "[리본인텔리전스] 인공지능 풀스택 엔지니어 LLM RAG 시스템 개발자",
     "company_name": "리본인텔리전스",
     "location": "경기 화성시",
@@ -7390,7 +5829,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 224,
+    "id": 173,
     "title": "퀵스타 AI 활용 개발 프리랜서 모집",
     "company_name": "㈜퀵스타",
     "location": "인천 연수구",
@@ -7418,7 +5857,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 225,
+    "id": 174,
     "title": "[리본홀딩스] 풀스택 엔지니어 (RAG 파이프라인 개발, 연구원, 경력직)",
     "company_name": "㈜리본홀딩스",
     "location": "경기 화성시",
@@ -7446,7 +5885,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 226,
+    "id": 175,
     "title": "[리그시스템] IT분야 AI Agent 개발 경력사원 채용",
     "company_name": "㈜리그시스템",
     "location": "경기 성남시",
@@ -7474,7 +5913,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 227,
+    "id": 176,
     "title": "SW Engineer 채용",
     "company_name": "바이온사이트",
     "location": "서울 성동구",
@@ -7502,7 +5941,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 228,
+    "id": 177,
     "title": "[퍼블릭에이아이] 백엔드 엔지니어 채용",
     "company_name": "㈜퍼블릭에이아이",
     "location": "서울 서초구",
@@ -7530,7 +5969,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 229,
+    "id": 178,
     "title": "[㈜오츠] IT 인프라 구축 및 백엔드 서비스 개발자 채용",
     "company_name": "㈜오츠",
     "location": "서울 금천구",
@@ -7558,7 +5997,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 230,
+    "id": 179,
     "title": "[AIOps팀] 인공지능 엔지니어 모집 기흥(Python)",
     "company_name": "㈜씨에스리",
     "location": "서울 마포구 외 2",
@@ -7586,7 +6025,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 231,
+    "id": 180,
     "title": "[제이엘케이] 백엔드 개발자 (병역특례 [산업기능요원])",
     "company_name": "㈜제이엘케이",
     "location": "서울 강남구",
@@ -7614,35 +6053,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 232,
-    "title": "주식회사 이음 개발팀 백엔드/서버 개발자 공개 채용",
-    "company_name": "㈜이음",
-    "location": "부산 해운대구",
-    "career": "경력1년↑",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49138722?Oem_Code=C1&logpath=1&stext=Flask&listno=3&sc=630",
-    "raw_detail_text": "스크랩 주식회사 이음 개발팀 백엔드/서버 개발자 공개 채용 ㈜이음 부산 해운대구 솔루션·SI·CRM·ERP, 웹개발자 연봉 2,800~3,000만원 즉시 지원 경력1년↑ • 점심 식사 지원 , 연차제도 , 4대보험",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 233,
+    "id": 181,
     "title": "프로젝트 리딩 및 개발 담당자 영입",
     "company_name": "베스핀글로벌㈜",
     "location": "서울 서초구",
@@ -7670,7 +6081,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 234,
+    "id": 182,
     "title": "[경력] Data Engineer",
     "company_name": "㈜씨어스",
     "location": "경기 성남시",
@@ -7698,7 +6109,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 235,
+    "id": 183,
     "title": "제이씨현시스템(주) AI연구소 기획/개발자 모집",
     "company_name": "제이씨현시스템㈜",
     "location": "서울 용산구",
@@ -7726,7 +6137,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 236,
+    "id": 184,
     "title": "Partner Backend 개발자 모집",
     "company_name": "크림(주)",
     "location": "경기 성남시",
@@ -7754,7 +6165,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 237,
+    "id": 185,
     "title": "불법주정차 단속 시스템 풀스택 개발자 채용",
     "company_name": "㈜창일",
     "location": "경기 화성시",
@@ -7782,7 +6193,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 238,
+    "id": 186,
     "title": "Data&AI Engineer(Core Member, MidLevel) 채용",
     "company_name": "㈜데이터마케팅코리아",
     "location": "서울 강남구",
@@ -7810,7 +6221,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 239,
+    "id": 187,
     "title": "EDA 인프라 관리자 및 SW 엔지니어(신입/경력)",
     "company_name": "퀄리타스반도체",
     "location": "경기 성남시",
@@ -7838,7 +6249,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 240,
+    "id": 188,
     "title": "IT개발팀 프론트엔드&백엔드&서버개발 채용",
     "company_name": "㈜블록스퀘어랩스",
     "location": "서울 송파구",
@@ -7866,7 +6277,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 241,
+    "id": 189,
     "title": "(주)케듀올 프로덕트 엔지니어 채용",
     "company_name": "㈜케듀올(Keduall Corp)",
     "location": "경기 김포시",
@@ -7894,7 +6305,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 242,
+    "id": 190,
     "title": "백엔드 / LLM 주니어 엔지니어",
     "company_name": "㈜코그콤",
     "location": "서울 송파구",
@@ -7922,7 +6333,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 243,
+    "id": 191,
     "title": "AI Product Engineer",
     "company_name": "㈜메이사",
     "location": "서울 강남구",
@@ -7950,7 +6361,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 244,
+    "id": 192,
     "title": "Backend Developer(경력) 모집",
     "company_name": "㈜플랜핏",
     "location": "서울 마포구",
@@ -7978,35 +6389,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 245,
-    "title": "(주)메디브 SW Web 개발자 1명 모집",
-    "company_name": "㈜메디브(Mediv)",
-    "location": "충북 청주시",
-    "career": "경력무관",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49246622?Oem_Code=C1&logpath=1&stext=Django&listno=9&sc=630",
-    "raw_detail_text": "스크랩 (주)메디브 SW Web 개발자 1명 모집 ㈜메디브(Mediv) 충북 청주시 솔루션·SI·CRM·ERP, 백엔드개발자, 프론트엔드개발자, 웹개발자 즉시 지원 경력무관",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 246,
+    "id": 193,
     "title": "기계공학 S/W 개발 인재 채용 공고",
     "company_name": "㈜아톰소프트",
     "location": "서울 금천구",
@@ -8034,7 +6417,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 247,
+    "id": 194,
     "title": "[(주)아톰소프트] 기계공학 S/W 개발 인재 채용 공고",
     "company_name": "청년취업사관학교",
     "location": "서울 금천구",
@@ -8062,7 +6445,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 248,
+    "id": 195,
     "title": "Back-end(백엔드) 개발자 채용",
     "company_name": "시큐리온",
     "location": "서울 송파구",
@@ -8090,35 +6473,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 249,
-    "title": "[동국시스템즈] AI프로젝트 관리/운영자 모집(부산근무)",
-    "company_name": "동국시스템즈㈜동국제강그룹",
-    "location": "부산 남구",
-    "career": "경력4년↑",
-    "employment_type": null,
-    "posted_date": null,
-    "deadline": "마감일 미정",
-    "deadline_date": null,
-    "detail_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49381961?Oem_Code=C1&logpath=1&stext=Django&listno=2&sc=630",
-    "raw_detail_text": "스크랩 [동국시스템즈] AI프로젝트 관리/운영자 모집(부산근무) 동국시스템즈㈜ 동국제강그룹 부산 남구 솔루션·SI·CRM·ERP, PL·PM·PO, AI/ML연구원, AI서비스개발자 즉시 지원 경력4년↑",
-    "reopen_count": 0,
-    "skill_candidates": "",
-    "detail_status": null,
-    "match_score": 0,
-    "recommendation_level": "unscored",
-    "matched_keywords": [
-      "JobKorea"
-    ],
-    "positive_reasons": [
-      "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-    ],
-    "negative_reasons": [],
-    "is_favorite": false,
-    "favorite_memo": null,
-    "favorite_status": null
-  },
-  {
-    "id": 250,
+    "id": 196,
     "title": "프로덕트 엔지니어 (경력 3~10년)",
     "company_name": "㈜오픈서베이",
     "location": "서울 강남구",
@@ -8146,7 +6501,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 251,
+    "id": 197,
     "title": "[Product Center] Backend Engineer(신입/경력) 채용",
     "company_name": "㈜솔트룩스",
     "location": "서울 송파구 외 2",
@@ -8174,7 +6529,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 252,
+    "id": 198,
     "title": "[LG CNS 자회사] AI 엔지니어(PM/PL) 모집(경력)",
     "company_name": "㈜비즈테크아이LG그룹",
     "location": "서울 강서구",
@@ -8202,7 +6557,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 253,
+    "id": 199,
     "title": "[Product Center] AI Backend Engineer (신입/경력)",
     "company_name": "㈜솔트룩스",
     "location": "서울 송파구 외 2",
@@ -8230,7 +6585,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 254,
+    "id": 200,
     "title": "[애경그룹] AK아이에스 AI 엔지니어 경력 모집",
     "company_name": "에이케이아이에스㈜",
     "location": "서울 마포구",
@@ -8258,7 +6613,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 255,
+    "id": 201,
     "title": "[지주부문] AI Platform Engineer 경력 채용",
     "company_name": "두산두산그룹",
     "location": "서울 중구",
@@ -8286,7 +6641,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 256,
+    "id": 202,
     "title": "[CDO] AI/빅데이터 연구개발 경력 상시 모집 - AI Agent 개발",
     "company_name": "LG에너지솔루션",
     "location": "서울 영등포구",
@@ -8314,7 +6669,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 257,
+    "id": 203,
     "title": "GenAI Engineer 영업",
     "company_name": "베스핀글로벌㈜",
     "location": "서울 서초구",
@@ -8342,7 +6697,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 258,
+    "id": 204,
     "title": "[그루비] ML Backend Engineer",
     "company_name": "㈜플래티어",
     "location": "서울 송파구",
@@ -8370,7 +6725,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 259,
+    "id": 205,
     "title": "CodeSpace(DX)개발/즉시-12/증미/초-중급/Python(FastAPI),필수등 참조/..",
     "company_name": "㈜조인아이티",
     "location": "서울 강서구",
@@ -8398,7 +6753,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 260,
+    "id": 206,
     "title": "메이저맵 파이썬 백엔드 개발자(FastAPI / GCP) 모집",
     "company_name": "메이저맵",
     "location": "서울 중구",
@@ -8426,7 +6781,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 261,
+    "id": 207,
     "title": "Nextjs, FastAPI 기반의 풀스택 웹 개발자 채용",
     "company_name": "아우라웍스㈜",
     "location": "경기 성남시",
@@ -8454,7 +6809,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 262,
+    "id": 208,
     "title": "(취업연계과정)[IBMXRedHat]AI Transformation AX Academy 개발 교육생 모집",
     "company_name": "㈜하이미디어아카데미",
     "location": "서울 종로구 외 14",
@@ -8482,7 +6837,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 263,
+    "id": 209,
     "title": "Service Backend 개발자 모집",
     "company_name": "크림(주)",
     "location": "경기 성남시",
@@ -8510,7 +6865,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 264,
+    "id": 210,
     "title": "AI Agent Engineer (Python)",
     "company_name": "㈜아이엔소프트",
     "location": "서울 영등포구",
@@ -8538,7 +6893,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 265,
+    "id": 211,
     "title": "파이썬(Python, AWS, OCR) 경력 개발자 채용",
     "company_name": "오토패스",
     "location": "경기 파주시",
@@ -8566,7 +6921,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 266,
+    "id": 212,
     "title": "[본사] Java / Python 활용 / 금융솔루션 개발자 채용 공고(경력/신입)",
     "company_name": "㈜포이시스",
     "location": "서울 금천구",
@@ -8594,7 +6949,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 267,
+    "id": 213,
     "title": "[평일·주말] AI·Python 기초 프로그래밍 강사 모집",
     "company_name": "레브아트컴퓨터학원",
     "location": "경기 고양시",
@@ -8622,7 +6977,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 268,
+    "id": 214,
     "title": "[정규직] 그룹웨어 운영 및 웹서비스 개발 ( ASP , Python )",
     "company_name": "㈜엑스퍼트컨설팅",
     "location": "서울 송파구",
@@ -8650,7 +7005,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 269,
+    "id": 215,
     "title": "2026년 하반기 신입 및 경력사원 공개 채용",
     "company_name": "㈜화신이앤엘(E&L)",
     "location": "서울 금천구 외 14",
@@ -8678,7 +7033,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 270,
+    "id": 216,
     "title": "[ 잠실 ] JAVA 마트 관리 중급 이상 파이썬 Python  모델링",
     "company_name": "넥서스인프라",
     "location": "서울 송파구",
@@ -8706,7 +7061,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 271,
+    "id": 217,
     "title": "[휴넷] 백엔드 개발자 [정규직/경력]",
     "company_name": "㈜휴넷",
     "location": "서울 구로구",
@@ -8734,7 +7089,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 272,
+    "id": 218,
     "title": "[IT] 백엔드 개발자 경력사원 모집",
     "company_name": "㈜에이피알",
     "location": "서울 송파구",
@@ -8762,7 +7117,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 273,
+    "id": 219,
     "title": "서버 백엔드 개발자 채용",
     "company_name": "㈜머니무브",
     "location": "서울 강남구",
@@ -8790,7 +7145,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 274,
+    "id": 220,
     "title": "시스템 접근제어 솔루션 Backend 개발자 신입 사원 채용",
     "company_name": "펜타시스템테크놀러지㈜",
     "location": "서울 영등포구",
@@ -8818,7 +7173,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 275,
+    "id": 221,
     "title": "경력직 백엔드 개발자 모집 - 그룹웨어",
     "company_name": "한진정보통신㈜한진그룹",
     "location": "서울 강서구",
@@ -8846,7 +7201,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 276,
+    "id": 222,
     "title": "개발자 통합 채용 - 백엔드 개발",
     "company_name": "아토머스㈜",
     "location": "서울 강남구",
@@ -8874,7 +7229,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 277,
+    "id": 223,
     "title": "솔루션개발실 백엔드개발자",
     "company_name": "㈜넵튠",
     "location": "서울 강남구",
@@ -8902,7 +7257,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 278,
+    "id": 224,
     "title": "[쿠도커뮤니케이션] AX사업부 AX엔지니어링팀 백엔드개발자 경력직 채용",
     "company_name": "쿠도커뮤니케이션㈜",
     "location": "경기 과천시",
@@ -8930,7 +7285,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 279,
+    "id": 225,
     "title": "Java 백엔드 개발자 - 회원 개발",
     "company_name": "와디즈㈜",
     "location": "경기 성남시",
@@ -8958,7 +7313,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 280,
+    "id": 226,
     "title": "백엔드 개발자 (회원/인증/알림)",
     "company_name": "㈜카카오스타일",
     "location": "경기 성남시",
@@ -8986,7 +7341,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 281,
+    "id": 227,
     "title": "백엔드 개발자 (물류 시스템)",
     "company_name": "㈜카카오스타일",
     "location": "경기 성남시",
@@ -9014,7 +7369,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 282,
+    "id": 228,
     "title": "백엔드 개발자",
     "company_name": "아토머스㈜",
     "location": "서울 강남구",
@@ -9042,7 +7397,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 283,
+    "id": 229,
     "title": "메가스터디교육 2026년 하반기 신입/경력 채용",
     "company_name": "메가스터디교육㈜",
     "location": "서울 서초구 외 4",
@@ -9070,7 +7425,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 284,
+    "id": 230,
     "title": "엔씨소프트 전 부문 수시 채용",
     "company_name": "NC",
     "location": "경기 성남시",
@@ -9098,7 +7453,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 285,
+    "id": 231,
     "title": "[바텍 네트웍스] 2026년 하반기 신입 채용",
     "company_name": "㈜바텍이우홀딩스",
     "location": "경기 용인시 외 13",
@@ -9126,7 +7481,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 286,
+    "id": 232,
     "title": "Software Engineer, Backend - 서비스 코어 (Location Intelligence)",
     "company_name": "(주)당근마켓",
     "location": "서울 서초구",
@@ -9154,7 +7509,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 287,
+    "id": 233,
     "title": "디지털본부 백엔드 개발 경력직 채용",
     "company_name": "F&F",
     "location": "서울 강남구",
@@ -9182,7 +7537,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 288,
+    "id": 234,
     "title": "Software Engineer, Backend - 부동산",
     "company_name": "(주)당근마켓",
     "location": "서울 서초구",
@@ -9210,7 +7565,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 289,
+    "id": 235,
     "title": "Software Engineer, Backend - 서비스 코어 (Identity Service)",
     "company_name": "(주)당근마켓",
     "location": "서울 서초구",
@@ -9238,7 +7593,7 @@ export const demoJobs: Job[] = [
     "favorite_status": null
   },
   {
-    "id": 290,
+    "id": 236,
     "title": "PaaS 백엔드 개발",
     "company_name": "엔에이치엔클라우드",
     "location": "경기 성남시",

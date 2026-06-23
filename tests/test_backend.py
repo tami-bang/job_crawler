@@ -59,6 +59,47 @@ class BackendServiceTests(unittest.TestCase):
         titles = [job["title"] for job in list_jobs()]
         self.assertNotIn("부산 Python 개발자", titles)
 
+    def test_dashboard_excludes_multi_location_jobs_with_outside_workplace(self):
+        with get_connection(self.db_path) as conn:
+            conn.execute(
+                """
+                INSERT INTO job_postings (
+                    source, source_job_id, title, location, raw_detail_text,
+                    employment_type, detail_status, detail_collected_at
+                ) VALUES (
+                    'demo',
+                    'multi-location-outside',
+                    '복수지역 개발자',
+                    '서울 강남구 외 14',
+                    '근무지주소\n서울 강남구 테헤란로 1\n지도보기\n부산 해운대구 센텀로 1\n지도보기\n지원자격',
+                    '정규직',
+                    'success',
+                    CURRENT_TIMESTAMP
+                )
+                """
+            )
+            conn.execute(
+                """
+                INSERT INTO job_postings (
+                    source, source_job_id, title, location, raw_detail_text,
+                    employment_type, detail_status, detail_collected_at
+                ) VALUES (
+                    'demo',
+                    'seoul-sejong-road',
+                    '세종대로 개발자',
+                    '서울 중구 세종대로7길 25',
+                    '근무지주소\n서울 중구 세종대로7길 25\n지도보기\n지원자격',
+                    '정규직',
+                    'success',
+                    CURRENT_TIMESTAMP
+                )
+                """
+            )
+
+        titles = [job["title"] for job in list_jobs(limit=20)]
+        self.assertNotIn("복수지역 개발자", titles)
+        self.assertIn("세종대로 개발자", titles)
+
 
 if __name__ == "__main__":
     unittest.main()

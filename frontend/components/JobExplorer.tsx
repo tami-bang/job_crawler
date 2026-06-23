@@ -627,7 +627,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                       {Object.entries(statusLabel).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
                     </select>
                   )}
-                  {job.detail_url && <a href={job.detail_url} target="_blank" rel="noreferrer">원문 보기 ↗</a>}
+                  {job.detail_url && <a href={job.detail_url} target="_blank" rel="noreferrer" onClick={() => markViewed(job.id)}>원문 보기 ↗</a>}
                   <button onClick={() => void openSnapshot(job)}>저장 스냅샷</button>
                 </div>
               </article>
