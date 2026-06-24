@@ -27,17 +27,56 @@ const sortLabels = {
 } as const;
 type SortKey = keyof typeof sortLabels;
 type ExplorerView = "list" | "calendar" | "expired";
-type MatchBasisKey = "ai" | "newcomer" | "junior" | "backend" | "frontend" | "data" | "cloud" | "regular" | "metro";
-const matchBasisOptions: Array<{ key: MatchBasisKey; label: string; keywords: string[] }> = [
-  { key: "ai", label: "AI 사용", keywords: ["ai", "인공지능", "머신러닝", "딥러닝", "llm", "ml", "prompt", "chatgpt"] },
-  { key: "newcomer", label: "신입", keywords: ["신입"] },
-  { key: "junior", label: "경력1년 이하", keywords: ["경력1년", "1년이상", "1년 이상"] },
-  { key: "backend", label: "백엔드", keywords: ["백엔드", "backend", "server", "서버", "spring", "java", "node"] },
-  { key: "frontend", label: "프론트엔드", keywords: ["프론트엔드", "frontend", "react", "vue", "typescript", "javascript"] },
-  { key: "data", label: "데이터", keywords: ["데이터", "data", "etl", "sql", "spark", "bi"] },
-  { key: "cloud", label: "클라우드", keywords: ["클라우드", "cloud", "aws", "azure", "gcp", "kubernetes", "devops"] },
-  { key: "regular", label: "정규직", keywords: ["정규직"] },
-  { key: "metro", label: "서울·경기·인천", keywords: ["서울", "경기", "인천"] },
+type MatchBasisKey =
+  | "detail_done" | "job_developer" | "job_backend" | "job_frontend" | "job_fullstack" | "job_mobile"
+  | "job_ai" | "job_data" | "job_cloud" | "job_qa" | "job_pm"
+  | "loc_seoul" | "loc_gyeonggi" | "loc_incheon"
+  | "career_new" | "career_open" | "career_1_3" | "career_1" | "career_2" | "career_3"
+  | "edu_open" | "edu_high" | "edu_college" | "edu_university"
+  | "emp_regular" | "emp_contract" | "emp_intern"
+  | "skill_python" | "skill_java_spring" | "skill_js_ts" | "skill_react_vue" | "skill_sql_db"
+  | "skill_cloud" | "skill_docker_linux" | "skill_git" | "skill_crawling" | "skill_automation"
+  | "skill_llm_rag" | "skill_test_auto";
+const matchBasisOptions: Array<{ key: MatchBasisKey; label: string; keywords: string[]; weight: number }> = [
+  { key: "detail_done", label: "상세수집 완료", weight: 5, keywords: ["상세 페이지 수집 완료", "상세 원문 수집 완료"] },
+  { key: "job_developer", label: "개발자/IT개발", weight: 15, keywords: ["개발자", "it개발", "소프트웨어개발", "소프트웨어개발자", "웹개발", "앱개발"] },
+  { key: "job_backend", label: "백엔드/서버", weight: 20, keywords: ["백엔드", "백엔드개발자", "서버개발", "서버개발자", "server", "backend"] },
+  { key: "job_frontend", label: "프론트엔드/웹", weight: 13, keywords: ["프론트엔드", "프론트엔드개발자", "웹개발자", "웹퍼블리셔", "frontend"] },
+  { key: "job_fullstack", label: "풀스택/웹서비스", weight: 12, keywords: ["풀스택", "풀스택개발자", "웹서비스", "saas", "플랫폼", "서비스개발"] },
+  { key: "job_mobile", label: "모바일 앱", weight: 11, keywords: ["모바일앱개발", "앱개발자", "android", "ios", "flutter", "react native"] },
+  { key: "job_ai", label: "AI/AX/LLM", weight: 18, keywords: ["ai", "인공지능", "ai개발", "ai서비스", "ai자동화", "ai ax", "ax", "llm", "생성형ai", "rag", "프롬프트"] },
+  { key: "job_data", label: "데이터/ETL", weight: 16, keywords: ["데이터엔지니어", "데이터분석가", "데이터 수집", "데이터 파이프라인", "etl", "dba", "db"] },
+  { key: "job_cloud", label: "클라우드/인프라", weight: 9, keywords: ["devops", "데브옵스", "클라우드", "인프라", "시스템엔지니어", "네트워크엔지니어", "보안엔지니어"] },
+  { key: "job_qa", label: "QA/테스트자동화", weight: 10, keywords: ["qa", "qa자동화", "테스트자동화", "자동화테스트", "sdet", "테스트엔지니어", "품질엔지니어"] },
+  { key: "job_pm", label: "PM/서비스기획", weight: 3, keywords: ["서비스기획", "it기획", "프로덕트", "테크pm", "요구사항", "데이터 기반 기획"] },
+  { key: "loc_seoul", label: "서울", weight: 18, keywords: ["서울"] },
+  { key: "loc_gyeonggi", label: "경기", weight: 18, keywords: ["경기"] },
+  { key: "loc_incheon", label: "인천", weight: 18, keywords: ["인천"] },
+  { key: "career_new", label: "신입", weight: 16, keywords: ["신입"] },
+  { key: "career_open", label: "경력무관", weight: 16, keywords: ["경력무관"] },
+  { key: "career_1_3", label: "경력1~3년", weight: 16, keywords: ["1~3년", "경력1년", "경력2년", "경력3년", "경력1년이상", "경력2년이상", "경력3년이상"] },
+  { key: "career_1", label: "경력1년", weight: 16, keywords: ["경력1년", "1년이상", "1년 이상"] },
+  { key: "career_2", label: "경력2년", weight: 16, keywords: ["경력2년", "2년이상", "2년 이상"] },
+  { key: "career_3", label: "경력3년", weight: 16, keywords: ["경력3년", "3년이상", "3년 이상"] },
+  { key: "edu_open", label: "학력무관", weight: 10, keywords: ["학력무관"] },
+  { key: "edu_high", label: "고졸", weight: 10, keywords: ["고졸", "고등학교졸업"] },
+  { key: "edu_college", label: "초대졸", weight: 10, keywords: ["초대졸", "대학졸업(2,3년)"] },
+  { key: "edu_university", label: "대졸", weight: 10, keywords: ["대졸", "대학교졸업(4년)"] },
+  { key: "emp_regular", label: "정규직", weight: 16, keywords: ["정규직"] },
+  { key: "emp_contract", label: "계약직", weight: 16, keywords: ["계약직"] },
+  { key: "emp_intern", label: "인턴", weight: 16, keywords: ["인턴"] },
+  { key: "skill_python", label: "Python", weight: 4, keywords: ["python", "fastapi", "django", "flask"] },
+  { key: "skill_java_spring", label: "Java/Spring", weight: 4, keywords: ["java", "spring", "spring boot"] },
+  { key: "skill_js_ts", label: "JavaScript/TypeScript", weight: 4, keywords: ["javascript", "typescript", "node.js", "express"] },
+  { key: "skill_react_vue", label: "React/Next/Vue", weight: 4, keywords: ["react", "next.js", "vue"] },
+  { key: "skill_sql_db", label: "SQL/DB", weight: 4, keywords: ["sql", "mariadb", "mysql", "postgresql", "oracle", "redis", "db"] },
+  { key: "skill_cloud", label: "AWS/Azure/GCP", weight: 4, keywords: ["aws", "azure", "gcp", "클라우드"] },
+  { key: "skill_docker_linux", label: "Docker/Linux", weight: 4, keywords: ["docker", "kubernetes", "linux"] },
+  { key: "skill_git", label: "Git", weight: 4, keywords: ["git"] },
+  { key: "skill_crawling", label: "크롤링/스크래핑", weight: 16, keywords: ["크롤링", "웹크롤링", "스크래핑", "parser", "파서", "자동수집"] },
+  { key: "skill_automation", label: "업무자동화", weight: 18, keywords: ["자동화", "업무자동화", "python 자동화", "ai자동화"] },
+  { key: "skill_llm_rag", label: "LLM/RAG/OpenAI", weight: 18, keywords: ["llm", "rag", "openai", "chatgpt", "claude", "gemini", "cursor", "copilot"] },
+  { key: "skill_test_auto", label: "테스트자동화", weight: 10, keywords: ["테스트자동화", "자동화테스트", "api 테스트", "e2e 테스트", "playwright", "selenium", "pytest"] },
 ];
 const allowedLocationPrefixes = ["서울", "서울특별시", "경기", "경기도", "인천", "인천광역시"];
 const baseLocationOptions = [
@@ -368,10 +407,21 @@ function getSearchableJobText(job: Job) {
 }
 
 function matchesBasis(job: Job, key: MatchBasisKey) {
-  if (key === "newcomer") return getCareerFilterTokens(job.career).includes("신입");
-  if (key === "junior") return getCareerFilterTokens(job.career).some((token) => token === "신입" || token === "경력1년이상");
-  if (key === "regular") return getEmploymentFilterTokens(job.employment_type).includes("정규직");
-  if (key === "metro") return allowedLocationPrefixes.some((prefix) => (job.location ?? "").startsWith(prefix));
+  if (key === "detail_done") return job.detail_status === "success" || getSearchableJobText(job).includes("상세 원문 수집 완료");
+  if (key.startsWith("loc_")) {
+    const option = matchBasisOptions.find((item) => item.key === key);
+    return Boolean(option && option.keywords.some((keyword) => (job.location ?? "").startsWith(keyword)));
+  }
+  if (key.startsWith("career_")) {
+    const tokens = getCareerFilterTokens(job.career);
+    if (key === "career_new") return tokens.includes("신입");
+    if (key === "career_open") return tokens.includes("경력무관");
+    if (key === "career_1_3") return tokens.some((token) => ["신입", "경력무관", "경력1년이상", "경력2년이상", "경력3년이상"].includes(token));
+  }
+  if (key.startsWith("emp_")) {
+    const option = matchBasisOptions.find((item) => item.key === key);
+    return Boolean(option && option.keywords.some((keyword) => getEmploymentFilterTokens(job.employment_type).includes(keyword)));
+  }
 
   const option = matchBasisOptions.find((item) => item.key === key);
   const text = getSearchableJobText(job);
@@ -380,8 +430,12 @@ function matchesBasis(job: Job, key: MatchBasisKey) {
 
 function getDynamicMatchScore(job: Job, selectedBasis: MatchBasisKey[]) {
   if (selectedBasis.length === 0) return job.match_score;
-  const matched = selectedBasis.filter((key) => matchesBasis(job, key)).length;
-  return Math.round((matched / selectedBasis.length) * 100);
+  const selectedOptions = matchBasisOptions.filter((option) => selectedBasis.includes(option.key));
+  const totalWeight = selectedOptions.reduce((sum, option) => sum + Math.max(option.weight, 1), 0);
+  const matchedWeight = selectedOptions.reduce((sum, option) => (
+    matchesBasis(job, option.key) ? sum + Math.max(option.weight, 1) : sum
+  ), 0);
+  return totalWeight ? Math.round((matchedWeight / totalWeight) * 100) : job.match_score;
 }
 
 function getDynamicMatchReasons(job: Job, selectedBasis: MatchBasisKey[]) {
@@ -646,7 +700,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       await api.dislike(job.id);
       markViewed(job.id);
       await new Promise((resolve) => window.setTimeout(resolve, 220));
-      updateJobState(job.id, () => null);
+      updateJobState(job.id, (current) => ({ ...current, is_disliked: true }));
     } finally {
       setDislikingJobs((previous) => {
         const next = new Set(previous);
@@ -775,7 +829,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       <div className="filterGroup">
         <div>
           <span>{label}</span>
-          {selected.length > 0 && <button type="button" onClick={() => setter(() => [])}>전체</button>}
+          <div className="filterActions">
+            <button type="button" onClick={() => setter(() => entries.map(([value]) => value))}>전체선택</button>
+            <button type="button" onClick={() => setter(() => [])}>선택해제</button>
+          </div>
         </div>
         <div className="filterChips">
           {entries.map(([value, text]) => (
@@ -827,6 +884,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <div>
           <span>지역 다중 선택</span>
           <p>{selectedLocations.length ? `${selectedLocations.length}개 지역 선택됨` : "서울·경기·인천의 시/구 단위로 여러 지역을 선택할 수 있어요."}</p>
+          <div className="locationFilterActions">
+            <button type="button" onClick={() => setSelectedLocations(locationOptions)}>전체선택</button>
+            <button type="button" onClick={() => setSelectedLocations([])}>선택해제</button>
+          </div>
         </div>
         <div className="locationChips">
           {locationOptions.map((location) => (
@@ -840,7 +901,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             </button>
           ))}
         </div>
-        {selectedLocations.length > 0 && <button type="button" className="clearFilter" onClick={() => setSelectedLocations([])}>지역 전체 해제</button>}
       </div>
 
       <div className="filterPanel" aria-label="공고 조건 필터">
@@ -877,7 +937,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
           </div>
           <div className="jobList">
             {pagedJobs.map((job, index) => (
-              <article className={`jobRow ${viewedJobs.has(job.id) ? "viewed" : ""} ${job.is_favorite ? "favorite" : ""}`} key={job.id} style={{ "--delay": `${index * 25}ms` } as React.CSSProperties}>
+              <article className={`jobRow ${viewedJobs.has(job.id) ? "viewed" : ""} ${job.is_favorite ? "favorite" : ""} ${job.is_disliked ? "disliked" : ""}`} key={job.id} style={{ "--delay": `${index * 25}ms` } as React.CSSProperties}>
                 <div className="rowScore" style={{ "--score": `${getDynamicMatchScore(job, matchBasis) * 3.6}deg` } as React.CSSProperties}>
                   <strong>{getDynamicMatchScore(job, matchBasis)}</strong>
                   <small>MATCH</small>
@@ -936,14 +996,14 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     aria-label={job.is_favorite ? "관심공고 해제" : "관심공고 저장"}
                     className={`favoriteButton ${job.is_favorite ? "active" : ""}`}
                     onClick={() => void toggleFavorite(job)}
-                  >{job.is_favorite ? "💖 저장됨" : "🤍 저장"}</button>
+                  >{job.is_favorite ? "💖 저장됨" : "💚 저장"}</button>
                   {!favoriteOnly && (
                     <button
                       aria-label="별로 표시하고 목록에서 숨기기"
-                      className={`dislikeButton ${dislikingJobs.has(job.id) ? "active" : ""}`}
+                      className={`dislikeButton ${dislikingJobs.has(job.id) || job.is_disliked ? "active" : ""}`}
                       disabled={dislikingJobs.has(job.id)}
                       onClick={() => void dislikeJob(job)}
-                    >⭐ 별로</button>
+                    >{job.is_disliked ? "⭐ 별로 표시됨" : "⭐ 별로"}</button>
                   )}
                   {job.is_favorite && (
                     <select
