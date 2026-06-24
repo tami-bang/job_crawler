@@ -8,10 +8,12 @@
     "strict_location_only": true
   },
   "search_keywords": [
-    "백엔드", "백엔드개발자", "Python", "FastAPI", "Django", "Flask", "API", "REST API", "SQL", "DB", "데이터베이스",
+    "개발자", "소프트웨어개발", "소프트웨어개발자", "IT개발", "IT 개발", "웹개발", "앱개발", "서버개발", "서버개발자",
+    "백엔드", "백엔드개발자", "Python", "Java", "Spring", "Spring Boot", "FastAPI", "Django", "Flask", "API", "REST API", "SQL", "DB", "데이터베이스",
     "크롤링", "웹크롤링", "스크래핑", "자동화", "업무자동화", "Python 자동화", "데이터 파이프라인", "ETL",
-    "프론트엔드", "프론트엔드개발자", "웹개발", "웹개발자", "React", "Vue", "JavaScript", "TypeScript", "HTML", "CSS", "Next.js",
-    "풀스택", "풀스택개발자", "웹서비스", "SaaS", "플랫폼", "서비스개발",
+    "프론트엔드", "프론트엔드개발자", "웹개발자", "React", "Vue", "JavaScript", "TypeScript", "HTML", "CSS", "Next.js",
+    "풀스택", "풀스택개발자", "웹서비스", "SaaS", "플랫폼", "서비스개발", "모바일앱개발", "앱개발자", "Android", "iOS", "Flutter", "React Native",
+    "DevOps", "데브옵스", "클라우드", "AWS", "Azure", "GCP", "인프라", "시스템엔지니어", "네트워크엔지니어", "보안엔지니어", "DBA", "데이터엔지니어", "MLOps",
     "AI", "인공지능", "AI개발", "AI서비스", "AI자동화", "AI AX", "AX", "바이브코딩", "바이브 코딩", "노코드", "로우코드", "LLM", "생성형AI", "RAG", "ChatGPT", "Claude", "Gemini", "Copilot", "Cursor",
     "프롬프트엔지니어", "프롬프트", "QA자동화", "테스트자동화", "자동화테스트", "SDET", "테스트엔지니어", "품질엔지니어",
     "주니어개발자", "신입개발자"
@@ -20,8 +22,8 @@
     "job_categories": {
       "primary": "AI·개발·데이터",
       "preferred": [
-        "AI·개발·데이터", "백엔드개발자", "프론트엔드개발자", "웹개발자", "소프트웨어개발자", "풀스택개발자",
-        "AI/ML엔지니어", "AI서비스개발자", "AI개발자", "AI AX", "AX 개발자", "바이브 코딩", "바이브코딩", "AI AX 개발자", "바이브 코딩 개발자", "바이브코딩 개발자", "데이터엔지니어", "데이터분석가", "보안엔지니어", "클라우드엔지니어",
+        "AI·개발·데이터", "개발자", "IT개발", "소프트웨어개발", "소프트웨어개발자", "서버개발자", "백엔드개발자", "프론트엔드개발자", "웹개발자", "앱개발자", "모바일앱개발자", "풀스택개발자",
+        "AI/ML엔지니어", "AI서비스개발자", "AI개발자", "AI AX", "AX 개발자", "바이브 코딩", "바이브코딩", "AI AX 개발자", "바이브 코딩 개발자", "바이브코딩 개발자", "데이터엔지니어", "데이터분석가", "DBA", "DevOps", "데브옵스", "보안엔지니어", "클라우드엔지니어",
         "시스템엔지니어", "네트워크엔지니어", "웹퍼블리셔", "프롬프트엔지니어", "MLOps엔지니어"
       ],
       "secondary": ["QA", "테스트엔지니어", "QA엔지니어", "품질엔지니어", "테스트자동화", "SDET"],
@@ -47,14 +49,16 @@
     "skill_keywords": {
       "preferred": [
         "Python", "FastAPI", "Django", "Flask", "SQL", "REST API", "API", "JavaScript", "TypeScript", "React", "Next.js", "Vue",
-        "HTML", "CSS", "Git", "Docker", "AWS", "Linux", "MariaDB", "MySQL", "PostgreSQL", "크롤링", "자동화", "AI AX", "바이브코딩", "바이브 코딩", "LLM", "RAG", "OpenAI", "테스트자동화"
+        "HTML", "CSS", "Git", "Docker", "Kubernetes", "AWS", "Azure", "GCP", "Linux", "MariaDB", "MySQL", "PostgreSQL", "Oracle", "Redis",
+        "Java", "Spring", "Spring Boot", "Node.js", "Express", "Android", "iOS", "Flutter", "React Native", "DevOps", "MLOps", "클라우드", "인프라", "보안", "DBA",
+        "크롤링", "자동화", "AI AX", "바이브코딩", "바이브 코딩", "LLM", "RAG", "OpenAI", "테스트자동화"
       ]
     },
     "career_goal_boosts": {
       "backend_python": {
         "label": "1순위 Python 백엔드/서비스 개발",
         "weight": 20,
-        "keywords": ["백엔드", "백엔드개발자", "Python", "FastAPI", "Django", "Flask", "API", "REST API", "SQL", "DB", "MariaDB", "MySQL", "PostgreSQL", "서비스개발"]
+        "keywords": ["서버개발", "서버개발자", "백엔드", "백엔드개발자", "Python", "Java", "Spring", "Spring Boot", "Node.js", "FastAPI", "Django", "Flask", "API", "REST API", "SQL", "DB", "MariaDB", "MySQL", "PostgreSQL", "서비스개발"]
       },
       "ai_automation": {
         "label": "1순위 AI/업무자동화 개발",
@@ -70,6 +74,16 @@
         "label": "2순위 프론트엔드/웹개발",
         "weight": 13,
         "keywords": ["프론트엔드", "프론트엔드개발자", "웹개발", "웹개발자", "React", "Vue", "JavaScript", "TypeScript", "HTML", "CSS", "Next.js", "퍼블리싱", "웹퍼블리싱"]
+      },
+      "mobile_app": {
+        "label": "2순위 모바일 앱 개발",
+        "weight": 11,
+        "keywords": ["모바일앱개발", "앱개발", "앱개발자", "Android", "iOS", "Flutter", "React Native", "Kotlin", "Swift"]
+      },
+      "cloud_infra_security": {
+        "label": "2순위 클라우드/인프라/보안",
+        "weight": 9,
+        "keywords": ["DevOps", "데브옵스", "클라우드", "인프라", "AWS", "Azure", "GCP", "Kubernetes", "Docker", "Linux", "보안", "보안엔지니어", "시스템엔지니어", "네트워크엔지니어", "DBA"]
       },
       "fullstack_web_service": {
         "label": "2순위 풀스택/웹서비스",

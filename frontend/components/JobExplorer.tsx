@@ -295,7 +295,7 @@ function isLongSnapshotBoundary(line: string) {
   return headings.some((heading) => compact === heading || compact.startsWith(heading));
 }
 
-function readLongSection(lines: string[], labels: string[], maxChars = 1600) {
+function readLongSection(lines: string[], labels: string[], maxChars = 3200) {
   for (const label of labels) {
     const target = label.replace(/\s+/g, "");
     const index = lines.findIndex((line) => line.replace(/\s+/g, "").includes(target));
@@ -356,6 +356,12 @@ function buildSnapshotRows(title: string, body: string) {
     ["담당업무", readFirstAfterLabels(lines, ["담당업무", "주요업무", "직무내용", "모집분야"], 5)],
   ].filter(([, value]) => value);
   return rows.length ? rows : [["저장 내용", lines.slice(0, 24).join(" / ")]];
+}
+
+function getEmployeeCount(job: Job) {
+  if (!job.raw_detail_text) return "사원수 미정";
+  const value = readAfterLabel(cleanSnapshotLines(job.raw_detail_text), "사원수", 1);
+  return value ? `사원수 ${value}` : "사원수 미정";
 }
 
 function buildEmailReportBody(jobs: Job[]) {
@@ -504,7 +510,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     const farFuture = 8640000000000000;
     const farPast = -8640000000000000;
     return [...visibleJobs].sort((a, b) => {
-      if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1;
       if (sortBy === "deadline_asc") {
         return getDateTime(getEffectiveDeadlineDate(a), farFuture) - getDateTime(getEffectiveDeadlineDate(b), farFuture);
       }
@@ -545,15 +550,48 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const visibleStart = sortedJobs.length ? (currentPage - 1) * pageSize + 1 : 0;
   const visibleEnd = Math.min(currentPage * pageSize, sortedJobs.length);
 
+  function updateJobState(jobId: number, update: (job: Job) => Job | null) {
+    setJobs((previous) => previous.flatMap((job) => {
+      if (job.id !== jobId) return [job];
+      const next = update(job);
+      return next ? [next] : [];
+    }));
+  }
+
   async function toggleFavorite(job: Job) {
-    if (job.is_favorite) await api.unfavorite(job.id);
-    else await api.favorite(job.id);
-    await loadJobs(search);
+    if (job.is_favorite) {
+      await api.unfavorite(job.id);
+      updateJobState(job.id, (current) => (
+        favoriteOnly
+          ? null
+          : { ...current, is_favorite: false, favorite_memo: null, favorite_status: null }
+      ));
+      return;
+    }
+
+    await api.favorite(job.id);
+    updateJobState(job.id, (current) => ({
+      ...current,
+      is_favorite: true,
+      favorite_memo: current.favorite_memo ?? "",
+      favorite_status: current.favorite_status ?? "planned",
+    }));
   }
 
   async function changeStatus(job: Job, status: string) {
     await api.updateFavorite(job.id, job.favorite_memo ?? "", status);
-    await loadJobs(search);
+    updateJobState(job.id, (current) => ({ ...current, favorite_status: status }));
+  }
+
+  async function changeMemo(job: Job, memo: string) {
+    await api.updateFavorite(job.id, memo, job.favorite_status ?? "planned");
+    updateJobState(job.id, (current) => ({ ...current, favorite_memo: memo }));
+  }
+
+  async function dislikeJob(job: Job) {
+    await api.dislike(job.id);
+    markViewed(job.id);
+    updateJobState(job.id, () => null);
   }
 
   async function submitEmail() {
@@ -773,11 +811,11 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <>
           <div className="tableHeader">
             <span>표시 {visibleStart}-{visibleEnd} · {view === "expired" ? "마감 공고" : "진행 공고"}</span>
-            <label className="tableSort"><span>{view === "expired" ? "오늘 이전 마감" : "정렬"}</span><select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortKey)}>{Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><b>관심공고 우선</b></label>
+            <label className="tableSort"><span>{view === "expired" ? "오늘 이전 마감" : "정렬"}</span><select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortKey)}>{Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
           </div>
           <div className="jobList">
             {pagedJobs.map((job, index) => (
-              <article className={`jobRow ${viewedJobs.has(job.id) ? "viewed" : ""}`} key={job.id} style={{ "--delay": `${index * 25}ms` } as React.CSSProperties}>
+              <article className={`jobRow ${viewedJobs.has(job.id) ? "viewed" : ""} ${job.is_favorite ? "favorite" : ""}`} key={job.id} style={{ "--delay": `${index * 25}ms` } as React.CSSProperties}>
                 <div className="rowScore" style={{ "--score": `${job.match_score * 3.6}deg` } as React.CSSProperties}>
                   <strong>{job.match_score}</strong>
                   <small>MATCH</small>
@@ -794,6 +832,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     <span>{job.employment_type || "고용형태 미정"}</span>
                     <span>{formatPostedDate(job.posted_date)}</span>
                     <span>{formatDeadlineDate(job.deadline_date, job.deadline)}</span>
+                    <span>{getEmployeeCount(job)}</span>
                   </div>
                   <div className="commuteLine">
                     <span>이동경로: {originAddress ? `${originAddress} → ${getDestination(job)}` : "출발지 입력 후 확인"}</span>
@@ -824,11 +863,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                       aria-label="관심공고 메모"
                       defaultValue={job.favorite_memo ?? ""}
                       placeholder="지원 전 확인할 내용을 메모하세요"
-                      onBlur={(event) => void api.updateFavorite(
-                        job.id,
-                        event.target.value,
-                        job.favorite_status ?? "planned",
-                      )}
+                      onBlur={(event) => void changeMemo(job, event.target.value)}
                     />
                   )}
                 </div>
@@ -838,6 +873,13 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     className={`favoriteButton ${job.is_favorite ? "active" : ""}`}
                     onClick={() => void toggleFavorite(job)}
                   >{job.is_favorite ? "♥ 저장됨" : "♡ 저장"}</button>
+                  {!favoriteOnly && (
+                    <button
+                      aria-label="별로 표시하고 목록에서 숨기기"
+                      className="dislikeButton"
+                      onClick={() => void dislikeJob(job)}
+                    >* 별로</button>
+                  )}
                   {job.is_favorite && (
                     <select
                       aria-label="지원 상태"

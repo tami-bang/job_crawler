@@ -19,6 +19,7 @@ export type Job = {
   positive_reasons: string[];
   negative_reasons: string[];
   is_favorite: boolean;
+  is_disliked?: boolean;
   favorite_memo: string | null;
   favorite_status: string | null;
 };
@@ -40,11 +41,13 @@ export type CommuteEstimate = {
 };
 
 type FavoriteState = Record<number, { memo: string; status: string }>;
+type DislikedState = number[];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 const STATIC_DEMO = process.env.NEXT_PUBLIC_STATIC_DEMO === "true";
 const REPORT_API_URL = process.env.NEXT_PUBLIC_REPORT_API_URL?.replace(/\/$/, "") ?? "";
 const FAVORITES_KEY = "job-radar-demo-favorites";
+const DISLIKED_JOBS_KEY = "job-radar-disliked-jobs";
 
 function getReportDeadline(job: Job) {
   if (job.deadline?.includes("상시")) return job.deadline;
@@ -56,16 +59,19 @@ function getReportDeadline(job: Job) {
 async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
   const { demoJobs } = await import("./demo-data");
   const favorites = readFavorites();
+  const disliked = readDislikedJobs();
   const term = search.trim().toLowerCase();
 
   return demoJobs
     .map((job) => ({
       ...job,
       is_favorite: Boolean(favorites[job.id]),
+      is_disliked: disliked.has(job.id),
       favorite_memo: favorites[job.id]?.memo ?? null,
       favorite_status: favorites[job.id]?.status ?? null,
     }))
     .filter((job) => !favoriteOnly || job.is_favorite)
+    .filter((job) => favoriteOnly || !job.is_disliked)
     .filter((job) => !term || [job.title, job.company_name, job.skill_candidates]
       .some((value) => value?.toLowerCase().includes(term)));
 }
@@ -83,6 +89,25 @@ function writeFavorites(favorites: FavoriteState) {
   try {
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
     window.dispatchEvent(new Event("job-radar-favorites-updated"));
+  } catch {
+    // 저장소가 차단된 브라우저에서도 화면 탐색은 계속 허용합니다.
+  }
+}
+
+function readDislikedJobs() {
+  if (typeof window === "undefined") return new Set<number>();
+  try {
+    const parsed = JSON.parse(localStorage.getItem(DISLIKED_JOBS_KEY) ?? "[]") as DislikedState;
+    return new Set(parsed);
+  } catch {
+    return new Set<number>();
+  }
+}
+
+function writeDislikedJobs(dislikedJobs: Set<number>) {
+  try {
+    localStorage.setItem(DISLIKED_JOBS_KEY, JSON.stringify([...dislikedJobs]));
+    window.dispatchEvent(new Event("job-radar-disliked-updated"));
   } catch {
     // 저장소가 차단된 브라우저에서도 화면 탐색은 계속 허용합니다.
   }
@@ -171,7 +196,7 @@ export const api = {
   favorite: async (jobId: number) => {
     if (STATIC_DEMO) {
       const favorites = readFavorites();
-      favorites[jobId] = { memo: "", status: "planned" };
+      favorites[jobId] = favorites[jobId] ?? { memo: "", status: "planned" };
       writeFavorites(favorites);
       return getDemoJob(jobId);
     }
@@ -200,6 +225,25 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify({ memo, status }),
     });
+  },
+  dislike: async (jobId: number) => {
+    if (STATIC_DEMO) {
+      const dislikedJobs = readDislikedJobs();
+      dislikedJobs.add(jobId);
+      writeDislikedJobs(dislikedJobs);
+      return;
+    }
+    return request<Job>(`/api/jobs/${jobId}/favorite`, {
+      method: "POST",
+      body: JSON.stringify({ memo: "", status: "excluded" }),
+    });
+  },
+  undislike: async (jobId: number) => {
+    if (STATIC_DEMO) {
+      const dislikedJobs = readDislikedJobs();
+      dislikedJobs.delete(jobId);
+      writeDislikedJobs(dislikedJobs);
+    }
   },
   emailReport: async (email: string, jobs: Job[]) => {
     const baseUrl = REPORT_API_URL || API_URL;

@@ -258,6 +258,16 @@ Optional fields:
 * main_tasks
 * qualifications
 * benefits
+
+---
+
+## 21. User State Preservation Rules
+
+* Never reset or delete user-created state such as favorites, memos, viewed/read markers, hidden/disliked jobs, or application status during UI changes, crawling, exporting, or demo-data refreshes.
+* Do not reorder the current job list just because a job was saved, memoed, viewed, or marked as disliked. User navigation position matters.
+* Keep crawler/import order and explicit user-selected sort order separate from UI state. UI state may decorate or hide an item, but it must not silently reshuffle source data.
+* Adding new crawl data must not mutate existing localStorage keys or backend favorite records unless the user explicitly asks for a reset.
+* If a feature needs a new state such as "별로", store it separately from favorites so saved notes and application statuses cannot be lost.
 * company_size
 * industry
 

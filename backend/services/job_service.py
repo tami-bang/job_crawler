@@ -93,6 +93,8 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
     if status:
         where.append("fj.status = ?")
         params.append(status)
+    elif not favorite_only:
+        where.append("(fj.status IS NULL OR fj.status != 'excluded')")
     if job_id is not None:
         where.append("jp.id = ?")
         params.append(job_id)
@@ -147,7 +149,6 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
         LEFT JOIN favorite_jobs fj ON fj.job_posting_id = jp.id
         WHERE {' AND '.join(where)}
         ORDER BY
-            CASE WHEN fj.id IS NULL THEN 1 ELSE 0 END,
             COALESCE(jmr.match_score, jmr.score, 0) DESC,
             jp.updated_at DESC
         LIMIT ?
@@ -175,7 +176,7 @@ def save_favorite(job_id, memo="", status="saved"):
             INSERT INTO favorite_jobs (job_posting_id, memo, status)
             VALUES (?, ?, ?)
             ON CONFLICT(job_posting_id) DO UPDATE SET
-                memo = excluded.memo,
+                memo = COALESCE(NULLIF(excluded.memo, ''), favorite_jobs.memo),
                 status = excluded.status,
                 updated_at = CURRENT_TIMESTAMP
             """,
