@@ -25,15 +25,20 @@ const sortLabels = {
   posted_asc: "시작 오래된순",
   company_asc: "회사명 가나다순",
 } as const;
-const scoreFilterLabels = {
-  strong: "85점 이상",
-  good: "65~84점",
-  possible: "1~64점",
-  unscored: "미분석",
-} as const;
 type SortKey = keyof typeof sortLabels;
-type ScoreFilterKey = keyof typeof scoreFilterLabels;
 type ExplorerView = "list" | "calendar" | "expired";
+type MatchBasisKey = "ai" | "newcomer" | "junior" | "backend" | "frontend" | "data" | "cloud" | "regular" | "metro";
+const matchBasisOptions: Array<{ key: MatchBasisKey; label: string; keywords: string[] }> = [
+  { key: "ai", label: "AI 사용", keywords: ["ai", "인공지능", "머신러닝", "딥러닝", "llm", "ml", "prompt", "chatgpt"] },
+  { key: "newcomer", label: "신입", keywords: ["신입"] },
+  { key: "junior", label: "경력1년 이하", keywords: ["경력1년", "1년이상", "1년 이상"] },
+  { key: "backend", label: "백엔드", keywords: ["백엔드", "backend", "server", "서버", "spring", "java", "node"] },
+  { key: "frontend", label: "프론트엔드", keywords: ["프론트엔드", "frontend", "react", "vue", "typescript", "javascript"] },
+  { key: "data", label: "데이터", keywords: ["데이터", "data", "etl", "sql", "spark", "bi"] },
+  { key: "cloud", label: "클라우드", keywords: ["클라우드", "cloud", "aws", "azure", "gcp", "kubernetes", "devops"] },
+  { key: "regular", label: "정규직", keywords: ["정규직"] },
+  { key: "metro", label: "서울·경기·인천", keywords: ["서울", "경기", "인천"] },
+];
 const allowedLocationPrefixes = ["서울", "서울특별시", "경기", "경기도", "인천", "인천광역시"];
 const baseLocationOptions = [
   "서울 강남구", "서울 강동구", "서울 강북구", "서울 강서구", "서울 관악구", "서울 광진구", "서울 구로구", "서울 금천구",
@@ -314,23 +319,78 @@ function readLongSection(lines: string[], labels: string[], maxChars = 3200) {
   return "";
 }
 
-function careerRank(value: string) {
-  const text = value.replace(/\s+/g, "");
-  if (text === "신입") return [0, 0, value] as const;
-  if (text.includes("경력무관") || text.includes("무관")) return [1, 0, value] as const;
-  if (text.includes("신입") && text.includes("경력")) return [2, 0, value] as const;
-  const range = text.match(/경력(\d+)\s*~\s*(\d+)년/);
-  if (range) return [3, Number(range[1]), value] as const;
-  const years = text.match(/경력(\d+)년/);
-  if (years) return [3, Number(years[1]), value] as const;
-  if (text.includes("경력")) return [8, 0, value] as const;
-  return [9, 0, value] as const;
+function uniqueSorted<T extends string>(values: T[], compare?: (a: T, b: T) => number) {
+  return Array.from(new Set(values)).sort(compare);
 }
 
-function compareCareerOptions(a: string, b: string) {
-  const left = careerRank(a);
-  const right = careerRank(b);
-  return left[0] - right[0] || left[1] - right[1] || left[2].localeCompare(right[2], "ko");
+function getCareerFilterTokens(career: string | null | undefined) {
+  const text = (career ?? "").replace(/\s+/g, "");
+  const tokens: string[] = [];
+  if (!text) return tokens;
+  if (text.includes("신입")) tokens.push("신입");
+  if (text.includes("경력무관") || text === "무관") tokens.push("경력무관");
+  if (text.includes("경력") && !text.includes("경력무관")) {
+    tokens.push("경력");
+    const years = text.match(/경력(\d+)(?:~\d+)?년(?:이상|↑)?/);
+    if (years) tokens.push(`경력${years[1]}년이상`);
+  }
+  return tokens;
+}
+
+function compareCareerFilterTokens(a: string, b: string) {
+  const baseOrder: Record<string, number> = { 신입: 0, 경력무관: 1, 경력: 2 };
+  const leftYear = a.match(/^경력(\d+)년이상$/);
+  const rightYear = b.match(/^경력(\d+)년이상$/);
+  const leftRank = baseOrder[a] ?? (leftYear ? 3 : 9);
+  const rightRank = baseOrder[b] ?? (rightYear ? 3 : 9);
+  return leftRank - rightRank || Number(leftYear?.[1] ?? 0) - Number(rightYear?.[1] ?? 0) || a.localeCompare(b, "ko");
+}
+
+function getEmploymentFilterTokens(employmentType: string | null | undefined) {
+  return (employmentType ?? "")
+    .split(/[,/·ㆍ|]/)
+    .map((value) => value.replace(/\([^)]*\)/g, "").trim())
+    .filter(Boolean);
+}
+
+function getSearchableJobText(job: Job) {
+  return [
+    job.title,
+    job.company_name,
+    job.location,
+    job.career,
+    job.employment_type,
+    job.skill_candidates,
+    job.raw_detail_text,
+    ...job.matched_keywords,
+    ...job.positive_reasons,
+  ].filter(Boolean).join("\n").toLowerCase();
+}
+
+function matchesBasis(job: Job, key: MatchBasisKey) {
+  if (key === "newcomer") return getCareerFilterTokens(job.career).includes("신입");
+  if (key === "junior") return getCareerFilterTokens(job.career).some((token) => token === "신입" || token === "경력1년이상");
+  if (key === "regular") return getEmploymentFilterTokens(job.employment_type).includes("정규직");
+  if (key === "metro") return allowedLocationPrefixes.some((prefix) => (job.location ?? "").startsWith(prefix));
+
+  const option = matchBasisOptions.find((item) => item.key === key);
+  const text = getSearchableJobText(job);
+  return Boolean(option && option.keywords.some((keyword) => text.includes(keyword.toLowerCase())));
+}
+
+function getDynamicMatchScore(job: Job, selectedBasis: MatchBasisKey[]) {
+  if (selectedBasis.length === 0) return job.match_score;
+  const matched = selectedBasis.filter((key) => matchesBasis(job, key)).length;
+  return Math.round((matched / selectedBasis.length) * 100);
+}
+
+function getDynamicMatchReasons(job: Job, selectedBasis: MatchBasisKey[]) {
+  if (selectedBasis.length === 0) return job.positive_reasons[0] || "저장된 조건을 기준으로 분석한 공고입니다.";
+  const matchedLabels = matchBasisOptions
+    .filter((option) => selectedBasis.includes(option.key) && matchesBasis(job, option.key))
+    .map((option) => option.label);
+  if (matchedLabels.length === 0) return "선택한 매칭 기준과 직접 맞는 항목이 아직 없습니다.";
+  return `선택 기준 일치: ${matchedLabels.join(", ")}`;
 }
 
 function buildSnapshotRows(title: string, body: string) {
@@ -406,17 +466,13 @@ function readViewedJobs() {
   }
 }
 
-function isString(value: string | null | undefined): value is string {
-  return Boolean(value);
-}
-
 export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: boolean }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const [scoreFilters, setScoreFilters] = useState<ScoreFilterKey[]>([]);
   const [employmentFilters, setEmploymentFilters] = useState<string[]>([]);
   const [careerFilters, setCareerFilters] = useState<string[]>([]);
+  const [matchBasis, setMatchBasis] = useState<MatchBasisKey[]>([]);
   const [sortBy, setSortBy] = useState<SortKey>("posted_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -466,10 +522,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }, []);
 
   const employmentOptions = useMemo(() => (
-    Array.from(new Set(jobs.map((job) => job.employment_type).filter(Boolean))).sort() as string[]
+    uniqueSorted(jobs.flatMap((job) => getEmploymentFilterTokens(job.employment_type)))
   ), [jobs]);
   const careerOptions = useMemo(() => (
-    Array.from(new Set(jobs.map((job) => job.career).filter(isString))).sort(compareCareerOptions)
+    uniqueSorted(jobs.flatMap((job) => getCareerFilterTokens(job.career)), compareCareerFilterTokens)
   ), [jobs]);
   const locationOptions = useMemo(() => (
     Array.from(new Set([...baseLocationOptions, ...(jobs.map((job) => normalizeLocationOption(job.location)).filter(Boolean) as string[])]))
@@ -484,17 +540,12 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         return Boolean(option && selectedLocations.includes(option));
       })
       .filter((job) => {
-        if (scoreFilters.length === 0) return true;
-        return scoreFilters.some((filter) => {
-          if (filter === "strong") return job.match_score >= 85;
-          if (filter === "good") return job.match_score >= 65 && job.match_score < 85;
-          if (filter === "possible") return job.match_score > 0 && job.match_score < 65;
-          return job.match_score === 0;
-        });
+        if (matchBasis.length === 0) return true;
+        return getDynamicMatchScore(job, matchBasis) > 0;
       })
-      .filter((job) => careerFilters.length === 0 || Boolean(job.career && careerFilters.includes(job.career)))
-      .filter((job) => employmentFilters.length === 0 || Boolean(job.employment_type && employmentFilters.includes(job.employment_type)))
-  ), [careerFilters, employmentFilters, jobs, scoreFilters, selectedLocations]);
+      .filter((job) => careerFilters.length === 0 || getCareerFilterTokens(job.career).some((token) => careerFilters.includes(token)))
+      .filter((job) => employmentFilters.length === 0 || getEmploymentFilterTokens(job.employment_type).some((token) => employmentFilters.includes(token)))
+  ), [careerFilters, employmentFilters, jobs, matchBasis, selectedLocations]);
   const todayKey = toDateKey(new Date());
 
   const activeFilteredJobs = useMemo(() => (
@@ -526,13 +577,13 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       if (sortBy === "company_asc") {
         return (a.company_name || "").localeCompare(b.company_name || "", "ko");
       }
-      return b.match_score - a.match_score || getDateTime(b.posted_date, farPast) - getDateTime(a.posted_date, farPast);
+      return getDynamicMatchScore(b, matchBasis) - getDynamicMatchScore(a, matchBasis) || getDateTime(b.posted_date, farPast) - getDateTime(a.posted_date, farPast);
     });
-  }, [sortBy, visibleJobs]);
+  }, [matchBasis, sortBy, visibleJobs]);
 
   useEffect(() => {
     setPage(1);
-  }, [careerFilters, employmentFilters, scoreFilters, selectedLocations, sortBy, view]);
+  }, [careerFilters, employmentFilters, matchBasis, selectedLocations, sortBy, view]);
 
   const jobsByDeadline = useMemo(() => {
     return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
@@ -594,7 +645,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     try {
       await api.dislike(job.id);
       markViewed(job.id);
-      await new Promise((resolve) => window.setTimeout(resolve, 140));
+      await new Promise((resolve) => window.setTimeout(resolve, 220));
       updateJobState(job.id, () => null);
     } finally {
       setDislikingJobs((previous) => {
@@ -793,7 +844,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       </div>
 
       <div className="filterPanel" aria-label="공고 조건 필터">
-        {renderFilterChips("매칭 점수", scoreFilters, Object.entries(scoreFilterLabels) as Array<[ScoreFilterKey, string]>, setScoreFilters)}
+        {renderFilterChips("매칭 기준", matchBasis, matchBasisOptions.map((option) => [option.key, option.label]), setMatchBasis)}
         {renderFilterChips("경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
         {renderFilterChips("고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
       </div>
@@ -827,8 +878,8 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
           <div className="jobList">
             {pagedJobs.map((job, index) => (
               <article className={`jobRow ${viewedJobs.has(job.id) ? "viewed" : ""} ${job.is_favorite ? "favorite" : ""}`} key={job.id} style={{ "--delay": `${index * 25}ms` } as React.CSSProperties}>
-                <div className="rowScore" style={{ "--score": `${job.match_score * 3.6}deg` } as React.CSSProperties}>
-                  <strong>{job.match_score}</strong>
+                <div className="rowScore" style={{ "--score": `${getDynamicMatchScore(job, matchBasis) * 3.6}deg` } as React.CSSProperties}>
+                  <strong>{getDynamicMatchScore(job, matchBasis)}</strong>
                   <small>MATCH</small>
                 </div>
                 <div className="rowMain">
@@ -840,7 +891,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                   <div className="meta">
                     <span>{job.location || "지역 미정"}</span>
                     <span>{job.career || "경력 무관"}</span>
-                    <span>{job.employment_type || "고용형태 미정"}</span>
+                    {getEmploymentFilterTokens(job.employment_type).length
+                      ? getEmploymentFilterTokens(job.employment_type).map((type) => <span key={type}>{type}</span>)
+                      : <span>고용형태 미정</span>}
                     <span>{formatPostedDate(job.posted_date)}</span>
                     <span>{formatDeadlineDate(job.deadline_date, job.deadline)}</span>
                     <span>{getEmployeeCount(job)}</span>
@@ -867,7 +920,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                   <div className="keywords">
                     {job.matched_keywords.slice(0, 5).map((keyword) => <span key={keyword}>#{keyword}</span>)}
                   </div>
-                  <p className="reason">{job.positive_reasons[0] || "저장된 조건을 기준으로 분석한 공고입니다."}</p>
+                  <p className="reason">{getDynamicMatchReasons(job, matchBasis)}</p>
                   {job.is_favorite && (
                     <input
                       className="memoInput"
@@ -883,7 +936,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     aria-label={job.is_favorite ? "관심공고 해제" : "관심공고 저장"}
                     className={`favoriteButton ${job.is_favorite ? "active" : ""}`}
                     onClick={() => void toggleFavorite(job)}
-                  >{job.is_favorite ? "♥ 저장됨" : "♡ 저장"}</button>
+                  >{job.is_favorite ? "💖 저장됨" : "🤍 저장"}</button>
                   {!favoriteOnly && (
                     <button
                       aria-label="별로 표시하고 목록에서 숨기기"
@@ -952,7 +1005,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                   )}
                   {dayJobs.slice(0, 3).map((job) => (
                     <a className="deadlinePill" href={job.detail_url ?? "#"} target="_blank" rel="noreferrer" key={job.id}>
-                      <b>{job.match_score}</b> {job.company_name || "회사 미상"}
+                      <b>{getDynamicMatchScore(job, matchBasis)}</b> {job.company_name || "회사 미상"}
                     </a>
                   ))}
                   {dayJobs.length > 3 && <small className="moreJobs">+{dayJobs.length - 3}개 더</small>}
