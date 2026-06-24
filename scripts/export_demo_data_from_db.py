@@ -108,9 +108,9 @@ def load_jobs(db_path, limit):
          AND jmr.user_profile_id = (
             SELECT id FROM user_profiles ORDER BY updated_at DESC, id DESC LIMIT 1
          )
+        WHERE jp.detail_status = 'success'
         ORDER BY
             COALESCE(jmr.match_score, jmr.score, 0) DESC,
-            CASE WHEN jp.detail_status = 'success' THEN 0 ELSE 1 END,
             jp.updated_at DESC,
             jp.id DESC
         LIMIT ?

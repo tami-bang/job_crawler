@@ -57,6 +57,7 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
   const term = search.trim().toLowerCase();
 
   return demoJobs
+    .filter((job) => job.detail_status === "success")
     .map((job) => ({
       ...job,
       is_favorite: Boolean(favorites[job.id]),

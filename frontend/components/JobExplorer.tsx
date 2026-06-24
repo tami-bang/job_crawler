@@ -21,13 +21,9 @@ const sortLabels = {
   match_desc: "매칭 점수 높은순",
   deadline_asc: "마감 임박순",
   deadline_desc: "마감 여유순",
-  posted_desc: "등록 최신순",
-  posted_asc: "등록 오래된순",
+  posted_desc: "시작일 최신순",
+  posted_asc: "시작일 오래된순",
   company_asc: "회사명 가나다순",
-} as const;
-const detailFilterLabels = {
-  success: "상세완료",
-  pending: "상세대기",
 } as const;
 const scoreFilterLabels = {
   strong: "85점 이상",
@@ -36,7 +32,6 @@ const scoreFilterLabels = {
   unscored: "미분석",
 } as const;
 type SortKey = keyof typeof sortLabels;
-type DetailFilterKey = keyof typeof detailFilterLabels;
 type ScoreFilterKey = keyof typeof scoreFilterLabels;
 type ExplorerView = "list" | "calendar" | "expired";
 const allowedLocationPrefixes = ["서울", "서울특별시", "경기", "경기도", "인천", "인천광역시"];
@@ -156,8 +151,8 @@ function parseDateParts(value: string | null | undefined) {
 
 function formatPostedDate(value: string | null) {
   const parsed = parseDateParts(value);
-  if (!parsed) return "등록 미정";
-  return `등록 ${parsed.year}.${parsed.month}.${parsed.day}(${parsed.weekday})`;
+  if (!parsed) return "시작일 미정";
+  return `시작일 ${parsed.year}.${parsed.month}.${parsed.day}(${parsed.weekday})`;
 }
 
 function formatDeadlineDate(deadlineDate: string | null, deadline: string | null) {
@@ -256,8 +251,51 @@ function readFirstAfterLabels(lines: string[], labels: string[], maxLines = 6) {
   return "";
 }
 
-function readSectionPresence(lines: string[], labels: string[]) {
-  return labels.some((label) => lines.includes(label)) ? "원문에 섹션 있음" : "";
+function isSnapshotSectionBreak(line: string) {
+  return snapshotStopLines.has(line)
+    || /^(20\d{2}|19\d{2})년?$/.test(line)
+    || /^(상반기|하반기|신입|경력)$/.test(line);
+}
+
+function readSectionSnippet(lines: string[], labels: string[], maxChars = 220) {
+  for (const label of labels) {
+    const index = lines.findIndex((line) => line === label);
+    if (index < 0) continue;
+
+    const values = [];
+    for (const line of lines.slice(index + 1)) {
+      if (isSnapshotSectionBreak(line)) {
+        if (values.length > 0) break;
+        continue;
+      }
+      if (line.length < 3 || /^[·ㆍ∙|]+$/.test(line)) continue;
+      values.push(line);
+      if (values.join(" ").length >= maxChars) break;
+    }
+
+    const snippet = values.join(" ").replace(/\s+/g, " ").trim();
+    if (snippet) return snippet.length > maxChars ? `${snippet.slice(0, maxChars).trim()}...` : snippet;
+  }
+  return "";
+}
+
+function careerRank(value: string) {
+  const text = value.replace(/\s+/g, "");
+  if (text === "신입") return [0, 0, value] as const;
+  if (text.includes("신입") && text.includes("경력")) return [1, 0, value] as const;
+  if (text.includes("경력무관") || text.includes("무관")) return [2, 0, value] as const;
+  const range = text.match(/경력(\d+)\s*~\s*(\d+)년/);
+  if (range) return [3, Number(range[1]), value] as const;
+  const years = text.match(/경력(\d+)년/);
+  if (years) return [4, Number(years[1]), value] as const;
+  if (text.includes("경력")) return [5, 0, value] as const;
+  return [9, 0, value] as const;
+}
+
+function compareCareerOptions(a: string, b: string) {
+  const left = careerRank(a);
+  const right = careerRank(b);
+  return left[0] - right[0] || left[1] - right[1] || left[2].localeCompare(right[2], "ko");
 }
 
 function buildSnapshotRows(title: string, body: string) {
@@ -273,10 +311,10 @@ function buildSnapshotRows(title: string, body: string) {
     ["우대조건", readFirstAfterLabels(lines, ["기본우대", "우대조건"], 4)],
     ["시작일", readAfterLabel(lines, "시작일", 1)],
     ["마감일", readAfterLabel(lines, "마감일", 2)],
-    ["합격자소서", readSectionPresence(lines, ["합격자소서", "합격자소서 더보기"])],
-    ["인적성·면접 후기", readSectionPresence(lines, ["인적성·면접 후기", "면접 질문", "면접 후기"])],
+    ["합격자소서", readSectionSnippet(lines, ["합격자소서", "합격자소서 더보기"])],
+    ["인적성·면접 후기", readSectionSnippet(lines, ["인적성·면접 후기", "면접 질문", "면접 후기"])],
     ["사원수", readAfterLabel(lines, "사원수", 1)],
-    ["담당업무", readFirstAfterLabels(lines, ["담당업무", "주요업무", "직무내용"], 5)],
+    ["담당업무", readFirstAfterLabels(lines, ["담당업무", "주요업무", "직무내용", "모집분야"], 5)],
   ].filter(([, value]) => value);
   return rows.length ? rows : [["저장 내용", lines.slice(0, 24).join(" / ")]];
 }
@@ -331,7 +369,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const [detailFilters, setDetailFilters] = useState<DetailFilterKey[]>([]);
   const [scoreFilters, setScoreFilters] = useState<ScoreFilterKey[]>([]);
   const [employmentFilters, setEmploymentFilters] = useState<string[]>([]);
   const [careerFilters, setCareerFilters] = useState<string[]>([]);
@@ -386,7 +423,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     Array.from(new Set(jobs.map((job) => job.employment_type).filter(Boolean))).sort() as string[]
   ), [jobs]);
   const careerOptions = useMemo(() => (
-    Array.from(new Set(jobs.map((job) => job.career).filter(isString))).sort((a, b) => a.localeCompare(b, "ko"))
+    Array.from(new Set(jobs.map((job) => job.career).filter(isString))).sort(compareCareerOptions)
   ), [jobs]);
   const locationOptions = useMemo(() => (
     Array.from(new Set([...baseLocationOptions, ...(jobs.map((job) => normalizeLocationOption(job.location)).filter(Boolean) as string[])]))
@@ -401,12 +438,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         return Boolean(option && selectedLocations.includes(option));
       })
       .filter((job) => {
-        if (detailFilters.length === 0) return true;
-        return detailFilters.some((filter) => (
-          filter === "success" ? job.detail_status === "success" : job.detail_status !== "success"
-        ));
-      })
-      .filter((job) => {
         if (scoreFilters.length === 0) return true;
         return scoreFilters.some((filter) => {
           if (filter === "strong") return job.match_score >= 85;
@@ -417,7 +448,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       })
       .filter((job) => careerFilters.length === 0 || Boolean(job.career && careerFilters.includes(job.career)))
       .filter((job) => employmentFilters.length === 0 || Boolean(job.employment_type && employmentFilters.includes(job.employment_type)))
-  ), [careerFilters, detailFilters, employmentFilters, jobs, scoreFilters, selectedLocations]);
+  ), [careerFilters, employmentFilters, jobs, scoreFilters, selectedLocations]);
   const todayKey = toDateKey(new Date());
 
   const activeFilteredJobs = useMemo(() => (
@@ -456,7 +487,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   useEffect(() => {
     setPage(1);
-  }, [careerFilters, detailFilters, employmentFilters, scoreFilters, selectedLocations, sortBy, view]);
+  }, [careerFilters, employmentFilters, scoreFilters, selectedLocations, sortBy, view]);
 
   const jobsByDeadline = useMemo(() => {
     return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
@@ -674,12 +705,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       </div>
 
       <div className="filterPanel" aria-label="공고 조건 필터">
-        {renderFilterChips("수집 상태", detailFilters, Object.entries(detailFilterLabels) as Array<[DetailFilterKey, string]>, setDetailFilters)}
         {renderFilterChips("매칭 점수", scoreFilters, Object.entries(scoreFilterLabels) as Array<[ScoreFilterKey, string]>, setScoreFilters)}
         {renderFilterChips("경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
         {renderFilterChips("고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
       </div>
-      <p className="filterNote">상세대기는 목록 카드만 저장된 상태입니다. 상세 수집이 완료되면 직무 내용, 자격요건, 저장 스냅샷까지 함께 확인할 수 있어요.</p>
 
       <div className="explorerControls">
         <div className="viewSwitch" role="tablist" aria-label="공고 보기 방식">
@@ -717,7 +746,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                 <div className="rowMain">
                   <span className="company">
                     {job.company_name || "회사 미상"}
-                    <b className={`statusBadge ${job.detail_status === "success" ? "done" : "pending"}`}>{job.detail_status === "success" ? "상세완료" : "상세대기"}</b>
                     {Boolean(job.reopen_count) && <b className="statusBadge reopen">{job.reopen_count}번째 다시 올라온 공고</b>}
                   </span>
                   <h3>{job.title}</h3>
