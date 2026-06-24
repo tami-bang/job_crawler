@@ -73,6 +73,37 @@ const snapshotNoiseLines = new Set([
   "궁금해요",
   "지도보기",
 ]);
+const snapshotStopLines = new Set([
+  "모집인원",
+  "고용형태",
+  "직급/직책",
+  "급여",
+  "근무시간",
+  "근무지주소",
+  "지원자격",
+  "경력",
+  "학력",
+  "스킬",
+  "우대조건",
+  "기본우대",
+  "접수기간 · 방법",
+  "남은기간",
+  "시작일",
+  "마감일",
+  "채용 시 마감",
+  "이 기업의 취업 전략",
+  "합격자소서",
+  "합격자소서 더보기",
+  "인적성·면접 후기",
+  "면접 질문",
+  "면접 후기",
+  "기업 정보",
+  "기업정보 더보기",
+  "사원수",
+  "기업구분",
+  "산업(업종)",
+  "위치",
+]);
 
 function formatMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -205,45 +236,80 @@ function cleanSnapshotLines(text: string) {
     .filter((line) => line && !snapshotNoiseLines.has(line) && !line.includes("로그인하고 비슷한 조건"));
 }
 
-function readAfterLabel(lines: string[], label: string) {
+function readAfterLabel(lines: string[], label: string, maxLines = 6) {
   const index = lines.findIndex((line) => line === label);
   if (index < 0) return "";
   const values = [];
   for (const line of lines.slice(index + 1)) {
-    if (["모집인원", "고용형태", "직급/직책", "급여", "근무시간", "근무지주소", "지원자격", "경력", "학력", "스킬", "우대조건", "기본우대", "접수기간 · 방법", "남은기간", "시작일", "마감일", "기업 정보", "기업정보 더보기"].includes(line)) break;
+    if (snapshotStopLines.has(line)) break;
     values.push(line);
+    if (values.length >= maxLines) break;
   }
   return values.join(" ");
+}
+
+function readFirstAfterLabels(lines: string[], labels: string[], maxLines = 6) {
+  for (const label of labels) {
+    const value = readAfterLabel(lines, label, maxLines);
+    if (value) return value;
+  }
+  return "";
+}
+
+function readSectionPresence(lines: string[], labels: string[]) {
+  return labels.some((label) => lines.includes(label)) ? "원문에 섹션 있음" : "";
 }
 
 function buildSnapshotRows(title: string, body: string) {
   const lines = cleanSnapshotLines(body);
   const rows = [
     ["공고명", title],
-    ["모집분야", readAfterLabel(lines, "모집분야")],
-    ["고용형태", readAfterLabel(lines, "고용형태")],
-    ["근무시간", readAfterLabel(lines, "근무시간")],
-    ["근무지", readAfterLabel(lines, "근무지주소")],
-    ["경력", readAfterLabel(lines, "경력")],
-    ["학력", readAfterLabel(lines, "학력")],
-    ["스킬", readAfterLabel(lines, "스킬")],
-    ["우대조건", readAfterLabel(lines, "기본우대") || readAfterLabel(lines, "우대조건")],
-    ["시작일", readAfterLabel(lines, "시작일")],
-    ["마감일", readAfterLabel(lines, "마감일")],
+    ["모집분야", readAfterLabel(lines, "모집분야", 3)],
+    ["고용형태", readAfterLabel(lines, "고용형태", 2)],
+    ["근무시간", readAfterLabel(lines, "근무시간", 3)],
+    ["근무지", readAfterLabel(lines, "근무지주소", 2)],
+    ["경력", readAfterLabel(lines, "경력", 2)],
+    ["학력", readAfterLabel(lines, "학력", 2)],
+    ["우대조건", readFirstAfterLabels(lines, ["기본우대", "우대조건"], 4)],
+    ["시작일", readAfterLabel(lines, "시작일", 1)],
+    ["마감일", readAfterLabel(lines, "마감일", 2)],
+    ["합격자소서", readSectionPresence(lines, ["합격자소서", "합격자소서 더보기"])],
+    ["인적성·면접 후기", readSectionPresence(lines, ["인적성·면접 후기", "면접 질문", "면접 후기"])],
+    ["사원수", readAfterLabel(lines, "사원수", 1)],
+    ["담당업무", readFirstAfterLabels(lines, ["담당업무", "주요업무", "직무내용"], 5)],
   ].filter(([, value]) => value);
   return rows.length ? rows : [["저장 내용", lines.slice(0, 24).join(" / ")]];
 }
 
-function buildEmailReportMailto(email: string, jobs: Job[]) {
-  const subject = encodeURIComponent(`JobRadar 공고 ${jobs.length}건`);
-  const body = encodeURIComponent([
+function buildEmailReportBody(jobs: Job[]) {
+  return [
     "JobRadar 필터 결과입니다.",
     "",
     ...jobs.slice(0, 20).map((job, index) => (
       `${index + 1}. [${job.match_score}] ${job.company_name || "회사 미상"} - ${job.title}\n${job.detail_url || ""}`
     )),
     jobs.length > 20 ? `\n외 ${jobs.length - 20}건` : "",
-  ].filter(Boolean).join("\n"));
+  ].filter(Boolean).join("\n");
+}
+
+function buildGmailComposeUrl(to: string, subjectText: string, bodyText: string) {
+  const params = new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to,
+    su: subjectText,
+    body: bodyText,
+  });
+  return `https://mail.google.com/mail/?${params.toString()}`;
+}
+
+function buildEmailReportGmailUrl(email: string, jobs: Job[]) {
+  return buildGmailComposeUrl(email, `JobRadar 공고 ${jobs.length}건`, buildEmailReportBody(jobs));
+}
+
+function buildEmailReportMailto(email: string, jobs: Job[]) {
+  const subject = encodeURIComponent(`JobRadar 공고 ${jobs.length}건`);
+  const body = encodeURIComponent(buildEmailReportBody(jobs));
   return `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
 }
 
@@ -269,7 +335,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [scoreFilters, setScoreFilters] = useState<ScoreFilterKey[]>([]);
   const [employmentFilters, setEmploymentFilters] = useState<string[]>([]);
   const [careerFilters, setCareerFilters] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<SortKey>("match_desc");
+  const [sortBy, setSortBy] = useState<SortKey>("posted_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [view, setView] = useState<ExplorerView>("list");
@@ -430,8 +496,8 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     setEmailStatus("");
     try {
       if (!api.canEmailReport() || !reportServerReady) {
-        window.location.href = buildEmailReportMailto(email, sortedJobs);
-        setEmailStatus("메일 앱 작성창을 열었어요. 서버가 연결되면 첨부 리포트 자동 발송으로 전환됩니다.");
+        window.open(buildEmailReportGmailUrl(email, sortedJobs), "_blank", "noopener,noreferrer");
+        setEmailStatus("Gmail 작성창을 열었어요. REPORT_API_URL과 SMTP 값이 연결되면 첨부 리포트 자동 발송으로 전환됩니다.");
         return;
       }
 
@@ -573,7 +639,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <button className={`scanButton ${searchFeedback ? "searching" : ""}`} onClick={handleSearch}>{searchFeedback || "검색"}</button>
         <button className="ghostButton" onClick={() => downloadWorkbook(sortedJobs)} disabled={sortedJobs.length === 0}>엑셀 받기</button>
         <button className="ghostButton accent" onClick={() => setShowEmailModal(true)} disabled={sortedJobs.length === 0}>이메일로 보내기</button>
-        <span className="resultCount">{filteredJobs.length.toString().padStart(2, "0")} / {jobs.length.toString().padStart(2, "0")} RESULTS</span>
       </div>
 
       <div className="commutePanel" aria-label="네이버지도 경로 검색">
@@ -639,7 +704,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       {!loading && !error && sortedJobs.length > 0 && (view === "list" || view === "expired") && (
         <>
           <div className="tableHeader">
-            <span>표시 {visibleStart}-{visibleEnd} / {view === "expired" ? "마감 공고" : "진행 공고"} {sortedJobs.length} / 필터 결과 {filteredJobs.length}</span>
+            <span>표시 {visibleStart}-{visibleEnd} · {view === "expired" ? "마감 공고" : "진행 공고"}</span>
             <label className="tableSort"><span>{view === "expired" ? "오늘 이전 마감" : "정렬"}</span><select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortKey)}>{Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><b>관심공고 우선</b></label>
           </div>
           <div className="jobList">
@@ -787,7 +852,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
               받을 이메일을 입력하면 현재 필터 결과를 엑셀 리포트로 정리해요.
               {reportServerReady
                 ? " 지금은 발송 서버가 연결되어 있어요."
-                : " 지금은 발송 서버 연결을 확인할 수 없어요."}
+                : " 지금은 발송 서버가 아직 연결되지 않았어요. 서버가 연결되면 이 버튼으로 바로 발송됩니다."}
             </p>
             <input
               aria-label="받을 이메일"
@@ -798,9 +863,14 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
               onKeyDown={(event) => event.key === "Enter" && void submitEmail()}
             />
             <button className="scanButton wide" onClick={() => void submitEmail()} disabled={emailSending}>
-              {emailSending ? "보내는 중..." : "엑셀 리포트 보내기"}
+              {emailSending ? "보내는 중..." : reportServerReady ? "엑셀 리포트 보내기" : "Gmail로 열기"}
             </button>
             {emailStatus && <small>{emailStatus}</small>}
+            {!reportServerReady && (
+              <a className="mailFallback" href={buildEmailReportMailto(email || "name@example.com", sortedJobs)}>
+                기본 메일 앱으로 열기
+              </a>
+            )}
           </div>
         </div>
       )}
