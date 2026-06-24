@@ -48,7 +48,9 @@ const FAVORITES_KEY = "job-radar-demo-favorites";
 
 function getReportDeadline(job: Job) {
   if (job.deadline?.includes("상시")) return job.deadline;
-  return job.deadline_date || job.deadline || "";
+  if (job.deadline_date) return job.deadline_date;
+  const cleaned = (job.deadline || "").replace(/^마감\s*/, "").replace(/^마감일\s*/, "").trim();
+  return !cleaned || cleaned.includes("미정") ? "마감 미정" : cleaned;
 }
 
 async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {

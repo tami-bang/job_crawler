@@ -25,6 +25,27 @@ def is_always_open_deadline(value):
     return any(keyword in text for keyword in ("상시", "수시채용", "채용시", "채용 시"))
 
 
+def clean_deadline(value):
+    text = str(value or "").strip()
+    if not text or "미정" in text:
+        return ""
+    return text.replace("마감일", "").replace("마감", "").strip() or text
+
+
+def infer_deadline_from_text(text):
+    if not text:
+        return ""
+    lines = [line.strip() for line in str(text).splitlines() if line.strip()]
+    for index, line in enumerate(lines):
+        if line == "마감일" and index + 1 < len(lines):
+            return lines[index + 1]
+    compact = " ".join(lines)
+    if is_always_open_deadline(compact):
+        return "상시채용"
+    match = re.search(r"마감일\s*(\d{4}[.]\d{2}[.]\d{2}\([^)]+\)|\d{4}[.-]\d{2}[.-]\d{2})", compact)
+    return match.group(1) if match else ""
+
+
 def load_hard_filters():
     try:
         return json.loads(Path("config/user_preferences.json").read_text(encoding="utf-8")).get("hard_filters", {})
@@ -126,10 +147,13 @@ def serialize_job(index, row):
     matched_keywords = parse_json_list(row["matched_keywords_json"]) or ["JobKorea"]
     positive_reasons = parse_json_list(row["positive_reasons_json"])
     if not positive_reasons:
-        positive_reasons = [
-            "JobKorea 목록에서 실제 수집된 공고입니다. 상세 수집/매칭 분석 대기 상태입니다."
-        ]
+        if row["detail_status"] == "success":
+            positive_reasons = ["상세 원문 수집 완료. 원문 스냅샷에서 주요 정보를 확인할 수 있습니다."]
+        else:
+            positive_reasons = ["JobKorea 목록에서 수집된 공고입니다. 원문 보기로 최신 상세를 확인해주세요."]
     snapshot_text = build_snapshot_text(row)
+    deadline = clean_deadline(row["deadline"]) or infer_deadline_from_text(snapshot_text) or clean_deadline(row["deadline_date"])
+    deadline = "상시채용" if is_always_open_deadline(deadline) else (deadline or "마감 미정")
 
     return {
         "id": index,
@@ -139,8 +163,8 @@ def serialize_job(index, row):
         "career": row["career"] or None,
         "employment_type": row["employment_type"] or None,
         "posted_date": row["posted_date"] or None,
-        "deadline": row["deadline"] or row["deadline_date"] or "마감일 미정",
-        "deadline_date": None if is_always_open_deadline(row["deadline"]) else (row["deadline_date"] or None),
+        "deadline": deadline,
+        "deadline_date": None if is_always_open_deadline(deadline) else (row["deadline_date"] or None),
         "detail_url": row["detail_url"] or None,
         "raw_detail_text": snapshot_text,
         "reopen_count": row["reopen_count"] or 0,

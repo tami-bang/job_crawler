@@ -158,7 +158,11 @@ function formatPostedDate(value: string | null) {
 function formatDeadlineDate(deadlineDate: string | null, deadline: string | null) {
   if (isAlwaysOpen(deadline)) return "상시채용";
   const parsed = parseDateParts(deadlineDate || deadline);
-  if (!parsed) return `마감 ${deadline || "미정"}`;
+  const cleaned = (deadline || "").replace(/^마감\s*/, "").replace(/^마감일\s*/, "").trim();
+  if (!parsed) {
+    if (!cleaned || cleaned.includes("미정")) return "마감 미정";
+    return `마감 ${cleaned}`;
+  }
   return `마감 ${parsed.year}-${parsed.month}-${parsed.day}(${parsed.weekday})`;
 }
 
