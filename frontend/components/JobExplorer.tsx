@@ -21,8 +21,8 @@ const sortLabels = {
   match_desc: "매칭 점수 높은순",
   deadline_asc: "마감 임박순",
   deadline_desc: "마감 여유순",
-  posted_desc: "시작일 최신순",
-  posted_asc: "시작일 오래된순",
+  posted_desc: "시작 최신순",
+  posted_asc: "시작 오래된순",
   company_asc: "회사명 가나다순",
 } as const;
 const scoreFilterLabels = {
@@ -151,8 +151,8 @@ function parseDateParts(value: string | null | undefined) {
 
 function formatPostedDate(value: string | null) {
   const parsed = parseDateParts(value);
-  if (!parsed) return "시작일 미정";
-  return `시작일 ${parsed.year}.${parsed.month}.${parsed.day}(${parsed.weekday})`;
+  if (!parsed) return "시작 미정";
+  return `시작 ${parsed.year}.${parsed.month}.${parsed.day}(${parsed.weekday})`;
 }
 
 function formatDeadlineDate(deadlineDate: string | null, deadline: string | null) {
@@ -279,6 +279,37 @@ function readSectionSnippet(lines: string[], labels: string[], maxChars = 220) {
   return "";
 }
 
+function isLongSnapshotBoundary(line: string) {
+  const compact = line.replace(/\s+/g, "");
+  const headings = [
+    "모집요강", "모집분야", "모집인원", "고용형태", "급여", "근무시간", "근무지주소",
+    "지원자격", "경력", "학력", "스킬", "핵심역량", "우대조건", "기본우대",
+    "복리후생", "접수기간·방법", "접수기간∙방법", "남은기간", "시작일", "마감일",
+    "이기업의취업전략", "합격자소서", "인적성·면접후기", "기업정보", "사원수",
+    "기업구분", "산업(업종)", "위치", "지도보기",
+  ];
+  return headings.some((heading) => compact === heading || compact.startsWith(heading));
+}
+
+function readLongSection(lines: string[], labels: string[], maxChars = 1600) {
+  for (const label of labels) {
+    const target = label.replace(/\s+/g, "");
+    const index = lines.findIndex((line) => line.replace(/\s+/g, "").includes(target));
+    if (index < 0) continue;
+
+    const values = [];
+    for (const line of lines.slice(index + 1)) {
+      if (isLongSnapshotBoundary(line) && values.length > 0) break;
+      if (line.length < 2 || /^[·ㆍ∙|,]+$/.test(line)) continue;
+      values.push(line);
+      if (values.join("\n").length >= maxChars) break;
+    }
+    const section = values.join("\n").trim();
+    if (section) return section.length > maxChars ? `${section.slice(0, maxChars).trim()}...` : section;
+  }
+  return "";
+}
+
 function careerRank(value: string) {
   const text = value.replace(/\s+/g, "");
   if (text === "신입") return [0, 0, value] as const;
@@ -311,6 +342,10 @@ function buildSnapshotRows(title: string, body: string) {
     ["우대조건", readFirstAfterLabels(lines, ["기본우대", "우대조건"], 4)],
     ["시작일", readAfterLabel(lines, "시작일", 1)],
     ["마감일", readAfterLabel(lines, "마감일", 2)],
+    ["주요업무", readLongSection(lines, ["주요업무", "담당업무", "업무내용", "하는 일"])],
+    ["자격요건", readLongSection(lines, ["자격요건", "지원자격", "필수사항", "필수요건"])],
+    ["우대사항", readLongSection(lines, ["우대사항", "우대조건", "선호조건"])],
+    ["지원서 작성 안내", readLongSection(lines, ["지원서는 이렇게 작성하세요", "지원서 작성", "제출서류", "접수방법", "이력서", "자기소개서"])],
     ["합격자소서", readSectionSnippet(lines, ["합격자소서", "합격자소서 더보기"])],
     ["인적성·면접 후기", readSectionSnippet(lines, ["인적성·면접 후기", "면접 질문", "면접 후기"])],
     ["사원수", readAfterLabel(lines, "사원수", 1)],
@@ -753,7 +788,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     <span>{job.location || "지역 미정"}</span>
                     <span>{job.career || "경력 무관"}</span>
                     <span>{job.employment_type || "고용형태 미정"}</span>
-                    {!isAlwaysOpen(job.deadline) && <span>{formatPostedDate(job.posted_date)}</span>}
+                    <span>{formatPostedDate(job.posted_date)}</span>
                     <span>{formatDeadlineDate(job.deadline_date, job.deadline)}</span>
                   </div>
                   <div className="commuteLine">

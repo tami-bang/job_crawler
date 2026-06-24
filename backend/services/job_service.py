@@ -80,7 +80,7 @@ def _is_allowed_by_hard_location(row, hard_filters):
 
 
 def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=None):
-    where = ["jp.detail_status = 'success'"]
+    where = ["1 = 1"]
     include_raw_detail = 1 if job_id is not None else 0
     params = [include_raw_detail]
 
@@ -223,20 +223,11 @@ def get_stats():
         row = conn.execute(
             """
             SELECT
-                (SELECT COUNT(*) FROM job_postings WHERE detail_status = 'success') AS total_jobs,
+                (SELECT COUNT(*) FROM job_postings) AS total_jobs,
                 (SELECT COUNT(*) FROM job_postings WHERE detail_status = 'success') AS detailed_jobs,
-                (SELECT COUNT(DISTINCT jmr.job_posting_id)
-                   FROM job_match_results jmr
-                   JOIN job_postings jp ON jp.id = jmr.job_posting_id
-                  WHERE jp.detail_status = 'success') AS matched_jobs,
-                (SELECT COUNT(*)
-                   FROM favorite_jobs fj
-                   JOIN job_postings jp ON jp.id = fj.job_posting_id
-                  WHERE jp.detail_status = 'success') AS favorite_jobs,
-                (SELECT ROUND(AVG(COALESCE(jmr.match_score, jmr.score)), 1)
-                   FROM job_match_results jmr
-                   JOIN job_postings jp ON jp.id = jmr.job_posting_id
-                  WHERE jp.detail_status = 'success') AS average_score
+                (SELECT COUNT(DISTINCT job_posting_id) FROM job_match_results) AS matched_jobs,
+                (SELECT COUNT(*) FROM favorite_jobs) AS favorite_jobs,
+                (SELECT ROUND(AVG(COALESCE(match_score, score)), 1) FROM job_match_results) AS average_score
             """
         ).fetchone()
     return dict(row)
