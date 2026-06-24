@@ -746,6 +746,17 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   async function dislikeJob(job: Job) {
     setDislikingJobs((previous) => new Set(previous).add(job.id));
     try {
+      if (job.is_disliked) {
+        await api.undislike(job.id);
+        updateJobState(job.id, (current) => ({
+          ...current,
+          is_disliked: false,
+          favorite_memo: null,
+          favorite_status: null,
+        }));
+        return;
+      }
+
       await api.dislike(job.id);
       markViewed(job.id);
       await new Promise((resolve) => window.setTimeout(resolve, 220));
@@ -1081,7 +1092,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                   >{job.is_favorite ? "💖 저장됨" : "💚 저장"}</button>
                   {!favoriteOnly && (
                     <button
-                      aria-label="별로 표시하고 목록에서 숨기기"
+                      aria-label={job.is_disliked ? "별로 표시 해제" : "별로 표시"}
                       className={`dislikeButton ${dislikingJobs.has(job.id) || job.is_disliked ? "active" : ""}`}
                       disabled={dislikingJobs.has(job.id)}
                       onClick={() => void dislikeJob(job)}
@@ -1184,6 +1195,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     >{job.is_favorite ? "💖 저장됨" : "💚 저장"}</button>
                     <button
                       type="button"
+                      aria-label={job.is_disliked ? "별로 표시 해제" : "별로 표시"}
                       className={`dislikeButton ${dislikingJobs.has(job.id) || job.is_disliked ? "active" : ""}`}
                       disabled={dislikingJobs.has(job.id)}
                       onClick={() => void dislikeJob(job)}

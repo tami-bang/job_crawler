@@ -248,7 +248,9 @@ export const api = {
       const dislikedJobs = readDislikedJobs();
       dislikedJobs.delete(jobId);
       writeDislikedJobs(dislikedJobs);
+      return;
     }
+    await fetch(`${API_URL}/api/jobs/${jobId}/favorite`, { method: "DELETE" });
   },
   emailReport: async (email: string, jobs: Job[]) => {
     const baseUrl = REPORT_API_URL || API_URL;
