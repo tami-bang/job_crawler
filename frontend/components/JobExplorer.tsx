@@ -167,6 +167,12 @@ function toDateKey(date: Date) {
   ].join("-");
 }
 
+function addDays(date: Date, days: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
 function getInitialMonth(jobs: Job[]) {
   const firstDeadline = jobs
     .map((job) => job.deadline_date)
@@ -664,6 +670,31 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     }, {});
   }, [activeFilteredJobs]);
   const calendarModalJobs = calendarModalDate ? jobsByDeadline[calendarModalDate] ?? [] : [];
+  const tomorrowKey = toDateKey(addDays(new Date(), 1));
+  const favoriteDeadlineAlerts = useMemo(() => (
+    jobs
+      .filter((job) => job.is_favorite && getEffectiveDeadlineDate(job) === tomorrowKey)
+      .sort((a, b) => getDynamicMatchScore(b, matchBasis) - getDynamicMatchScore(a, matchBasis))
+  ), [jobs, matchBasis, tomorrowKey]);
+  const favoriteInsights = useMemo(() => {
+    const favorites = jobs.filter((job) => job.is_favorite);
+    const topKeywords = Array.from(
+      favorites.flatMap((job) => job.matched_keywords).reduce<Map<string, number>>((acc, keyword) => {
+        acc.set(keyword, (acc.get(keyword) ?? 0) + 1);
+        return acc;
+      }, new Map()),
+    ).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const topCareers = Array.from(
+      favorites.map((job) => job.career || "경력 미정").reduce<Map<string, number>>((acc, career) => {
+        acc.set(career, (acc.get(career) ?? 0) + 1);
+        return acc;
+      }, new Map()),
+    ).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const averageScore = favorites.length
+      ? Math.round(favorites.reduce((sum, job) => sum + getDynamicMatchScore(job, matchBasis), 0) / favorites.length)
+      : 0;
+    return { count: favorites.length, averageScore, topKeywords, topCareers };
+  }, [jobs, matchBasis]);
   const totalPages = Math.max(1, Math.ceil(sortedJobs.length / pageSize));
   const currentPage = Math.min(page, totalPages);
   const pagedJobs = useMemo(() => {
@@ -876,6 +907,33 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   return (
     <section className="explorer">
+      <div className="privacyNotice">
+        <strong>내 브라우저 기준</strong>
+        <span>GitHub Pages에서는 저장·별로·메모가 이 브라우저에만 저장돼요. 다른 사람이 접속해도 내 표시를 볼 수 없습니다.</span>
+      </div>
+      {favoriteDeadlineAlerts.length > 0 && (
+        <div className="deadlineAlert" role="status">
+          <strong>내일 마감 알림</strong>
+          <span>
+            저장한 공고 {favoriteDeadlineAlerts.length}건이 내일 마감돼요:
+            {" "}
+            {favoriteDeadlineAlerts.slice(0, 3).map((job) => job.company_name || job.title).join(", ")}
+            {favoriteDeadlineAlerts.length > 3 ? ` 외 ${favoriteDeadlineAlerts.length - 3}건` : ""}
+          </span>
+        </div>
+      )}
+      {favoriteOnly && favoriteInsights.count > 0 && (
+        <div className="favoriteInsightPanel" aria-label="관심공고 취향 분석">
+          <div>
+            <span>MY PATTERN</span>
+            <strong>저장한 공고는 평균 {favoriteInsights.averageScore}점대예요.</strong>
+          </div>
+          <div className="insightChips">
+            {favoriteInsights.topKeywords.map(([keyword, count]) => <span key={keyword}>#{keyword} {count}</span>)}
+            {favoriteInsights.topCareers.map(([career, count]) => <span key={career}>{career} {count}</span>)}
+          </div>
+        </div>
+      )}
       <div className="toolbar">
         <label className="searchBox">
           <span>⌕</span>
@@ -1133,6 +1191,15 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     {job.detail_url && <a href={job.detail_url} target="_blank" rel="noreferrer" onClick={() => markViewed(job.id)}>원문 보기 ↗</a>}
                     <button type="button" onClick={() => void openSnapshot(job)}>저장 스냅샷</button>
                   </div>
+                  {job.is_favorite && (
+                    <input
+                      className="memoInput calendarMemoInput"
+                      aria-label="달력 모달 관심공고 메모"
+                      defaultValue={job.favorite_memo ?? ""}
+                      placeholder="저장한 이유나 지원 전 확인할 내용을 적어두세요"
+                      onBlur={(event) => void changeMemo(job, event.target.value)}
+                    />
+                  )}
                 </article>
               ))}
             </div>

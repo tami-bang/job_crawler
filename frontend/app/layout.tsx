@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ScrollTopButton from "@/components/ScrollTopButton";
 import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <div className="systemState"><i /> {dataMode}</div>
         </header>
         <main>{children}</main>
+        <ScrollTopButton />
         <SiteFooter />
       </body>
     </html>
