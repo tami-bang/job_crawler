@@ -575,6 +575,21 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       .then((status) => setReportServerReady(status.ready))
       .catch(() => setReportServerReady(false));
   }, []);
+  useEffect(() => {
+    const hasOpenModal = Boolean(showEmailModal || noticeModal || snapshotModal || calendarModalDate);
+    if (!hasOpenModal) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
+    };
+  }, [calendarModalDate, noticeModal, showEmailModal, snapshotModal]);
 
   const employmentOptions = useMemo(() => (
     uniqueSorted(jobs.flatMap((job) => getEmploymentFilterTokens(job.employment_type)))
@@ -681,6 +696,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     updateJobState(job.id, (current) => ({
       ...current,
       is_favorite: true,
+      is_disliked: false,
       favorite_memo: current.favorite_memo ?? "",
       favorite_status: current.favorite_status ?? "planned",
     }));
@@ -702,7 +718,13 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       await api.dislike(job.id);
       markViewed(job.id);
       await new Promise((resolve) => window.setTimeout(resolve, 220));
-      updateJobState(job.id, (current) => ({ ...current, is_disliked: true }));
+      updateJobState(job.id, (current) => ({
+        ...current,
+        is_disliked: true,
+        is_favorite: false,
+        favorite_memo: null,
+        favorite_status: null,
+      }));
     } finally {
       setDislikingJobs((previous) => {
         const next = new Set(previous);

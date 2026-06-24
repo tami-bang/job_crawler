@@ -71,7 +71,6 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
       favorite_status: favorites[job.id]?.status ?? null,
     }))
     .filter((job) => !favoriteOnly || job.is_favorite)
-    .filter((job) => favoriteOnly || !job.is_disliked)
     .filter((job) => !term || [job.title, job.company_name, job.skill_candidates]
       .some((value) => value?.toLowerCase().includes(term)));
 }
@@ -196,8 +195,11 @@ export const api = {
   favorite: async (jobId: number) => {
     if (STATIC_DEMO) {
       const favorites = readFavorites();
+      const dislikedJobs = readDislikedJobs();
+      dislikedJobs.delete(jobId);
       favorites[jobId] = favorites[jobId] ?? { memo: "", status: "planned" };
       writeFavorites(favorites);
+      writeDislikedJobs(dislikedJobs);
       return getDemoJob(jobId);
     }
     return request<Job>(`/api/jobs/${jobId}/favorite`, {
@@ -229,7 +231,10 @@ export const api = {
   dislike: async (jobId: number) => {
     if (STATIC_DEMO) {
       const dislikedJobs = readDislikedJobs();
+      const favorites = readFavorites();
+      delete favorites[jobId];
       dislikedJobs.add(jobId);
+      writeFavorites(favorites);
       writeDislikedJobs(dislikedJobs);
       return;
     }

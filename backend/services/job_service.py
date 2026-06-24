@@ -35,7 +35,8 @@ def _serialize_job(row):
     item["matched_keywords"] = _parse_list(item.pop("matched_keywords_json", None))
     item["positive_reasons"] = _parse_list(item.pop("positive_reasons_json", None))
     item["negative_reasons"] = _parse_list(item.pop("negative_reasons_json", None))
-    item["is_favorite"] = bool(item.get("favorite_id"))
+    item["is_disliked"] = item.get("favorite_status") == "excluded"
+    item["is_favorite"] = bool(item.get("favorite_id")) and not item["is_disliked"]
     return item
 
 
@@ -90,11 +91,10 @@ def list_jobs(search=None, favorite_only=False, status=None, limit=100, job_id=N
         params.extend([term, term, term])
     if favorite_only:
         where.append("fj.id IS NOT NULL")
+        where.append("fj.status != 'excluded'")
     if status:
         where.append("fj.status = ?")
         params.append(status)
-    elif not favorite_only:
-        where.append("(fj.status IS NULL OR fj.status != 'excluded')")
     if job_id is not None:
         where.append("jp.id = ?")
         params.append(job_id)
@@ -227,7 +227,7 @@ def get_stats():
                 (SELECT COUNT(*) FROM job_postings) AS total_jobs,
                 (SELECT COUNT(*) FROM job_postings WHERE detail_status = 'success') AS detailed_jobs,
                 (SELECT COUNT(DISTINCT job_posting_id) FROM job_match_results) AS matched_jobs,
-                (SELECT COUNT(*) FROM favorite_jobs) AS favorite_jobs,
+                (SELECT COUNT(*) FROM favorite_jobs WHERE status != 'excluded') AS favorite_jobs,
                 (SELECT ROUND(AVG(COALESCE(match_score, score)), 1) FROM job_match_results) AS average_score
             """
         ).fetchone()

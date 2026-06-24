@@ -45,6 +45,19 @@ class BackendServiceTests(unittest.TestCase):
         self.assertTrue(delete_favorite(job_id))
         self.assertEqual(list_jobs(favorite_only=True), [])
 
+    def test_excluded_jobs_stay_visible_as_disliked(self):
+        job_id = list_jobs()[0]["id"]
+
+        excluded = save_favorite(job_id, "", "excluded")
+
+        self.assertFalse(excluded["is_favorite"])
+        self.assertTrue(excluded["is_disliked"])
+        self.assertEqual(get_stats()["favorite_jobs"], 0)
+        visible = [job for job in list_jobs() if job["id"] == job_id]
+        self.assertEqual(len(visible), 1)
+        self.assertTrue(visible[0]["is_disliked"])
+        self.assertEqual(list_jobs(favorite_only=True), [])
+
     def test_dashboard_excludes_jobs_outside_allowed_locations(self):
         with get_connection(self.db_path) as conn:
             conn.execute(
