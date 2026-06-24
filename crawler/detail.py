@@ -343,10 +343,72 @@ def parse_job_detail(html):
         "deadline": deadline,
         "deadline_date": "" if is_always_open_deadline(deadline) else normalize_deadline_date(deadline),
         "location": extract_structured_location(structured) or extract_location_from_text(lines),
-        "career": _normalize_structured_text(structured.get("experienceRequirements")),
+        "career": extract_career_from_text(lines) or _normalize_structured_text(structured.get("experienceRequirements")),
         "education": _normalize_structured_text(structured.get("educationRequirements")),
         "employment_type": extract_employment_type(structured, text),
     }
+
+
+def extract_career_from_text(lines):
+    stop_labels = {
+        "학력",
+        "스킬",
+        "우대조건",
+        "기본우대",
+        "근무조건",
+        "근무지주소",
+        "접수기간",
+        "복리후생",
+    }
+    for index, line in enumerate(lines):
+        compact_line = _compact_korean(line)
+        if compact_line != "경력" and not compact_line.startswith("경력("):
+            continue
+
+        window = []
+        for value in lines[index:index + 5]:
+            compact_value = _compact_korean(value)
+            if window and compact_value in stop_labels:
+                break
+            window.append(value)
+
+        career = _normalize_career_window(window)
+        if career:
+            return career
+    return ""
+
+
+def _normalize_career_window(lines):
+    text = " ".join(line.strip() for line in lines if line and line.strip())
+    compact = _compact_korean(text)
+    if not compact:
+        return ""
+
+    base = ""
+    for candidate in ("신입·경력", "신입/경력", "경력무관", "신입", "경력"):
+        if candidate.replace("/", "·") in compact.replace("/", "·"):
+            base = candidate.replace("/", "·")
+            break
+    if not base:
+        return ""
+
+    if base in {"신입", "경력무관"}:
+        return base
+
+    range_match = re.search(r"(\d+)\s*~\s*(\d+)\s*년", compact)
+    if range_match:
+        return f"{base}{range_match.group(1)}~{range_match.group(2)}년"
+
+    years_match = re.search(r"(\d+)\s*년\s*(?:이상|↑)?", compact)
+    if years_match:
+        suffix = "년이상" if re.search(rf"{years_match.group(1)}\s*년\s*(?:이상|↑)", compact) else "년"
+        return f"{base}{years_match.group(1)}{suffix}"
+
+    return base
+
+
+def _compact_korean(value):
+    return re.sub(r"\s+", "", str(value or "")).replace("（", "(").replace("）", ")")
 
 
 def extract_title_from_page(soup):

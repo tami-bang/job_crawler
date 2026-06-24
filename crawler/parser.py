@@ -148,8 +148,21 @@ def _extract_jobkorea_card_fields(card, base_url=None):
 
 
 def _extract_career(text):
-    match = re.search(r"(신입|경력무관|경력\s*\d+년[↑이상]*|경력\s*\d+~\d+년)", text)
-    return match.group(1).replace(" ", "") if match else ""
+    compact = re.sub(r"\s+", "", text or "")
+    patterns = [
+        r"(신입·경력\d+년(?:이상|↑)?)",
+        r"(신입·경력)",
+        r"(경력무관)",
+        r"(신입)",
+        r"(경력\d+~\d+년)",
+        r"(경력\d+년(?:이상|↑)?)",
+        r"(경력)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, compact)
+        if match:
+            return match.group(1).replace("↑", "이상")
+    return ""
 
 
 def _extract_education(text):

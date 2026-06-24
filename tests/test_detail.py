@@ -42,6 +42,24 @@ class JobKoreaDetailTests(unittest.TestCase):
 
         self.assertEqual(result["employment_type"], "계약직")
 
+    def test_extracts_visible_career_years(self):
+        html = """
+        <html><body>
+        <div>
+        지원자격
+        경력
+        신입·경력
+        (1년이상)
+        학력
+        학력무관
+        </div>
+        </body></html>
+        """
+
+        result = parse_job_detail(html)
+
+        self.assertEqual(result["career"], "신입·경력1년이상")
+
     def test_uses_street_address_when_region_fields_are_missing(self):
         payload = {
             "@type": "JobPosting",

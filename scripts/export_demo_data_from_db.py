@@ -8,6 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crawler.database import init_database
+from crawler.detail import extract_career_from_text
 
 
 def parse_json_list(value):
@@ -154,13 +155,14 @@ def serialize_job(index, row):
     snapshot_text = build_snapshot_text(row)
     deadline = clean_deadline(row["deadline"]) or infer_deadline_from_text(snapshot_text) or clean_deadline(row["deadline_date"])
     deadline = "상시채용" if is_always_open_deadline(deadline) else (deadline or "마감 미정")
+    career = infer_career_from_text(snapshot_text) or row["career"] or None
 
     return {
         "id": index,
         "title": row["title"] or "제목 미상",
         "company_name": row["company_name"] or None,
         "location": row["location"] or None,
-        "career": row["career"] or None,
+        "career": career,
         "employment_type": row["employment_type"] or None,
         "posted_date": row["posted_date"] or None,
         "deadline": deadline,
@@ -201,6 +203,12 @@ def build_snapshot_text(row):
         return section_text
 
     return row["description_text"] or row["raw_summary_text"] or None
+
+
+def infer_career_from_text(text):
+    if not text:
+        return ""
+    return extract_career_from_text([line.strip() for line in str(text).splitlines() if line.strip()])
 
 
 def write_demo_data(jobs, output_path, db_path):

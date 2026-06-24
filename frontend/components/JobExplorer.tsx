@@ -317,13 +317,13 @@ function readLongSection(lines: string[], labels: string[], maxChars = 3200) {
 function careerRank(value: string) {
   const text = value.replace(/\s+/g, "");
   if (text === "신입") return [0, 0, value] as const;
-  if (text.includes("신입") && text.includes("경력")) return [1, 0, value] as const;
-  if (text.includes("경력무관") || text.includes("무관")) return [2, 0, value] as const;
+  if (text.includes("경력무관") || text.includes("무관")) return [1, 0, value] as const;
+  if (text.includes("신입") && text.includes("경력")) return [2, 0, value] as const;
   const range = text.match(/경력(\d+)\s*~\s*(\d+)년/);
   if (range) return [3, Number(range[1]), value] as const;
   const years = text.match(/경력(\d+)년/);
-  if (years) return [4, Number(years[1]), value] as const;
-  if (text.includes("경력")) return [5, 0, value] as const;
+  if (years) return [3, Number(years[1]), value] as const;
+  if (text.includes("경력")) return [8, 0, value] as const;
   return [9, 0, value] as const;
 }
 
@@ -434,6 +434,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [noticeModal, setNoticeModal] = useState<{ title: string; message: string; hint?: string } | null>(null);
   const [snapshotModal, setSnapshotModal] = useState<{ title: string; body: string } | null>(null);
   const [viewedJobs, setViewedJobs] = useState<Set<number>>(() => new Set());
+  const [dislikingJobs, setDislikingJobs] = useState<Set<number>>(() => new Set());
 
   const loadJobs = useCallback(async (term = "", source: "initial" | "search" = "initial") => {
     setLoading(true);
@@ -589,9 +590,19 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }
 
   async function dislikeJob(job: Job) {
-    await api.dislike(job.id);
-    markViewed(job.id);
-    updateJobState(job.id, () => null);
+    setDislikingJobs((previous) => new Set(previous).add(job.id));
+    try {
+      await api.dislike(job.id);
+      markViewed(job.id);
+      await new Promise((resolve) => window.setTimeout(resolve, 140));
+      updateJobState(job.id, () => null);
+    } finally {
+      setDislikingJobs((previous) => {
+        const next = new Set(previous);
+        next.delete(job.id);
+        return next;
+      });
+    }
   }
 
   async function submitEmail() {
@@ -876,9 +887,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                   {!favoriteOnly && (
                     <button
                       aria-label="별로 표시하고 목록에서 숨기기"
-                      className="dislikeButton"
+                      className={`dislikeButton ${dislikingJobs.has(job.id) ? "active" : ""}`}
+                      disabled={dislikingJobs.has(job.id)}
                       onClick={() => void dislikeJob(job)}
-                    >* 별로</button>
+                    >⭐ 별로</button>
                   )}
                   {job.is_favorite && (
                     <select

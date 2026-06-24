@@ -35,17 +35,19 @@ function makeSheet(rows: (string | number)[][]) {
   const body = rows.map((row, rowIndex) => {
     const cells = row.map((value, columnIndex) => {
       const ref = `${columnLetter(columnIndex + 1)}${rowIndex + 1}`;
-      const style = rowIndex === 0 ? ' s="1"' : "";
+      const style = rowIndex === 0 ? ' s="1"' : ' s="2"';
       if (typeof value === "number") return `<c r="${ref}"${style}><v>${value}</v></c>`;
       return `<c r="${ref}" t="inlineStr"${style}><is><t>${escapeXml(value)}</t></is></c>`;
     }).join("");
-    return `<row r="${rowIndex + 1}">${cells}</row>`;
+    const height = rowIndex === 0 ? 28 : 74;
+    return `<row r="${rowIndex + 1}" ht="${height}" customHeight="1">${cells}</row>`;
   }).join("");
 
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
 <sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
-<cols><col min="1" max="1" width="11" customWidth="1"/><col min="2" max="2" width="22" customWidth="1"/><col min="3" max="3" width="42" customWidth="1"/><col min="4" max="7" width="18" customWidth="1"/><col min="8" max="9" width="45" customWidth="1"/><col min="10" max="10" width="50" customWidth="1"/></cols>
+<sheetFormatPr defaultRowHeight="28"/>
+<cols><col min="1" max="1" width="11" customWidth="1"/><col min="2" max="2" width="24" customWidth="1"/><col min="3" max="3" width="52" customWidth="1"/><col min="4" max="4" width="34" customWidth="1"/><col min="5" max="6" width="18" customWidth="1"/><col min="7" max="7" width="18" customWidth="1"/><col min="8" max="8" width="36" customWidth="1"/><col min="9" max="9" width="78" customWidth="1"/><col min="10" max="10" width="54" customWidth="1"/></cols>
 <sheetData>${body}</sheetData><autoFilter ref="A1:J${rows.length}"/></worksheet>`;
 }
 
@@ -70,7 +72,7 @@ export function createJobsWorkbook(jobs: Job[]) {
     "_rels/.rels": strToU8(`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`),
     "xl/workbook.xml": strToU8(`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="JobRadar 결과" sheetId="1" r:id="rId1"/></sheets></workbook>`),
     "xl/_rels/workbook.xml.rels": strToU8(`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`),
-    "xl/styles.xml": strToU8(`<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><name val="Arial"/><color rgb="FF07100A"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF99FF45"/></patternFill></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf/></cellStyleXfs><cellXfs count="2"><xf/><xf fontId="1" fillId="2" applyFont="1" applyFill="1"/></cellXfs></styleSheet>`),
+    "xl/styles.xml": strToU8(`<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/><color rgb="FF111827"/></font><font><b/><sz val="11"/><name val="Arial"/><color rgb="FF07100A"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF99FF45"/></patternFill></fill></fills><borders count="2"><border/><border><left style="thin"><color rgb="FFE5E7EB"/></left><right style="thin"><color rgb="FFE5E7EB"/></right><top style="thin"><color rgb="FFE5E7EB"/></top><bottom style="thin"><color rgb="FFE5E7EB"/></bottom></border></borders><cellStyleXfs count="1"><xf/></cellStyleXfs><cellXfs count="3"><xf/><xf fontId="1" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf fontId="0" borderId="1" applyFont="1" applyBorder="1"><alignment vertical="top" wrapText="1"/></xf></cellXfs></styleSheet>`),
     "xl/worksheets/sheet1.xml": strToU8(makeSheet(rows)),
   };
   const bytes = zipSync(files, { level: 6 });
