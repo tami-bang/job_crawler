@@ -543,6 +543,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [originAddress, setOriginAddress] = useState("");
   const [noticeModal, setNoticeModal] = useState<{ title: string; message: string; hint?: string } | null>(null);
   const [snapshotModal, setSnapshotModal] = useState<{ title: string; body: string } | null>(null);
+  const [calendarModalDate, setCalendarModalDate] = useState<string | null>(null);
   const [viewedJobs, setViewedJobs] = useState<Set<number>>(() => new Set());
   const [dislikingJobs, setDislikingJobs] = useState<Set<number>>(() => new Set());
 
@@ -647,6 +648,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       return acc;
     }, {});
   }, [activeFilteredJobs]);
+  const calendarModalJobs = calendarModalDate ? jobsByDeadline[calendarModalDate] ?? [] : [];
   const totalPages = Math.max(1, Math.ceil(sortedJobs.length / pageSize));
   const currentPage = Math.min(page, totalPages);
   const pagedJobs = useMemo(() => {
@@ -1064,14 +1066,54 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     </span>
                   )}
                   {dayJobs.slice(0, 3).map((job) => (
-                    <a className="deadlinePill" href={job.detail_url ?? "#"} target="_blank" rel="noreferrer" key={job.id}>
+                    <button type="button" className="deadlinePill" onClick={() => setCalendarModalDate(dateKey)} key={job.id}>
                       <b>{getDynamicMatchScore(job, matchBasis)}</b> {job.company_name || "회사 미상"}
-                    </a>
+                    </button>
                   ))}
-                  {dayJobs.length > 3 && <small className="moreJobs">+{dayJobs.length - 3}개 더</small>}
+                  {dayJobs.length > 3 && (
+                    <button type="button" className="moreJobs" onClick={() => setCalendarModalDate(dateKey)}>
+                      +{dayJobs.length - 3}개 더
+                    </button>
+                  )}
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {calendarModalDate && (
+        <div className="modalBackdrop" role="presentation" onMouseDown={() => setCalendarModalDate(null)}>
+          <div className="emailModal calendarDayModal" role="dialog" aria-modal="true" aria-labelledby="calendar-day-modal-title" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modalClose" aria-label="닫기" onClick={() => setCalendarModalDate(null)}>×</button>
+            <span className="modalKicker">DEADLINE JOBS</span>
+            <h3 id="calendar-day-modal-title">{calendarModalDate} 마감 공고</h3>
+            <div className="calendarJobList">
+              {calendarModalJobs.map((job) => (
+                <article className={`calendarJobItem ${job.is_favorite ? "favorite" : ""} ${job.is_disliked ? "disliked" : ""}`} key={job.id}>
+                  <div>
+                    <strong><b>{getDynamicMatchScore(job, matchBasis)}</b> {job.company_name || "회사 미상"}</strong>
+                    <p>{job.title}</p>
+                    <small>{[job.location, job.career, job.employment_type].filter(Boolean).join(" · ")}</small>
+                  </div>
+                  <div className="calendarJobActions">
+                    <button
+                      type="button"
+                      className={`favoriteButton ${job.is_favorite ? "active" : ""}`}
+                      onClick={() => void toggleFavorite(job)}
+                    >{job.is_favorite ? "💖 저장됨" : "💚 저장"}</button>
+                    <button
+                      type="button"
+                      className={`dislikeButton ${dislikingJobs.has(job.id) || job.is_disliked ? "active" : ""}`}
+                      disabled={dislikingJobs.has(job.id)}
+                      onClick={() => void dislikeJob(job)}
+                    >{job.is_disliked ? "⭐ 별로 표시됨" : "⭐ 별로"}</button>
+                    {job.detail_url && <a href={job.detail_url} target="_blank" rel="noreferrer" onClick={() => markViewed(job.id)}>원문 보기 ↗</a>}
+                    <button type="button" onClick={() => void openSnapshot(job)}>저장 스냅샷</button>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       )}
