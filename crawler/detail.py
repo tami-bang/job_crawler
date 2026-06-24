@@ -13,7 +13,7 @@ from crawler.database import (
     init_database,
     start_crawl_run,
 )
-from crawler.parser import is_always_open_deadline, normalize_deadline_date
+from crawler.parser import extract_job_id, is_always_open_deadline, normalize_deadline_date, normalize_url
 
 
 SECTION_LABELS = {
@@ -155,6 +155,134 @@ def collect_jobkorea_details(
         raise
 
 
+def collect_jobkorea_detail_urls(
+    fetch_func,
+    urls,
+    delay_seconds=1.0,
+    db_path=DEFAULT_DB_PATH,
+):
+    from crawler.job_store import save_job_list_items
+
+    init_database(db_path)
+    cleaned_urls = [str(url).strip() for url in urls if str(url).strip()]
+    crawl_run_id = start_crawl_run(
+        source="jobkorea",
+        crawl_type="detail-url",
+        request_params_json=json.dumps(
+            {
+                "urls": cleaned_urls,
+                "delay_seconds": delay_seconds,
+            },
+            ensure_ascii=False,
+        ),
+        db_path=db_path,
+    )
+
+    result = {
+        "target": len(cleaned_urls),
+        "success": 0,
+        "failed": 0,
+        "skipped": 0,
+    }
+
+    try:
+        for index, detail_url in enumerate(cleaned_urls):
+            if index > 0 and delay_seconds > 0:
+                time.sleep(delay_seconds)
+
+            try:
+                html = fetch_func(detail_url, dynamic=False)
+                if not html:
+                    raise RuntimeError("empty detail HTML")
+
+                parsed = parse_job_detail(html)
+                summary_job = build_job_from_detail_page(detail_url, html, parsed)
+                save_job_list_items([summary_job], crawl_run_id, db_path=db_path)
+                job_posting_id = find_job_posting_id(
+                    summary_job["job_id"],
+                    summary_job["normalized_url"],
+                    db_path=db_path,
+                )
+                if not job_posting_id:
+                    raise RuntimeError("detail URL was fetched but could not be saved")
+
+                with get_connection(db_path) as conn:
+                    save_raw_detail_page(conn, crawl_run_id, detail_url, html)
+                    update_job_detail(conn, job_posting_id, parsed)
+
+                result["success"] += 1
+                print(f"[INFO] Detail URL saved: job_posting_id={job_posting_id} url={detail_url}")
+            except Exception as exc:
+                result["failed"] += 1
+                print(f"[ERROR] Detail URL failed: url={detail_url} reason={exc}")
+
+        finish_crawl_run(crawl_run_id, status="success", db_path=db_path)
+        result["crawl_run_id"] = crawl_run_id
+        return result
+    except Exception as exc:
+        finish_crawl_run(crawl_run_id, status="failed", error_message=str(exc), db_path=db_path)
+        raise
+
+
+def build_job_from_detail_page(detail_url, html, parsed):
+    soup = BeautifulSoup(html, "html.parser")
+    structured = extract_jobposting_data(soup)
+    canonical_url = _normalize_structured_text(structured.get("url")) or detail_url
+    title = _normalize_structured_text(structured.get("title")) or extract_title_from_page(soup)
+    company = extract_company_name(structured, soup)
+
+    return {
+        "job_id": extract_job_id(canonical_url or detail_url),
+        "title": title,
+        "company": company,
+        "location": parsed.get("location") or "",
+        "url": canonical_url or detail_url,
+        "normalized_url": normalize_url(canonical_url or detail_url),
+        "company_url": "",
+        "career": parsed.get("career") or "",
+        "education": parsed.get("education") or "",
+        "employment_type": parsed.get("employment_type") or "",
+        "deadline": parsed.get("deadline") or "",
+        "deadline_date": parsed.get("deadline_date") or "",
+        "salary": "",
+        "raw_text": parsed.get("description_text") or "",
+    }
+
+
+def find_job_posting_id(job_id, normalized_url, db_path=DEFAULT_DB_PATH):
+    with get_connection(db_path) as conn:
+        if job_id:
+            row = conn.execute(
+                """
+                SELECT id
+                FROM job_postings
+                WHERE source = 'jobkorea'
+                  AND source_job_id = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (job_id,),
+            ).fetchone()
+            if row:
+                return row["id"]
+
+        if normalized_url:
+            row = conn.execute(
+                """
+                SELECT id
+                FROM job_postings
+                WHERE source = 'jobkorea'
+                  AND normalized_url = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (normalized_url,),
+            ).fetchone()
+            if row:
+                return row["id"]
+    return None
+
+
 def get_detail_targets(
     limit=10,
     db_path=DEFAULT_DB_PATH,
@@ -214,11 +342,46 @@ def parse_job_detail(html):
         "posted_date": posted_date,
         "deadline": deadline,
         "deadline_date": "" if is_always_open_deadline(deadline) else normalize_deadline_date(deadline),
-        "location": extract_structured_location(structured),
+        "location": extract_structured_location(structured) or extract_location_from_text(lines),
         "career": _normalize_structured_text(structured.get("experienceRequirements")),
         "education": _normalize_structured_text(structured.get("educationRequirements")),
         "employment_type": extract_employment_type(structured, text),
     }
+
+
+def extract_title_from_page(soup):
+    title_tag = soup.select_one('[data-sentry-component="Title"]')
+    title = _normalize_structured_text(title_tag.get_text(" ", strip=True) if title_tag else "")
+    if title:
+        return title
+
+    og_title = soup.select_one('meta[property="og:title"]')
+    title = _normalize_structured_text(og_title.get("content", "") if og_title else "")
+    if " 채용 - " in title:
+        return title.split(" 채용 - ", 1)[1].split("|", 1)[0].strip()
+    return title.split("|", 1)[0].strip()
+
+
+def extract_company_name(structured, soup):
+    organization = structured.get("hiringOrganization")
+    if isinstance(organization, dict):
+        name = _normalize_structured_text(organization.get("name"))
+        if name:
+            return name
+
+    title_tag = soup.select_one('[data-sentry-component="Title"]')
+    title_text = _normalize_structured_text(title_tag.get_text(" ", strip=True) if title_tag else "")
+    structured_title = _normalize_structured_text(structured.get("title"))
+    if title_text and structured_title and title_text.endswith(structured_title):
+        company = title_text[: -len(structured_title)].strip()
+        if company:
+            return company
+
+    og_title = soup.select_one('meta[property="og:title"]')
+    title = _normalize_structured_text(og_title.get("content", "") if og_title else "")
+    if " 채용 - " in title:
+        return title.split(" 채용 - ", 1)[0].strip()
+    return "Unknown"
 
 
 def save_raw_detail_page(conn, crawl_run_id, url, html, source="jobkorea"):
@@ -479,6 +642,22 @@ def extract_start_date_from_text(text):
         match = re.search(pattern, compact_text)
         if match:
             return match.group(1).strip()
+    return ""
+
+
+def extract_location_from_text(lines):
+    stop_labels = {"지도보기", "인근지하철", "지원자격", "경력", "학력", "스킬", "우대조건"}
+    for index, line in enumerate(lines):
+        if line != "근무지주소":
+            continue
+
+        collected = []
+        for next_line in lines[index + 1 : index + 4]:
+            if next_line in stop_labels:
+                break
+            if next_line:
+                collected.append(next_line)
+        return " ".join(collected).strip()
     return ""
 
 

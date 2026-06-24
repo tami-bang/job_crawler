@@ -5,6 +5,16 @@ import { useMemo, useState } from "react";
 const updates = [
   {
     date: "2026.06.24",
+    tag: "COVERAGE",
+    title: "AI AX·바이브코딩 공고 누락 보강",
+    items: [
+      "JobKorea 상세 URL을 직접 넣어도 공고를 저장하고 상세 스냅샷까지 반영할 수 있는 수집 모드를 추가했습니다.",
+      "AI AX, 바이브코딩, 바이브 코딩, 노코드, 로우코드 키워드를 검색·매칭 기준에 보강했습니다.",
+      "정적 대시보드는 상세 수집이 완료된 공고만 내보내도록 정리해 대기 상태 데이터가 섞이지 않게 했습니다.",
+    ],
+  },
+  {
+    date: "2026.06.24",
     tag: "DATA QUALITY",
     title: "마감 표기와 상세 스냅샷 신뢰도 보강",
     items: [

@@ -3,7 +3,7 @@ import argparse
 import json
 
 from crawler.database import finish_crawl_run, get_connection, init_database, start_crawl_run
-from crawler.detail import collect_jobkorea_details
+from crawler.detail import collect_jobkorea_detail_urls, collect_jobkorea_details
 from crawler.fetcher import fetch, is_blocked_page
 from crawler.health import build_collection_health_report, print_collection_health_report
 from crawler.job_store import save_job_list_items, save_raw_list_page
@@ -163,6 +163,24 @@ def collect_details():
     result = collect_jobkorea_details(fetch, limit=limit)
     print(
         "[INFO] JobKorea detail collection complete: "
+        f"target={result['target']}, "
+        f"success={result['success']}, "
+        f"failed={result['failed']}, "
+        f"skipped={result['skipped']}, "
+        f"crawl_run_id={result['crawl_run_id']}"
+    )
+
+
+def collect_detail_urls(urls=None):
+    if urls:
+        target_urls = urls
+    else:
+        url_str = input("JobKorea detail URL(s), comma separated: ").strip()
+        target_urls = [url.strip() for url in url_str.split(",")]
+
+    result = collect_jobkorea_detail_urls(fetch, target_urls)
+    print(
+        "[INFO] JobKorea detail URL collection complete: "
         f"target={result['target']}, "
         f"success={result['success']}, "
         f"failed={result['failed']}, "
@@ -692,6 +710,7 @@ def parse_args():
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--report-only", action="store_true")
+    parser.add_argument("--url", action="append", default=[])
     return parser.parse_args()
 
 
@@ -709,6 +728,7 @@ if __name__ == "__main__":
     available_sites = list(sites.keys()) + [
         "jobkorea-taxonomy",
         "jobkorea-detail",
+        "jobkorea-url",
         "jobkorea-match",
         "jobkorea-report",
         "jobkorea-report-only",
@@ -729,6 +749,8 @@ if __name__ == "__main__":
         sync_taxonomy()
     elif site == "jobkorea-detail":
         collect_details()
+    elif site == "jobkorea-url":
+        collect_detail_urls(args.url)
     elif site == "jobkorea-match":
         analyze_matches()
     elif site == "jobkorea-report":

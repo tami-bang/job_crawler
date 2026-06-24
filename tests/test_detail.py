@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from crawler.detail import parse_job_detail
+from crawler.detail import build_job_from_detail_page, parse_job_detail
 
 
 class JobKoreaDetailTests(unittest.TestCase):
@@ -71,6 +71,61 @@ class JobKoreaDetailTests(unittest.TestCase):
 
         self.assertEqual(result["deadline"], "상시채용")
         self.assertEqual(result["deadline_date"], "")
+
+    def test_extracts_location_from_visible_job_summary(self):
+        html = """
+        <html><body>
+        <div>
+        근무지주소
+        서울 강서구 강서로 468
+        지도보기
+        지원자격
+        </div>
+        </body></html>
+        """
+
+        result = parse_job_detail(html)
+
+        self.assertEqual(result["location"], "서울 강서구 강서로 468")
+
+    def test_builds_summary_job_from_detail_page(self):
+        payload = {
+            "@type": "JobPosting",
+            "title": "AI AX 바이브 코딩 개발자",
+            "datePosted": "2026-06-22",
+            "validThrough": "2026-07-22T23:59",
+            "employmentType": ["FULL_TIME", "CONTRACTOR"],
+            "hiringOrganization": {
+                "@type": "Organization",
+                "name": "㈜글로벌비전",
+            },
+            "jobLocation": {
+                "@type": "Place",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "서울 강서구 강서로 468",
+                },
+            },
+            "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49427812?Oem_Code=C1",
+        }
+        html = (
+            "<html><head><script type='application/ld+json'>"
+            + json.dumps(payload, ensure_ascii=False)
+            + "</script></head><body>시작일 2026.06.22(월) 마감일 2026.07.22(수)</body></html>"
+        )
+        parsed = parse_job_detail(html)
+
+        result = build_job_from_detail_page(
+            "https://www.jobkorea.co.kr/Recruit/GI_Read/49427812?Oem_Code=C1&sc=7",
+            html,
+            parsed,
+        )
+
+        self.assertEqual(result["job_id"], "49427812")
+        self.assertEqual(result["title"], "AI AX 바이브 코딩 개발자")
+        self.assertEqual(result["company"], "㈜글로벌비전")
+        self.assertEqual(result["location"], "서울 강서구 강서로 468")
+        self.assertEqual(result["employment_type"], "정규직, 계약직")
 
 
 if __name__ == "__main__":

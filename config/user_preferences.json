@@ -12,7 +12,7 @@
     "크롤링", "웹크롤링", "스크래핑", "자동화", "업무자동화", "Python 자동화", "데이터 파이프라인", "ETL",
     "프론트엔드", "프론트엔드개발자", "웹개발", "웹개발자", "React", "Vue", "JavaScript", "TypeScript", "HTML", "CSS", "Next.js",
     "풀스택", "풀스택개발자", "웹서비스", "SaaS", "플랫폼", "서비스개발",
-    "AI", "인공지능", "AI개발", "AI서비스", "AI자동화", "LLM", "생성형AI", "RAG", "ChatGPT", "Claude", "Gemini", "Copilot", "Cursor",
+    "AI", "인공지능", "AI개발", "AI서비스", "AI자동화", "AI AX", "AX", "바이브코딩", "바이브 코딩", "노코드", "로우코드", "LLM", "생성형AI", "RAG", "ChatGPT", "Claude", "Gemini", "Copilot", "Cursor",
     "프롬프트엔지니어", "프롬프트", "QA자동화", "테스트자동화", "자동화테스트", "SDET", "테스트엔지니어", "품질엔지니어",
     "주니어개발자", "신입개발자"
   ],
@@ -21,7 +21,7 @@
       "primary": "AI·개발·데이터",
       "preferred": [
         "AI·개발·데이터", "백엔드개발자", "프론트엔드개발자", "웹개발자", "소프트웨어개발자", "풀스택개발자",
-        "AI/ML엔지니어", "AI서비스개발자", "데이터엔지니어", "데이터분석가", "보안엔지니어", "클라우드엔지니어",
+        "AI/ML엔지니어", "AI서비스개발자", "AI개발자", "AI AX", "AX 개발자", "바이브 코딩", "바이브코딩", "AI AX 개발자", "바이브 코딩 개발자", "바이브코딩 개발자", "데이터엔지니어", "데이터분석가", "보안엔지니어", "클라우드엔지니어",
         "시스템엔지니어", "네트워크엔지니어", "웹퍼블리셔", "프롬프트엔지니어", "MLOps엔지니어"
       ],
       "secondary": ["QA", "테스트엔지니어", "QA엔지니어", "품질엔지니어", "테스트자동화", "SDET"],
@@ -47,7 +47,7 @@
     "skill_keywords": {
       "preferred": [
         "Python", "FastAPI", "Django", "Flask", "SQL", "REST API", "API", "JavaScript", "TypeScript", "React", "Next.js", "Vue",
-        "HTML", "CSS", "Git", "Docker", "AWS", "Linux", "MariaDB", "MySQL", "PostgreSQL", "크롤링", "자동화", "LLM", "RAG", "OpenAI", "테스트자동화"
+        "HTML", "CSS", "Git", "Docker", "AWS", "Linux", "MariaDB", "MySQL", "PostgreSQL", "크롤링", "자동화", "AI AX", "바이브코딩", "바이브 코딩", "LLM", "RAG", "OpenAI", "테스트자동화"
       ]
     },
     "career_goal_boosts": {
@@ -59,7 +59,7 @@
       "ai_automation": {
         "label": "1순위 AI/업무자동화 개발",
         "weight": 18,
-        "keywords": ["AI", "인공지능", "AI개발", "AI서비스", "AI자동화", "업무자동화", "Python 자동화", "LLM", "생성형AI", "RAG", "ChatGPT", "Claude", "Gemini", "Copilot", "Cursor", "OpenAI", "프롬프트", "프롬프트엔지니어"]
+        "keywords": ["AI", "인공지능", "AI개발", "AI서비스", "AI자동화", "AI AX", "AX", "바이브코딩", "바이브 코딩", "노코드", "로우코드", "업무자동화", "Python 자동화", "LLM", "생성형AI", "RAG", "ChatGPT", "Claude", "Gemini", "Copilot", "Cursor", "OpenAI", "프롬프트", "프롬프트엔지니어"]
       },
       "data_pipeline_crawling": {
         "label": "1순위 데이터 수집/파이프라인",
