@@ -1,0 +1,39 @@
+name: Neon 상세 수집 및 점수 계산
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_jobs:
+        description: "이번 실행 최대 처리 건수 (0은 큐 전체)"
+        required: true
+        default: "500"
+      workers:
+        description: "병렬 상세 요청 수"
+        required: true
+        default: "4"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: neon-jobkorea-details
+  cancel-in-progress: false
+
+jobs:
+  details:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: 상세 수집 및 점수 계산
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: >-
+          python scripts/neon_detail_worker.py
+          --max-jobs "${{ inputs.max_jobs }}"
+          --workers "${{ inputs.workers }}"

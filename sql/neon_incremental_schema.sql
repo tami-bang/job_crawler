@@ -48,3 +48,26 @@ CREATE TABLE IF NOT EXISTS detail_fetch_queue (
 
 CREATE INDEX IF NOT EXISTS idx_detail_queue_fetch
 ON detail_fetch_queue(status, next_attempt_at, priority DESC);
+
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS detail_url TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS location TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS career TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS education TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS employment_type TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS deadline TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS deadline_date TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS description_text TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS raw_detail_text TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS main_tasks TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS qualifications TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS preferred_conditions TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS benefits TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS skill_candidates TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS detail_status VARCHAR(20) DEFAULT 'pending';
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS detail_collected_at TIMESTAMPTZ;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS raw_score INTEGER;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS match_score INTEGER DEFAULT 0;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS recommendation_level VARCHAR(30);
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS matched_keywords_json TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS positive_reasons_json TEXT;
+ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS negative_reasons_json TEXT;
