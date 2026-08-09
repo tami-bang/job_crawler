@@ -3,6 +3,7 @@
 import { KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { api, Job } from "@/services/api";
 import { downloadWorkbook } from "@/services/export-xlsx";
+import { isAlwaysOpenDeadline, matchesEmploymentFilters } from "@/services/job-filters";
 
 const statusLabel: Record<string, string> = {
   planned: "지원예정",
@@ -247,7 +248,7 @@ function formatDeadlineDate(deadlineDate: string | null, deadline: string | null
 }
 
 function isAlwaysOpen(deadline: string | null | undefined) {
-  return Boolean(deadline?.includes("상시"));
+  return isAlwaysOpenDeadline(deadline);
 }
 
 function isExpiredJob(job: Job, todayKey: string) {
@@ -655,9 +656,11 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
           && option.keywords.some((keyword) => text.includes(keyword.toLowerCase())));
       })
       .filter((job) => careerFilters.length === 0 || getCareerFilterTokens(job.career).some((token) => careerFilters.includes(token)))
-      .filter((job) => employmentFilters.length === 0
-        || (employmentFilters.includes("상시채용") && isAlwaysOpen(job.deadline))
-        || getEmploymentFilterTokens(job.employment_type).some((token) => employmentFilters.includes(token)))
+      .filter((job) => matchesEmploymentFilters(
+        job.deadline,
+        getEmploymentFilterTokens(job.employment_type),
+        employmentFilters,
+      ))
   ), [careerFilters, employmentFilters, jobCategoryFilters, jobs, matchBasis, selectedLocations]);
   const todayKey = toDateKey(new Date());
 
