@@ -1,5 +1,16 @@
+import {
+  getStableJobKey,
+  migrateUserStorageV2,
+  readUserState,
+  updateUserInteraction,
+} from "./job-state";
+import { legacyIdToStableKeyMap } from "./legacy-job-id-map";
+
 export type Job = {
   id: number;
+  source?: string;
+  source_job_id?: string;
+  stable_key?: string;
   title: string;
   company_name: string | null;
   location: string | null;
@@ -20,6 +31,7 @@ export type Job = {
   negative_reasons: string[];
   is_favorite: boolean;
   is_disliked?: boolean;
+  is_viewed?: boolean;
   favorite_memo: string | null;
   favorite_status: string | null;
 };
@@ -40,14 +52,9 @@ export type CommuteEstimate = {
   reason?: string | null;
 };
 
-type FavoriteState = Record<number, { memo: string; status: string }>;
-type DislikedState = number[];
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 const STATIC_DEMO = process.env.NEXT_PUBLIC_STATIC_DEMO === "true";
 const REPORT_API_URL = process.env.NEXT_PUBLIC_REPORT_API_URL?.replace(/\/$/, "") ?? "";
-const FAVORITES_KEY = "job-radar-demo-favorites";
-const DISLIKED_JOBS_KEY = "job-radar-disliked-jobs";
 
 function getReportDeadline(job: Job) {
   if (job.deadline?.includes("상시")) return job.deadline;
@@ -58,62 +65,62 @@ function getReportDeadline(job: Job) {
 
 async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
   const { demoJobs } = await import("./demo-data");
-  const favorites = readFavorites();
-  const disliked = readDislikedJobs();
+  let userState: ReturnType<typeof readUserState> = {};
+  if (typeof window !== "undefined") {
+    try {
+      migrateUserStorageV2(localStorage, legacyIdToStableKeyMap);
+      userState = readUserState(localStorage);
+    } catch {
+      // 저장소가 차단되거나 용량이 부족해도 공고 탐색은 계속 허용합니다.
+    }
+  }
   const term = search.trim().toLowerCase();
 
   return demoJobs
-    .map((job) => ({
-      ...job,
-      is_favorite: Boolean(favorites[job.id]),
-      is_disliked: disliked.has(job.id),
-      favorite_memo: favorites[job.id]?.memo ?? null,
-      favorite_status: favorites[job.id]?.status ?? null,
-    }))
+    .map((job) => {
+      const stableKey = getStableJobKey(job);
+      const interaction = userState[stableKey] ?? {};
+      return {
+        ...job,
+        stable_key: stableKey,
+        is_favorite: Boolean(interaction.isFavorite),
+        is_disliked: Boolean(interaction.isDisliked),
+        is_viewed: Boolean(interaction.isViewed),
+        favorite_memo: interaction.memo ?? null,
+        favorite_status: interaction.status ?? null,
+      };
+    })
     .filter((job) => !favoriteOnly || job.is_favorite)
     .filter((job) => !term || [job.title, job.company_name, job.skill_candidates]
       .some((value) => value?.toLowerCase().includes(term)));
 }
 
-function readFavorites(): FavoriteState {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(localStorage.getItem(FAVORITES_KEY) ?? "{}") as FavoriteState;
-  } catch {
-    return {};
-  }
-}
-
-function writeFavorites(favorites: FavoriteState) {
-  try {
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-    window.dispatchEvent(new Event("job-radar-favorites-updated"));
-  } catch {
-    // 저장소가 차단된 브라우저에서도 화면 탐색은 계속 허용합니다.
-  }
-}
-
-function readDislikedJobs() {
-  if (typeof window === "undefined") return new Set<number>();
-  try {
-    const parsed = JSON.parse(localStorage.getItem(DISLIKED_JOBS_KEY) ?? "[]") as DislikedState;
-    return new Set(parsed);
-  } catch {
-    return new Set<number>();
-  }
-}
-
-function writeDislikedJobs(dislikedJobs: Set<number>) {
-  try {
-    localStorage.setItem(DISLIKED_JOBS_KEY, JSON.stringify([...dislikedJobs]));
-    window.dispatchEvent(new Event("job-radar-disliked-updated"));
-  } catch {
-    // 저장소가 차단된 브라우저에서도 화면 탐색은 계속 허용합니다.
-  }
-}
-
 async function getDemoJob(jobId: number) {
   return (await getDemoJobs()).find((job) => job.id === jobId) as Job;
+}
+
+async function getDemoStableKey(jobId: number) {
+  const { demoJobs } = await import("./demo-data");
+  const job = demoJobs.find((item) => item.id === jobId);
+  if (!job) throw new Error("공고를 찾을 수 없습니다.");
+  return getStableJobKey(job);
+}
+
+function dispatchStateEvents() {
+  window.dispatchEvent(new Event("job-radar-favorites-updated"));
+  window.dispatchEvent(new Event("job-radar-disliked-updated"));
+}
+
+function updateDemoInteraction(
+  stableKey: string,
+  update: Parameters<typeof updateUserInteraction>[2],
+) {
+  try {
+    updateUserInteraction(localStorage, stableKey, update);
+    dispatchStateEvents();
+  } catch {
+    // 저장소가 차단되거나 용량이 부족해도 공고 탐색은 계속 허용합니다.
+  }
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -194,12 +201,14 @@ export const api = {
   },
   favorite: async (jobId: number) => {
     if (STATIC_DEMO) {
-      const favorites = readFavorites();
-      const dislikedJobs = readDislikedJobs();
-      dislikedJobs.delete(jobId);
-      favorites[jobId] = favorites[jobId] ?? { memo: "", status: "planned" };
-      writeFavorites(favorites);
-      writeDislikedJobs(dislikedJobs);
+      const stableKey = await getDemoStableKey(jobId);
+      updateDemoInteraction(stableKey, (current) => ({
+        ...current,
+        isFavorite: true,
+        isDisliked: false,
+        memo: current.memo ?? "",
+        status: current.status ?? "planned",
+      }));
       return getDemoJob(jobId);
     }
     return request<Job>(`/api/jobs/${jobId}/favorite`, {
@@ -209,18 +218,27 @@ export const api = {
   },
   unfavorite: async (jobId: number) => {
     if (STATIC_DEMO) {
-      const favorites = readFavorites();
-      delete favorites[jobId];
-      writeFavorites(favorites);
+      const stableKey = await getDemoStableKey(jobId);
+      updateDemoInteraction(stableKey, (current) => ({
+        ...current,
+        isFavorite: false,
+        memo: undefined,
+        status: undefined,
+      }));
       return;
     }
     await fetch(`${API_URL}/api/jobs/${jobId}/favorite`, { method: "DELETE" });
   },
   updateFavorite: async (jobId: number, memo: string, status: string) => {
     if (STATIC_DEMO) {
-      const favorites = readFavorites();
-      favorites[jobId] = { memo, status };
-      writeFavorites(favorites);
+      const stableKey = await getDemoStableKey(jobId);
+      updateDemoInteraction(stableKey, (current) => ({
+        ...current,
+        isFavorite: true,
+        isDisliked: false,
+        memo,
+        status,
+      }));
       return getDemoJob(jobId);
     }
     return request<Job>(`/api/favorites/${jobId}`, {
@@ -230,12 +248,14 @@ export const api = {
   },
   dislike: async (jobId: number) => {
     if (STATIC_DEMO) {
-      const dislikedJobs = readDislikedJobs();
-      const favorites = readFavorites();
-      delete favorites[jobId];
-      dislikedJobs.add(jobId);
-      writeFavorites(favorites);
-      writeDislikedJobs(dislikedJobs);
+      const stableKey = await getDemoStableKey(jobId);
+      updateDemoInteraction(stableKey, (current) => ({
+        ...current,
+        isFavorite: false,
+        isDisliked: true,
+        memo: undefined,
+        status: undefined,
+      }));
       return;
     }
     return request<Job>(`/api/jobs/${jobId}/favorite`, {
@@ -245,12 +265,16 @@ export const api = {
   },
   undislike: async (jobId: number) => {
     if (STATIC_DEMO) {
-      const dislikedJobs = readDislikedJobs();
-      dislikedJobs.delete(jobId);
-      writeDislikedJobs(dislikedJobs);
+      const stableKey = await getDemoStableKey(jobId);
+      updateDemoInteraction(stableKey, (current) => ({ ...current, isDisliked: false }));
       return;
     }
     await fetch(`${API_URL}/api/jobs/${jobId}/favorite`, { method: "DELETE" });
+  },
+  markViewed: async (jobId: number) => {
+    if (!STATIC_DEMO) return;
+    const stableKey = await getDemoStableKey(jobId);
+    updateDemoInteraction(stableKey, (current) => ({ ...current, isViewed: true }));
   },
   emailReport: async (email: string, jobs: Job[]) => {
     const baseUrl = REPORT_API_URL || API_URL;

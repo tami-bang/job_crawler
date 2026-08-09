@@ -1,13 +1,7 @@
 name: 잡코리아 채용공고 수집
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/crawl.yml"
-  schedule:
-    # GitHub Actions cron은 UTC 기준입니다. 매일 한국시간 오전 9시에 실행합니다.
-    - cron: "0 0 * * *"
+  # 사용자 상태 마이그레이션을 검증하는 동안 자동 스냅샷 갱신은 일시 중지합니다.
   workflow_dispatch:
     inputs:
       keyword_batch_size:

@@ -99,6 +99,8 @@ def load_jobs(db_path, limit):
         """
         SELECT
             jp.id,
+            jp.source,
+            jp.source_job_id,
             jp.title,
             c.name AS company_name,
             jp.location,
@@ -159,6 +161,9 @@ def serialize_job(index, row):
 
     return {
         "id": index,
+        "source": row["source"] or "jobkorea",
+        "source_job_id": row["source_job_id"] or extract_job_id_from_url(row["detail_url"]),
+        "stable_key": build_stable_key(row),
         "title": row["title"] or "제목 미상",
         "company_name": row["company_name"] or None,
         "location": row["location"] or None,
@@ -181,6 +186,17 @@ def serialize_job(index, row):
         "favorite_memo": None,
         "favorite_status": None,
     }
+
+
+def extract_job_id_from_url(url):
+    match = re.search(r"/GI_Read/(\d+)", str(url or ""))
+    return match.group(1) if match else ""
+
+
+def build_stable_key(row):
+    source = row["source"] or "jobkorea"
+    source_job_id = row["source_job_id"] or extract_job_id_from_url(row["detail_url"])
+    return f"{source}:{source_job_id}" if source_job_id else f"{source}:legacy:{row['id']}"
 
 
 def build_snapshot_text(row):

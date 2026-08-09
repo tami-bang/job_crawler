@@ -89,7 +89,6 @@ const baseLocationOptions = [
   "경기 의정부시", "경기 이천시", "경기 파주시", "경기 평택시", "경기 포천시", "경기 하남시", "경기 화성시",
   "인천 강화군", "인천 계양구", "인천 남동구", "인천 동구", "인천 미추홀구", "인천 부평구", "인천 서구", "인천 연수구", "인천 옹진군", "인천 중구",
 ];
-const VIEWED_JOBS_KEY = "job-radar-viewed-jobs";
 const snapshotNoiseLines = new Set([
   "회원가입/로그인",
   "기업 서비스",
@@ -516,16 +515,6 @@ function buildEmailReportMailto(email: string, jobs: Job[]) {
   return `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
 }
 
-function readViewedJobs() {
-  if (typeof window === "undefined") return new Set<number>();
-  try {
-    const parsed = JSON.parse(localStorage.getItem(VIEWED_JOBS_KEY) ?? "[]") as number[];
-    return new Set(parsed);
-  } catch {
-    return new Set<number>();
-  }
-}
-
 export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: boolean }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
@@ -575,7 +564,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }, [favoriteOnly]);
 
   useEffect(() => { void loadJobs(); }, [loadJobs]);
-  useEffect(() => { setViewedJobs(readViewedJobs()); }, []);
+  useEffect(() => {
+    setViewedJobs(new Set(jobs.filter((job) => job.is_viewed).map((job) => job.id)));
+  }, [jobs]);
   useEffect(() => {
     api.reportStatus()
       .then((status) => setReportServerReady(status.ready))
@@ -844,13 +835,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     setViewedJobs((previous) => {
       const next = new Set(previous);
       next.add(jobId);
-      try {
-        localStorage.setItem(VIEWED_JOBS_KEY, JSON.stringify([...next]));
-      } catch {
-        // 브라우저 저장소가 막혀도 공고 탐색은 계속 동작합니다.
-      }
       return next;
     });
+    void api.markViewed(jobId);
   }
 
   async function openSnapshot(job: Job) {
