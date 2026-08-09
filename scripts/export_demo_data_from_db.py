@@ -226,17 +226,53 @@ def write_demo_data(jobs, output_path, db_path):
     output_path.write_text(content, encoding="utf-8")
 
 
+def load_existing_jobs(output_path):
+    if not output_path.exists():
+        return []
+    content = output_path.read_text(encoding="utf-8")
+    prefix = "export const demoJobs: Job[] = "
+    start = content.find(prefix)
+    if start < 0:
+        return []
+    payload = content[start + len(prefix):].strip()
+    if payload.endswith(";"):
+        payload = payload[:-1]
+    try:
+        jobs = json.loads(payload)
+    except json.JSONDecodeError:
+        return []
+    return jobs if isinstance(jobs, list) else []
+
+
+def merge_jobs(fresh_jobs, existing_jobs, limit):
+    merged = []
+    seen = set()
+    for job in [*fresh_jobs, *existing_jobs]:
+        key = job.get("detail_url") or f"{job.get('company_name')}::{job.get('title')}"
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append({**job, "id": len(merged) + 1})
+        if len(merged) >= limit:
+            break
+    return merged
+
+
 def main():
     parser = argparse.ArgumentParser(description="Export static demo data from JobRadar DB")
     parser.add_argument("--db", default="data/job_radar.db")
     parser.add_argument("--output", default="frontend/services/demo-data.ts")
     parser.add_argument("--limit", type=int, default=500)
+    parser.add_argument("--merge-existing", action="store_true")
     args = parser.parse_args()
 
     hard_filters = load_hard_filters()
     rows = [row for row in load_jobs(args.db, args.limit * 4) if is_allowed_by_hard_location(row, hard_filters)]
     jobs = [serialize_job(index, row) for index, row in enumerate(rows[:args.limit], start=1)]
-    write_demo_data(jobs, Path(args.output), args.db)
+    output_path = Path(args.output)
+    if args.merge_existing:
+        jobs = merge_jobs(jobs, load_existing_jobs(output_path), args.limit)
+    write_demo_data(jobs, output_path, args.db)
     print(f"[INFO] demo data exported: jobs={len(jobs)} output={args.output}")
 
 

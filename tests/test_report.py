@@ -7,9 +7,22 @@ from pathlib import Path
 from backend.services.report_service import build_jobs_xlsx, validate_email_address
 from backend.services.map_service import format_duration
 from crawler.report import export_match_report, export_xlsx_match_report, get_report_fieldnames
+from scripts.export_demo_data_from_db import merge_jobs
 
 
 class ReportTests(unittest.TestCase):
+    def test_demo_snapshot_merge_prefers_fresh_jobs_and_removes_duplicates(self):
+        fresh = [{"id": 7, "detail_url": "https://example.com/1", "title": "최신 공고"}]
+        existing = [
+            {"id": 1, "detail_url": "https://example.com/1", "title": "이전 공고"},
+            {"id": 2, "detail_url": "https://example.com/2", "title": "유지 공고"},
+        ]
+
+        merged = merge_jobs(fresh, existing, limit=2)
+
+        self.assertEqual([job["title"] for job in merged], ["최신 공고", "유지 공고"])
+        self.assertEqual([job["id"] for job in merged], [1, 2])
+
     def test_csv_and_xlsx_exports_are_created(self):
         row = {field: "" for field in get_report_fieldnames()}
         row.update({"company": "테스트 회사", "job_title": "백엔드 개발자", "score": 88})

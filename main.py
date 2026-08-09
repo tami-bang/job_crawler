@@ -336,7 +336,15 @@ def run_jobkorea_multi_pipeline(sites, options=None):
         keyword for keyword in search_keywords
         if keyword not in completed_keywords
     ]
-    selected_keywords = pending_keywords[:keyword_batch_size] if keyword_batch_size else pending_keywords
+    keyword_offset = max(0, getattr(options, "keyword_offset", 0)) if options else 0
+    if resume:
+        selected_keywords = pending_keywords[:keyword_batch_size] if keyword_batch_size else pending_keywords
+    elif keyword_batch_size and pending_keywords:
+        offset = keyword_offset % len(pending_keywords)
+        rotated_keywords = pending_keywords[offset:] + pending_keywords[:offset]
+        selected_keywords = rotated_keywords[:keyword_batch_size]
+    else:
+        selected_keywords = pending_keywords
 
     summary = {
         "keywords": [],
@@ -704,6 +712,7 @@ def parse_args():
     parser.add_argument("mode", nargs="?", help="Execution mode")
     parser.add_argument("--pages", type=int, default=3)
     parser.add_argument("--keyword-batch-size", type=int, default=10)
+    parser.add_argument("--keyword-offset", type=int, default=0)
     parser.add_argument("--detail-limit", type=int, default=100)
     parser.add_argument("--report-top-n", type=int, default=None)
     parser.add_argument("--keyword-delay", type=float, default=2.0)
