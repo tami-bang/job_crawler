@@ -55,6 +55,29 @@ export type CommuteEstimate = {
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 const STATIC_DEMO = process.env.NEXT_PUBLIC_STATIC_DEMO === "true";
 const REPORT_API_URL = process.env.NEXT_PUBLIC_REPORT_API_URL?.replace(/\/$/, "") ?? "";
+const STATIC_DATA_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/static_jobs.json`;
+let demoJobsPromise: Promise<Job[]> | null = null;
+
+async function loadDemoJobs(): Promise<Job[]> {
+  if (typeof window === "undefined") {
+    const { demoJobs } = await import("./demo-data");
+    return demoJobs;
+  }
+  if (!demoJobsPromise) {
+    demoJobsPromise = fetch(STATIC_DATA_URL, { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error("정적 공고 스냅샷을 불러오지 못했습니다.");
+        return response.json().then((jobs: Job[]) => {
+          if (!Array.isArray(jobs) || (jobs.length > 0 && (jobs[0].match_score == null || !jobs[0].stable_key))) {
+            throw new Error("아직 상세 점수 스냅샷이 아닙니다.");
+          }
+          return jobs;
+        });
+      })
+      .catch(async () => (await import("./demo-data")).demoJobs);
+  }
+  return demoJobsPromise;
+}
 
 function getReportDeadline(job: Job) {
   if (job.deadline?.includes("상시")) return job.deadline;
@@ -64,7 +87,7 @@ function getReportDeadline(job: Job) {
 }
 
 async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
-  const { demoJobs } = await import("./demo-data");
+  const demoJobs = await loadDemoJobs();
   let userState: ReturnType<typeof readUserState> = {};
   if (typeof window !== "undefined") {
     try {
@@ -100,7 +123,7 @@ async function getDemoJob(jobId: number) {
 }
 
 async function getDemoStableKey(jobId: number) {
-  const { demoJobs } = await import("./demo-data");
+  const demoJobs = await loadDemoJobs();
   const job = demoJobs.find((item) => item.id === jobId);
   if (!job) throw new Error("공고를 찾을 수 없습니다.");
   return getStableJobKey(job);
