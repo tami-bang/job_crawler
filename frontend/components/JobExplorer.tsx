@@ -27,6 +27,8 @@ const sortLabels = {
 } as const;
 type SortKey = keyof typeof sortLabels;
 type ExplorerView = "list" | "calendar" | "expired";
+type RegionGroup = "서울" | "경기" | "인천";
+type JobCategoryKey = "backend" | "frontend" | "web" | "app" | "system" | "network" | "dba" | "data_engineer" | "data_scientist" | "security" | "software" | "game" | "hardware" | "ai_ml" | "blockchain" | "cloud" | "publisher" | "consulting" | "qa" | "ai_research" | "data_analyst" | "labeler" | "prompt" | "ai_security" | "mlops" | "ai_service";
 type MatchBasisKey =
   | "detail_done" | "job_developer" | "job_backend" | "job_frontend" | "job_fullstack" | "job_mobile"
   | "job_ai" | "job_data" | "job_cloud" | "job_qa" | "job_pm"
@@ -88,6 +90,35 @@ const baseLocationOptions = [
   "경기 안양시", "경기 양주시", "경기 양평군", "경기 여주시", "경기 연천군", "경기 오산시", "경기 용인시", "경기 의왕시",
   "경기 의정부시", "경기 이천시", "경기 파주시", "경기 평택시", "경기 포천시", "경기 하남시", "경기 화성시",
   "인천 강화군", "인천 계양구", "인천 남동구", "인천 동구", "인천 미추홀구", "인천 부평구", "인천 서구", "인천 연수구", "인천 옹진군", "인천 중구",
+];
+const regionGroups: RegionGroup[] = ["서울", "경기", "인천"];
+const jobCategoryOptions: Array<{ key: JobCategoryKey; label: string; count: number; keywords: string[] }> = [
+  { key: "backend", label: "백엔드개발자", count: 1853, keywords: ["백엔드", "backend", "서버개발"] },
+  { key: "frontend", label: "프론트엔드개발자", count: 980, keywords: ["프론트엔드", "frontend", "front-end"] },
+  { key: "web", label: "웹개발자", count: 1595, keywords: ["웹개발", "web developer"] },
+  { key: "app", label: "앱개발자", count: 556, keywords: ["앱개발", "모바일개발", "android", "ios", "flutter", "react native"] },
+  { key: "system", label: "시스템엔지니어", count: 2205, keywords: ["시스템엔지니어", "시스템 엔지니어"] },
+  { key: "network", label: "네트워크엔지니어", count: 974, keywords: ["네트워크엔지니어", "네트워크 엔지니어"] },
+  { key: "dba", label: "DBA", count: 352, keywords: ["dba", "데이터베이스 관리자"] },
+  { key: "data_engineer", label: "데이터엔지니어", count: 445, keywords: ["데이터엔지니어", "데이터 엔지니어", "data engineer"] },
+  { key: "data_scientist", label: "데이터사이언티스트", count: 304, keywords: ["데이터사이언티스트", "데이터 사이언티스트", "data scientist"] },
+  { key: "security", label: "보안엔지니어", count: 1044, keywords: ["보안엔지니어", "보안 엔지니어", "security engineer"] },
+  { key: "software", label: "소프트웨어개발자", count: 2076, keywords: ["소프트웨어개발", "software developer", "software engineer"] },
+  { key: "game", label: "게임개발자", count: 576, keywords: ["게임개발", "게임 개발"] },
+  { key: "hardware", label: "하드웨어개발자", count: 510, keywords: ["하드웨어개발", "하드웨어 개발"] },
+  { key: "ai_ml", label: "AI/ML엔지니어", count: 780, keywords: ["ai 엔지니어", "ai engineer", "ml 엔지니어", "ml engineer", "머신러닝 엔지니어"] },
+  { key: "blockchain", label: "블록체인개발자", count: 19, keywords: ["블록체인", "blockchain"] },
+  { key: "cloud", label: "클라우드엔지니어", count: 386, keywords: ["클라우드엔지니어", "클라우드 엔지니어", "cloud engineer"] },
+  { key: "publisher", label: "웹퍼블리셔", count: 143, keywords: ["웹퍼블리셔", "웹 퍼블리셔"] },
+  { key: "consulting", label: "IT컨설팅", count: 424, keywords: ["it컨설팅", "it 컨설팅", "it consultant"] },
+  { key: "qa", label: "QA", count: 401, keywords: ["qa", "품질보증", "테스트엔지니어"] },
+  { key: "ai_research", label: "AI/ML연구원", count: 211, keywords: ["ai 연구", "ml 연구", "머신러닝 연구"] },
+  { key: "data_analyst", label: "데이터분석가", count: 159, keywords: ["데이터분석가", "데이터 분석가", "data analyst"] },
+  { key: "labeler", label: "데이터라벨러", count: 46, keywords: ["데이터라벨", "데이터 라벨"] },
+  { key: "prompt", label: "프롬프트엔지니어", count: 33, keywords: ["프롬프트엔지니어", "프롬프트 엔지니어", "prompt engineer"] },
+  { key: "ai_security", label: "AI보안전문가", count: 65, keywords: ["ai 보안", "인공지능 보안"] },
+  { key: "mlops", label: "MLOps엔지니어", count: 64, keywords: ["mlops"] },
+  { key: "ai_service", label: "AI서비스개발자", count: 401, keywords: ["ai서비스", "ai 서비스", "인공지능 서비스"] },
 ];
 const snapshotNoiseLines = new Set([
   "회원가입/로그인",
@@ -519,6 +550,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [jobs, setJobs] = useState<Job[]>([]);
   const [search, setSearch] = useState("");
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [activeRegion, setActiveRegion] = useState<RegionGroup | null>(null);
+  const [jobCategoryFilters, setJobCategoryFilters] = useState<JobCategoryKey[]>([]);
+  const [includeAlwaysOpen, setIncludeAlwaysOpen] = useState(true);
   const [employmentFilters, setEmploymentFilters] = useState<string[]>([]);
   const [careerFilters, setCareerFilters] = useState<string[]>([]);
   const [matchBasis, setMatchBasis] = useState<MatchBasisKey[]>([]);
@@ -598,6 +632,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     Array.from(new Set([...baseLocationOptions, ...(jobs.map((job) => normalizeLocationOption(job.location)).filter(Boolean) as string[])]))
       .sort((a, b) => a.localeCompare(b, "ko"))
   ), [jobs]);
+  const visibleLocationOptions = useMemo(() => (
+    activeRegion ? locationOptions.filter((location) => location.startsWith(`${activeRegion} `)) : []
+  ), [activeRegion, locationOptions]);
 
   const filteredJobs = useMemo(() => (
     jobs
@@ -610,9 +647,16 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         if (matchBasis.length === 0) return true;
         return getDynamicMatchScore(job, matchBasis) > 0;
       })
+      .filter((job) => includeAlwaysOpen || !isAlwaysOpen(job.deadline))
+      .filter((job) => {
+        if (jobCategoryFilters.length === 0) return true;
+        const text = getSearchableJobText(job);
+        return jobCategoryOptions.some((option) => jobCategoryFilters.includes(option.key)
+          && option.keywords.some((keyword) => text.includes(keyword.toLowerCase())));
+      })
       .filter((job) => careerFilters.length === 0 || getCareerFilterTokens(job.career).some((token) => careerFilters.includes(token)))
       .filter((job) => employmentFilters.length === 0 || getEmploymentFilterTokens(job.employment_type).some((token) => employmentFilters.includes(token)))
-  ), [careerFilters, employmentFilters, jobs, matchBasis, selectedLocations]);
+  ), [careerFilters, employmentFilters, includeAlwaysOpen, jobCategoryFilters, jobs, matchBasis, selectedLocations]);
   const todayKey = toDateKey(new Date());
 
   const activeFilteredJobs = useMemo(() => (
@@ -650,7 +694,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   useEffect(() => {
     setPage(1);
-  }, [careerFilters, employmentFilters, matchBasis, selectedLocations, sortBy, view]);
+  }, [careerFilters, employmentFilters, includeAlwaysOpen, jobCategoryFilters, matchBasis, selectedLocations, sortBy, view]);
 
   const jobsByDeadline = useMemo(() => {
     return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
@@ -730,7 +774,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }
 
   async function changeMemo(job: Job, memo: string) {
-    await api.updateFavorite(job.id, memo, job.favorite_status ?? "planned");
+    await api.updateFavorite(job.id, memo, job.is_disliked ? "excluded" : (job.favorite_status ?? "planned"));
     updateJobState(job.id, (current) => ({ ...current, favorite_memo: memo }));
   }
 
@@ -962,15 +1006,19 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
       <div className="locationPanel" aria-label="지역 다중 선택 필터">
         <div>
-          <span>지역 다중 선택</span>
+          <span>지역 대분류</span>
           <p>{selectedLocations.length ? `${selectedLocations.length}개 지역 선택됨` : "서울·경기·인천의 시/구 단위로 여러 지역을 선택할 수 있어요."}</p>
+          <div className="regionGroups">
+            {regionGroups.map((region) => <button type="button" className={activeRegion === region ? "active" : ""} onClick={() => setActiveRegion(region)} key={region}>{region}</button>)}
+          </div>
           <div className="locationFilterActions">
-            <button type="button" onClick={() => setSelectedLocations(locationOptions)}>전체선택</button>
+            <button type="button" disabled={!activeRegion} onClick={() => setSelectedLocations((previous) => Array.from(new Set([...previous, ...visibleLocationOptions])))}>현재 지역 전체선택</button>
             <button type="button" onClick={() => setSelectedLocations([])}>선택해제</button>
           </div>
         </div>
         <div className="locationChips">
-          {locationOptions.map((location) => (
+          {!activeRegion && <p className="locationPrompt">대분류를 선택하면 하위 시·군·구가 표시됩니다.</p>}
+          {visibleLocationOptions.map((location) => (
             <button
               type="button"
               className={selectedLocations.includes(location) ? "active" : ""}
@@ -983,11 +1031,33 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         </div>
       </div>
 
+      <div className="jobCategoryPanel" aria-label="직무 다중 선택 필터">
+        <div className="categoryHeading">
+          <div><span>직무 대분류</span><strong>AI·개발·데이터</strong></div>
+          <div className="filterActions">
+            <button type="button" onClick={() => setJobCategoryFilters(jobCategoryOptions.map((option) => option.key))}>전체선택</button>
+            <button type="button" onClick={() => setJobCategoryFilters([])}>선택해제</button>
+          </div>
+        </div>
+        <div className="filterChips jobCategoryChips">
+          {jobCategoryOptions.map((option) => (
+            <button type="button" className={jobCategoryFilters.includes(option.key) ? "active" : ""} onClick={() => toggleValue(option.key, setJobCategoryFilters)} key={option.key}>
+              {option.label}<b>{option.count.toLocaleString("ko-KR")}</b>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="filterPanel" aria-label="공고 조건 필터">
         {renderFilterChips("매칭 기준", matchBasis, matchBasisOptions.map((option) => [option.key, option.label]), setMatchBasis)}
         {renderFilterChips("경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
         {renderFilterChips("고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
       </div>
+      <label className="alwaysOpenToggle">
+        <input type="checkbox" checked={includeAlwaysOpen} onChange={(event) => setIncludeAlwaysOpen(event.target.checked)} />
+        <span>상시채용 포함</span>
+        <small>{includeAlwaysOpen ? "상시채용 공고가 보여요." : "상시채용 공고를 제외했어요."}</small>
+      </label>
 
       <div className="explorerControls">
         <div className="viewSwitch" role="tablist" aria-label="공고 보기 방식">
@@ -1061,12 +1131,12 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     {job.matched_keywords.slice(0, 5).map((keyword) => <span key={keyword}>#{keyword}</span>)}
                   </div>
                   <p className="reason">{getDynamicMatchReasons(job, matchBasis)}</p>
-                  {job.is_favorite && (
+                  {(job.is_favorite || job.is_disliked) && (
                     <input
                       className="memoInput"
-                      aria-label="관심공고 메모"
+                      aria-label={job.is_disliked ? "제외 공고 메모" : "관심공고 메모"}
                       defaultValue={job.favorite_memo ?? ""}
-                      placeholder="지원 전 확인할 내용을 메모하세요"
+                      placeholder={job.is_disliked ? "제외한 이유를 메모하세요" : "지원 전 확인할 내용을 메모하세요"}
                       onBlur={(event) => void changeMemo(job, event.target.value)}
                     />
                   )}
@@ -1190,12 +1260,12 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     {job.detail_url && <a href={job.detail_url} target="_blank" rel="noreferrer" onClick={() => markViewed(job.id)}>원문 보기 ↗</a>}
                     <button type="button" onClick={() => void openSnapshot(job)}>저장 스냅샷</button>
                   </div>
-                  {job.is_favorite && (
+                  {(job.is_favorite || job.is_disliked) && (
                     <input
                       className="memoInput calendarMemoInput"
-                      aria-label="달력 모달 관심공고 메모"
+                      aria-label={job.is_disliked ? "달력 모달 제외 공고 메모" : "달력 모달 관심공고 메모"}
                       defaultValue={job.favorite_memo ?? ""}
-                      placeholder="저장한 이유나 지원 전 확인할 내용을 적어두세요"
+                      placeholder={job.is_disliked ? "제외한 이유를 적어두세요" : "저장한 이유나 지원 전 확인할 내용을 적어두세요"}
                       onBlur={(event) => void changeMemo(job, event.target.value)}
                     />
                   )}

@@ -58,6 +58,17 @@ class BackendServiceTests(unittest.TestCase):
         self.assertTrue(visible[0]["is_disliked"])
         self.assertEqual(list_jobs(favorite_only=True), [])
 
+    def test_excluded_job_memo_can_be_updated(self):
+        job_id = list_jobs()[0]["id"]
+        save_favorite(job_id, "", "excluded")
+
+        updated = update_favorite(job_id, memo="직무 범위가 맞지 않음")
+
+        self.assertTrue(updated["is_disliked"])
+        self.assertFalse(updated["is_favorite"])
+        self.assertEqual(updated["favorite_status"], "excluded")
+        self.assertEqual(updated["favorite_memo"], "직무 범위가 맞지 않음")
+
     def test_dashboard_excludes_jobs_outside_allowed_locations(self):
         with get_connection(self.db_path) as conn:
             conn.execute(

@@ -257,8 +257,8 @@ export const api = {
       const stableKey = await getDemoStableKey(jobId);
       updateDemoInteraction(stableKey, (current) => ({
         ...current,
-        isFavorite: true,
-        isDisliked: false,
+        isFavorite: status !== "excluded",
+        isDisliked: status === "excluded",
         memo,
         status,
       }));
