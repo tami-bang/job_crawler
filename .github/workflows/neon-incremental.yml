@@ -57,9 +57,9 @@ jobs:
         run: python scripts/neon_incremental_crawl.py "${{ inputs.command || 'crawl-and-export' }}"
 
       - name: 정적 JSON 저장소 반영
-        if: success() && (github.event_name == 'schedule' || inputs.command == 'crawl-and-export')
+        if: success() && (github.event_name == 'schedule' || inputs.command != 'crawl')
         run: |
-          if git diff --quiet -- frontend/public/static_jobs.json; then
+          if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json)" ]; then
             echo "정적 공고 변경 없음"
             exit 0
           fi
