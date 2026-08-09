@@ -3,6 +3,7 @@ import hashlib
 import json
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from bs4 import BeautifulSoup
 
@@ -89,6 +90,7 @@ def collect_jobkorea_details(
     fetch_func,
     limit=10,
     delay_seconds=1.0,
+    max_workers=1,
     db_path=DEFAULT_DB_PATH,
     allowed_location_prefixes=DEFAULT_DETAIL_LOCATION_PREFIXES,
 ):
@@ -100,6 +102,7 @@ def collect_jobkorea_details(
             {
                 "limit": limit,
                 "delay_seconds": delay_seconds,
+                "max_workers": max_workers,
             },
             ensure_ascii=False,
         ),
@@ -121,31 +124,51 @@ def collect_jobkorea_details(
         )
         result["target"] = len(targets)
 
-        for index, job in enumerate(targets):
-            if index > 0 and delay_seconds > 0:
-                time.sleep(delay_seconds)
-
+        def fetch_detail(job):
             detail_url = job["detail_url"]
             if not detail_url:
-                result["skipped"] += 1
-                continue
+                return job, None, None, None
 
             try:
                 html = fetch_func(detail_url, dynamic=False)
                 if not html:
                     raise RuntimeError("empty detail HTML")
-
                 parsed = parse_job_detail(html)
-                with get_connection(db_path) as conn:
-                    save_raw_detail_page(conn, crawl_run_id, detail_url, html)
-                    update_job_detail(conn, job["id"], parsed)
-
-                result["success"] += 1
-                print(f"[INFO] Detail saved: job_posting_id={job['id']} url={detail_url}")
+                return job, html, parsed, None
             except Exception as exc:
-                result["failed"] += 1
-                mark_detail_failed(job["id"], str(exc), db_path=db_path)
-                print(f"[ERROR] Detail failed: job_posting_id={job['id']} url={detail_url} reason={exc}")
+                return job, None, None, exc
+
+        worker_count = max(1, int(max_workers or 1))
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            futures = []
+            for index, job in enumerate(targets):
+                if index > 0 and delay_seconds > 0:
+                    time.sleep(delay_seconds / worker_count)
+                futures.append(executor.submit(fetch_detail, job))
+
+            for future in futures:
+                job, html, parsed, error = future.result()
+                detail_url = job["detail_url"]
+                if not detail_url:
+                    result["skipped"] += 1
+                    continue
+                if error is not None:
+                    result["failed"] += 1
+                    mark_detail_failed(job["id"], str(error), db_path=db_path)
+                    print(f"[ERROR] Detail failed: job_posting_id={job['id']} url={detail_url} reason={error}")
+                    continue
+
+                try:
+                    with get_connection(db_path) as conn:
+                        save_raw_detail_page(conn, crawl_run_id, detail_url, html)
+                        update_job_detail(conn, job["id"], parsed)
+
+                    result["success"] += 1
+                    print(f"[INFO] Detail saved: job_posting_id={job['id']} url={detail_url}")
+                except Exception as exc:
+                    result["failed"] += 1
+                    mark_detail_failed(job["id"], str(exc), db_path=db_path)
+                    print(f"[ERROR] Detail save failed: job_posting_id={job['id']} url={detail_url} reason={exc}")
 
         finish_crawl_run(crawl_run_id, status="success", db_path=db_path)
         result["crawl_run_id"] = crawl_run_id

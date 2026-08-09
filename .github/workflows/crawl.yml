@@ -38,7 +38,7 @@ jobs:
   crawl:
     name: 수집·분석·리포트 생성
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
 
     steps:
       - name: 저장소 내려받기
@@ -75,6 +75,7 @@ jobs:
             --keyword-batch-size "$KEYWORD_BATCH_SIZE" \
             --pages "$PAGES" \
             --detail-limit "$DETAIL_LIMIT" \
+            --detail-workers 5 \
             --report-top-n "$REPORT_TOP_N" \
             --keyword-delay 2
 

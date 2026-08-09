@@ -308,6 +308,7 @@ def run_jobkorea_multi_pipeline(sites, options=None):
     if options:
         pages = options.pages
         detail_limit = options.detail_limit
+        detail_workers = options.detail_workers
         report_limit = options.report_top_n
         delay_seconds = options.keyword_delay
         keyword_batch_size = options.keyword_batch_size
@@ -321,6 +322,7 @@ def run_jobkorea_multi_pipeline(sites, options=None):
 
         pages = int(pages_str) if pages_str.isdigit() else 3
         detail_limit = int(detail_limit_str) if detail_limit_str.isdigit() else 10
+        detail_workers = 1
         report_limit = int(report_limit_str) if report_limit_str.isdigit() else None
         delay_seconds = float(delay_str) if is_number(delay_str) else 1.0
         keyword_batch_size = len(search_keywords)
@@ -405,7 +407,7 @@ def run_jobkorea_multi_pipeline(sites, options=None):
 
     print("[MULTI PIPELINE] Step 2/4: detail collection")
     try:
-        detail_result = collect_jobkorea_details(fetch, limit=detail_limit)
+        detail_result = collect_jobkorea_details(fetch, limit=detail_limit, max_workers=detail_workers)
         summary["detail"] = {
             "status": "success",
             **detail_result,
@@ -714,6 +716,7 @@ def parse_args():
     parser.add_argument("--keyword-batch-size", type=int, default=10)
     parser.add_argument("--keyword-offset", type=int, default=0)
     parser.add_argument("--detail-limit", type=int, default=100)
+    parser.add_argument("--detail-workers", type=int, default=1)
     parser.add_argument("--report-top-n", type=int, default=None)
     parser.add_argument("--keyword-delay", type=float, default=2.0)
     parser.add_argument("--skip-existing", action="store_true")
