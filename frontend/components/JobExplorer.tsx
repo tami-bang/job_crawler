@@ -552,8 +552,8 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [activeRegion, setActiveRegion] = useState<RegionGroup | null>(null);
   const [jobCategoryFilters, setJobCategoryFilters] = useState<JobCategoryKey[]>([]);
-  const [includeAlwaysOpen, setIncludeAlwaysOpen] = useState(true);
   const [expandedFilters, setExpandedFilters] = useState<Set<string>>(() => new Set());
+  const [overflowingFilters, setOverflowingFilters] = useState<Set<string>>(() => new Set());
   const [employmentFilters, setEmploymentFilters] = useState<string[]>([]);
   const [careerFilters, setCareerFilters] = useState<string[]>([]);
   const [matchBasis, setMatchBasis] = useState<MatchBasisKey[]>([]);
@@ -624,7 +624,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }, [calendarModalDate, noticeModal, showEmailModal, snapshotModal]);
 
   const employmentOptions = useMemo(() => (
-    uniqueSorted(jobs.flatMap((job) => getEmploymentFilterTokens(job.employment_type)))
+    [...uniqueSorted(jobs.flatMap((job) => getEmploymentFilterTokens(job.employment_type))), "상시채용"]
   ), [jobs]);
   const careerOptions = useMemo(() => (
     uniqueSorted(jobs.flatMap((job) => getCareerFilterTokens(job.career)), compareCareerFilterTokens)
@@ -648,7 +648,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         if (matchBasis.length === 0) return true;
         return getDynamicMatchScore(job, matchBasis) > 0;
       })
-      .filter((job) => includeAlwaysOpen || !isAlwaysOpen(job.deadline))
       .filter((job) => {
         if (jobCategoryFilters.length === 0) return true;
         const text = getSearchableJobText(job);
@@ -656,8 +655,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
           && option.keywords.some((keyword) => text.includes(keyword.toLowerCase())));
       })
       .filter((job) => careerFilters.length === 0 || getCareerFilterTokens(job.career).some((token) => careerFilters.includes(token)))
-      .filter((job) => employmentFilters.length === 0 || getEmploymentFilterTokens(job.employment_type).some((token) => employmentFilters.includes(token)))
-  ), [careerFilters, employmentFilters, includeAlwaysOpen, jobCategoryFilters, jobs, matchBasis, selectedLocations]);
+      .filter((job) => employmentFilters.length === 0
+        || (employmentFilters.includes("상시채용") && isAlwaysOpen(job.deadline))
+        || getEmploymentFilterTokens(job.employment_type).some((token) => employmentFilters.includes(token)))
+  ), [careerFilters, employmentFilters, jobCategoryFilters, jobs, matchBasis, selectedLocations]);
   const todayKey = toDateKey(new Date());
 
   const activeFilteredJobs = useMemo(() => (
@@ -695,7 +696,31 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   useEffect(() => {
     setPage(1);
-  }, [careerFilters, employmentFilters, includeAlwaysOpen, jobCategoryFilters, matchBasis, selectedLocations, sortBy, view]);
+  }, [careerFilters, employmentFilters, jobCategoryFilters, matchBasis, selectedLocations, sortBy, view]);
+
+  useEffect(() => {
+    const measureOverflow = () => {
+      const next = new Set<string>();
+      document.querySelectorAll<HTMLElement>("[data-selection-key]").forEach((element) => {
+        const key = element.dataset.selectionKey;
+        if (!key) return;
+        if (expandedFilters.has(key) || element.scrollHeight > element.clientHeight + 1) next.add(key);
+      });
+      setOverflowingFilters((previous) => (
+        previous.size === next.size && [...previous].every((key) => next.has(key)) ? previous : next
+      ));
+    };
+
+    const frame = window.requestAnimationFrame(measureOverflow);
+    const observer = new ResizeObserver(measureOverflow);
+    document.querySelectorAll<HTMLElement>("[data-selection-key]").forEach((element) => observer.observe(element));
+    window.addEventListener("resize", measureOverflow);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", measureOverflow);
+    };
+  }, [activeRegion, careerOptions, employmentOptions, expandedFilters]);
 
   const jobsByDeadline = useMemo(() => {
     return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
@@ -943,7 +968,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <button type="button" onClick={() => setter(() => [])}>선택해제</button>
           </div>
         </div>
-        <div className={`filterChips selectionBox ${isExpanded ? "expanded" : "collapsed"}`}>
+        <div className={`filterChips selectionBox ${isExpanded ? "expanded" : "collapsed"}`} data-selection-key={filterKey}>
           {entries.map(([value, text]) => (
             <button
               type="button"
@@ -955,7 +980,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             </button>
           ))}
         </div>
-        {entries.length > 8 && (
+        {(overflowingFilters.has(filterKey) || isExpanded) && (
           <button className="expandFilterButton" type="button" aria-expanded={isExpanded} onClick={() => toggleFilterExpanded(filterKey)}>
             {isExpanded ? "접기 ↑" : `더보기 (${entries.length}) ↓`}
           </button>
@@ -1034,7 +1059,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
           </div>
         </div>
         <div className="selectionArea">
-          <div className={`locationChips selectionBox ${expandedFilters.has("location") ? "expanded" : "collapsed"}`}>
+          <div className={`locationChips selectionBox ${expandedFilters.has("location") ? "expanded" : "collapsed"}`} data-selection-key="location">
             {!activeRegion && <p className="locationPrompt">대분류를 선택하면 하위 시·군·구가 표시됩니다.</p>}
             {visibleLocationOptions.map((location) => (
               <button
@@ -1047,7 +1072,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
               </button>
             ))}
           </div>
-          {visibleLocationOptions.length > 8 && (
+          {(overflowingFilters.has("location") || expandedFilters.has("location")) && (
             <button className="expandFilterButton" type="button" aria-expanded={expandedFilters.has("location")} onClick={() => toggleFilterExpanded("location")}>
               {expandedFilters.has("location") ? "접기 ↑" : `더보기 (${visibleLocationOptions.length}) ↓`}
             </button>
@@ -1063,16 +1088,18 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <button type="button" onClick={() => setJobCategoryFilters([])}>선택해제</button>
           </div>
         </div>
-        <div className={`filterChips jobCategoryChips selectionBox ${expandedFilters.has("job-category") ? "expanded" : "collapsed"}`}>
+        <div className={`filterChips jobCategoryChips selectionBox ${expandedFilters.has("job-category") ? "expanded" : "collapsed"}`} data-selection-key="job-category">
           {jobCategoryOptions.map((option) => (
             <button type="button" className={jobCategoryFilters.includes(option.key) ? "active" : ""} onClick={() => toggleValue(option.key, setJobCategoryFilters)} key={option.key}>
               {option.label}<b>{option.count.toLocaleString("ko-KR")}</b>
             </button>
           ))}
         </div>
-        <button className="expandFilterButton" type="button" aria-expanded={expandedFilters.has("job-category")} onClick={() => toggleFilterExpanded("job-category")}>
-          {expandedFilters.has("job-category") ? "접기 ↑" : `더보기 (${jobCategoryOptions.length}) ↓`}
-        </button>
+        {(overflowingFilters.has("job-category") || expandedFilters.has("job-category")) && (
+          <button className="expandFilterButton" type="button" aria-expanded={expandedFilters.has("job-category")} onClick={() => toggleFilterExpanded("job-category")}>
+            {expandedFilters.has("job-category") ? "접기 ↑" : `더보기 (${jobCategoryOptions.length}) ↓`}
+          </button>
+        )}
       </div>
 
       <div className="filterPanel" aria-label="공고 조건 필터">
@@ -1080,12 +1107,6 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         {renderFilterChips("career", "경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
         {renderFilterChips("employment", "고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
       </div>
-      <label className="alwaysOpenToggle">
-        <input type="checkbox" checked={includeAlwaysOpen} onChange={(event) => setIncludeAlwaysOpen(event.target.checked)} />
-        <span>상시채용 포함</span>
-        <small>{includeAlwaysOpen ? "상시채용 공고가 보여요." : "상시채용 공고를 제외했어요."}</small>
-      </label>
-
       <div className="explorerControls">
         <div className="viewSwitch" role="tablist" aria-label="공고 보기 방식">
           <button className={view === "list" ? "active" : ""} onClick={() => setView("list")}>리스트</button>
