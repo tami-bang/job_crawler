@@ -412,16 +412,33 @@ def export_static_json(database_url: str, output: str) -> int:
     with psycopg.connect(database_url) as conn, conn.cursor() as cur:
         cur.execute(
             """
-            SELECT id, source, source_job_id, stable_key, title, company_name, source_posted_at, raw_list_json
-            FROM job_postings WHERE status = 'ACTIVE' ORDER BY source_posted_at DESC
+            SELECT id, source, source_job_id, stable_key, title, company_name, source_posted_at,
+                   detail_url, location, career, employment_type, deadline, deadline_date,
+                   raw_detail_text, skill_candidates, detail_status, match_score,
+                   recommendation_level, matched_keywords_json, positive_reasons_json,
+                   negative_reasons_json
+            FROM job_postings
+            WHERE status = 'ACTIVE' AND detail_status = 'success'
+            ORDER BY match_score DESC, source_posted_at DESC, id DESC
             """
         )
         rows = cur.fetchall()
-    data = [{
-        "id": row[0], "source": row[1], "source_job_id": row[2], "stable_key": row[3],
-        "title": row[4], "company_name": row[5], "posted_at": row[6].isoformat(),
-        "raw": json.loads(row[7]) if row[7] else {},
-    } for row in rows]
+    data = []
+    for row in rows:
+        data.append({
+            "id": row[0], "source": row[1], "source_job_id": row[2], "stable_key": row[3],
+            "title": row[4], "company_name": row[5], "posted_date": row[6].isoformat(),
+            "detail_url": row[7], "location": row[8], "career": row[9],
+            "employment_type": row[10], "deadline": row[11] or "마감 미정",
+            "deadline_date": row[12], "raw_detail_text": row[13], "skill_candidates": row[14] or "",
+            "detail_status": row[15], "reopen_count": 0, "match_score": row[16] or 0,
+            "recommendation_level": row[17],
+            "matched_keywords": json.loads(row[18] or "[]"),
+            "positive_reasons": json.loads(row[19] or "[]"),
+            "negative_reasons": json.loads(row[20] or "[]"),
+            "is_favorite": False, "is_disliked": False,
+            "favorite_memo": None, "favorite_status": None,
+        })
     output_path = Path(output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
