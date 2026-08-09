@@ -553,6 +553,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [activeRegion, setActiveRegion] = useState<RegionGroup | null>(null);
   const [jobCategoryFilters, setJobCategoryFilters] = useState<JobCategoryKey[]>([]);
   const [includeAlwaysOpen, setIncludeAlwaysOpen] = useState(true);
+  const [expandedFilters, setExpandedFilters] = useState<Set<string>>(() => new Set());
   const [employmentFilters, setEmploymentFilters] = useState<string[]>([]);
   const [careerFilters, setCareerFilters] = useState<string[]>([]);
   const [matchBasis, setMatchBasis] = useState<MatchBasisKey[]>([]);
@@ -916,12 +917,23 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     ));
   }
 
+  function toggleFilterExpanded(filterKey: string) {
+    setExpandedFilters((previous) => {
+      const next = new Set(previous);
+      if (next.has(filterKey)) next.delete(filterKey);
+      else next.add(filterKey);
+      return next;
+    });
+  }
+
   function renderFilterChips<T extends string>(
+    filterKey: string,
     label: string,
     selected: T[],
     entries: Array<[T, string]>,
     setter: (update: (previous: T[]) => T[]) => void,
   ) {
+    const isExpanded = expandedFilters.has(filterKey);
     return (
       <div className="filterGroup">
         <div>
@@ -931,7 +943,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <button type="button" onClick={() => setter(() => [])}>선택해제</button>
           </div>
         </div>
-        <div className="filterChips">
+        <div className={`filterChips selectionBox ${isExpanded ? "expanded" : "collapsed"}`}>
           {entries.map(([value, text]) => (
             <button
               type="button"
@@ -943,6 +955,11 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             </button>
           ))}
         </div>
+        {entries.length > 8 && (
+          <button className="expandFilterButton" type="button" aria-expanded={isExpanded} onClick={() => toggleFilterExpanded(filterKey)}>
+            {isExpanded ? "접기 ↑" : `더보기 (${entries.length}) ↓`}
+          </button>
+        )}
       </div>
     );
   }
@@ -1016,18 +1033,25 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <button type="button" onClick={() => setSelectedLocations([])}>선택해제</button>
           </div>
         </div>
-        <div className="locationChips">
-          {!activeRegion && <p className="locationPrompt">대분류를 선택하면 하위 시·군·구가 표시됩니다.</p>}
-          {visibleLocationOptions.map((location) => (
-            <button
-              type="button"
-              className={selectedLocations.includes(location) ? "active" : ""}
-              onClick={() => toggleLocationFilter(location)}
-              key={location}
-            >
-              {location}
+        <div className="selectionArea">
+          <div className={`locationChips selectionBox ${expandedFilters.has("location") ? "expanded" : "collapsed"}`}>
+            {!activeRegion && <p className="locationPrompt">대분류를 선택하면 하위 시·군·구가 표시됩니다.</p>}
+            {visibleLocationOptions.map((location) => (
+              <button
+                type="button"
+                className={selectedLocations.includes(location) ? "active" : ""}
+                onClick={() => toggleLocationFilter(location)}
+                key={location}
+              >
+                {location}
+              </button>
+            ))}
+          </div>
+          {visibleLocationOptions.length > 8 && (
+            <button className="expandFilterButton" type="button" aria-expanded={expandedFilters.has("location")} onClick={() => toggleFilterExpanded("location")}>
+              {expandedFilters.has("location") ? "접기 ↑" : `더보기 (${visibleLocationOptions.length}) ↓`}
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -1039,19 +1063,22 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <button type="button" onClick={() => setJobCategoryFilters([])}>선택해제</button>
           </div>
         </div>
-        <div className="filterChips jobCategoryChips">
+        <div className={`filterChips jobCategoryChips selectionBox ${expandedFilters.has("job-category") ? "expanded" : "collapsed"}`}>
           {jobCategoryOptions.map((option) => (
             <button type="button" className={jobCategoryFilters.includes(option.key) ? "active" : ""} onClick={() => toggleValue(option.key, setJobCategoryFilters)} key={option.key}>
               {option.label}<b>{option.count.toLocaleString("ko-KR")}</b>
             </button>
           ))}
         </div>
+        <button className="expandFilterButton" type="button" aria-expanded={expandedFilters.has("job-category")} onClick={() => toggleFilterExpanded("job-category")}>
+          {expandedFilters.has("job-category") ? "접기 ↑" : `더보기 (${jobCategoryOptions.length}) ↓`}
+        </button>
       </div>
 
       <div className="filterPanel" aria-label="공고 조건 필터">
-        {renderFilterChips("매칭 기준", matchBasis, matchBasisOptions.map((option) => [option.key, option.label]), setMatchBasis)}
-        {renderFilterChips("경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
-        {renderFilterChips("고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
+        {renderFilterChips("match-basis", "매칭 기준", matchBasis, matchBasisOptions.map((option) => [option.key, option.label]), setMatchBasis)}
+        {renderFilterChips("career", "경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
+        {renderFilterChips("employment", "고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
       </div>
       <label className="alwaysOpenToggle">
         <input type="checkbox" checked={includeAlwaysOpen} onChange={(event) => setIncludeAlwaysOpen(event.target.checked)} />
