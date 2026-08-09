@@ -1,6 +1,6 @@
 import type { Job } from "./api";
 
-// data/job_radar.db에서 생성한 실제 JobKorea 수집 결과 스냅샷입니다.
+// /tmp/job-crawler-partial-31304307748/data/job_radar.db에서 생성한 실제 JobKorea 수집 결과 스냅샷입니다.
 // 공개 GitHub Pages 정적 데모에서 서버 없이 보여주기 위해 DB를 TypeScript 데이터로 변환했습니다.
 export const demoJobs: Job[] = [
   {
