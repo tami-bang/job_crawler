@@ -11,12 +11,18 @@ from typing import Any, Optional
 
 import httpx
 import psycopg
+from bs4 import BeautifulSoup
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 
 KST = timezone(timedelta(hours=9))
-API_URL = "https://www.jobkorea.co.kr/Search/api/display/v2/jobs"
+API_URL = "https://www.jobkorea.co.kr/Recruit/Home/_GI_List/"
 DEFAULT_PARTITION = "main_jobkorea"
+DEVELOPER_DUTY_CODES = (
+    "1000229,1000230,1000231,1000232,1000233,1000234,1000236,1000237,"
+    "1000423,1000422,1000421,1000420,1000419,1000418,1000417,1000247,"
+    "1000246,1000245,1000244,1000242"
+)
 
 
 class ApplicationPeriod(BaseModel):
@@ -97,6 +103,71 @@ def extract_items(payload: Any) -> list[dict[str, Any]]:
     raise ValueError("job list not found in API response")
 
 
+def parse_relative_posted_at(text: str, now: Optional[datetime] = None) -> datetime:
+    now = (now or datetime.now(KST)).astimezone(KST)
+    normalized = " ".join(text.split())
+    if "오늘" in normalized or "방금" in normalized:
+        return now.replace(hour=0, minute=0, second=0, microsecond=0)
+    import re
+    match = re.search(r"(\d+)\s*일\s*전", normalized)
+    if match:
+        return (now - timedelta(days=int(match.group(1)))).replace(hour=0, minute=0, second=0, microsecond=0)
+    match = re.search(r"(\d+)\s*시간\s*전", normalized)
+    if match:
+        return now - timedelta(hours=int(match.group(1)))
+    match = re.search(r"(\d{1,2})/(\d{1,2})", normalized)
+    if match:
+        month, day = map(int, match.groups())
+        year = now.year - (1 if month > now.month + 6 else 0)
+        return datetime(year, month, day, tzinfo=KST)
+    raise ValueError(f"unsupported posted date: {text!r}")
+
+
+def parse_deadline(text: str, now: Optional[datetime] = None) -> Optional[datetime]:
+    import re
+    now = (now or datetime.now(KST)).astimezone(KST)
+    match = re.search(r"(\d{1,2})/(\d{1,2})", text)
+    if not match:
+        return None
+    month, day = map(int, match.groups())
+    year = now.year + (1 if month < now.month - 6 else 0)
+    return datetime(year, month, day, 23, 59, 59, tzinfo=KST)
+
+
+def parse_job_list_html(html: str, now: Optional[datetime] = None) -> list[dict[str, Any]]:
+    soup = BeautifulSoup(html, "html.parser")
+    items = []
+    for row in soup.select("tr.devloopArea[data-gno]"):
+        source_job_id = (row.get("data-gno") or "").strip()
+        title_link = row.select_one("td.tplTit strong a[href*='/Recruit/GI_Read/']")
+        company_link = row.select_one("td.tplCo > a.link")
+        posted_node = row.select_one("td.odd .time")
+        if not source_job_id or not title_link or not company_link or not posted_node:
+            continue
+        cells = [node.get_text(" ", strip=True) for node in row.select("td.tplTit p.etc span.cell")]
+        deadline_text = row.select_one("td.odd .date")
+        detail_path = title_link.get("href", "")
+        item = {
+            "id": source_job_id,
+            "title": title_link.get("title") or title_link.get_text(" ", strip=True),
+            "companyName": company_link.get_text(" ", strip=True),
+            "createdAt": parse_relative_posted_at(posted_node.get_text(" ", strip=True), now),
+            "applicationPeriod": {
+                "end": parse_deadline(deadline_text.get_text(" ", strip=True), now) if deadline_text else None,
+            },
+            "careerRange": cells[0] if len(cells) > 0 else None,
+            "education": cells[1] if len(cells) > 1 else None,
+            "areaCodeList": [cells[2]] if len(cells) > 2 and cells[2] else [],
+            "employmentTypeCodeList": [cells[3]] if len(cells) > 3 and cells[3] else [],
+            "jobClassificationOrIndustry": (row.select_one("td.tplTit p.dsc") or row).get_text(" ", strip=True),
+            "detailUrl": f"https://www.jobkorea.co.kr{detail_path}" if detail_path.startswith("/") else detail_path,
+            "postedText": posted_node.get_text(" ", strip=True),
+            "deadlineText": deadline_text.get_text(" ", strip=True) if deadline_text else "",
+        }
+        items.append(item)
+    return items
+
+
 def load_request_payload() -> dict[str, Any]:
     raw = os.environ.get("JOBKOREA_REQUEST_PAYLOAD_JSON")
     if raw:
@@ -104,7 +175,19 @@ def load_request_payload() -> dict[str, Any]:
         if not isinstance(payload, dict):
             raise ValueError("JOBKOREA_REQUEST_PAYLOAD_JSON must be an object")
         return payload
-    return {"pageSize": 20, "page": 0, "sortProperty": "2", "sortDirection": "DESC", "deviceType": "PC"}
+    return {
+        "isDefault": "true",
+        "condition[duty]": DEVELOPER_DUTY_CODES,
+        "condition[menucode]": "",
+        "page": "1",
+        "direct": "0",
+        "order": "20",
+        "pagesize": "40",
+        "tabindex": "0",
+        "onePick": "0",
+        "confirm": "0",
+        "profile": "0",
+    }
 
 
 def upsert_job(cur, item: JobListItem, raw_item: dict[str, Any]) -> tuple[str, int]:
@@ -164,9 +247,10 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
     completed_page = 0
     consecutive_old_unchanged = 0
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36",
-        "Content-Type": "application/json",
-        "Referer": "https://www.jobkorea.co.kr/Search/",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Referer": "https://www.jobkorea.co.kr/recruit/joblist?menucode=duty",
+        "X-Requested-With": "XMLHttpRequest",
     }
 
     with psycopg.connect(database_url) as conn:
@@ -184,23 +268,38 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
             )
             previous_watermark = cur.fetchone()[0]
             conn.commit()
-        watermark = (previous_watermark or datetime.now(KST) - timedelta(days=30)) - timedelta(days=3)
+        watermark = previous_watermark - timedelta(days=3) if previous_watermark else None
 
         try:
             async with httpx.AsyncClient(headers=headers, timeout=20, follow_redirects=True) as client:
-                for page in range(100):
-                    payload = {**base_payload, "page": page}
-                    response = await client.post(API_URL, json=payload)
+                previous_page_ids = None
+                max_pages = int(os.environ.get("JOBKOREA_MAX_PAGES", "500"))
+                request_delay = float(os.environ.get("JOBKOREA_REQUEST_DELAY", "0.8"))
+                for page in range(1, max_pages + 1):
+                    payload = {**base_payload, "page": str(page)}
+                    for attempt in range(5):
+                        response = await client.post(API_URL, data=payload)
+                        if response.status_code not in (429, 500, 502, 503, 504):
+                            break
+                        if attempt == 4:
+                            response.raise_for_status()
+                        await asyncio.sleep((2 ** attempt) + (page % 7) / 10)
                     response.raise_for_status()
-                    raw_items = extract_items(response.json())
+                    raw_items = parse_job_list_html(response.text)
                     if not raw_items:
+                        if page == 1:
+                            raise RuntimeError("first page contained no recognizable job rows")
                         break
+                    page_ids = tuple(item["id"] for item in raw_items)
+                    if page_ids == previous_page_ids:
+                        raise RuntimeError(f"pagination did not advance on page {page}")
+                    previous_page_ids = page_ids
                     try:
                         items = [JobListItem.model_validate(raw) for raw in raw_items]
                     except ValidationError as exc:
                         Path("data/quarantine").mkdir(parents=True, exist_ok=True)
-                        Path(f"data/quarantine/{partition_key}-page-{page}.json").write_text(
-                            json.dumps(response.json(), ensure_ascii=False, indent=2), encoding="utf-8"
+                        Path(f"data/quarantine/{partition_key}-page-{page}.html").write_text(
+                            response.text, encoding="utf-8"
                         )
                         raise RuntimeError(f"schema validation failed on page {page}: {exc}") from exc
 
@@ -218,10 +317,11 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                         stats["pages"] += 1
                     conn.commit()
 
-                    page_is_old = max(item.created_at for item in items) < watermark
+                    page_is_old = watermark is not None and max(item.created_at for item in items) < watermark
                     consecutive_old_unchanged = consecutive_old_unchanged + 1 if page_is_old and changes == 0 else 0
                     if consecutive_old_unchanged >= 3:
                         break
+                    await asyncio.sleep(request_delay)
         except Exception:
             conn.rollback()
             with conn.cursor() as cur:
