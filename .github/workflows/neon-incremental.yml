@@ -1,6 +1,9 @@
 name: Neon 증분 수집 검증
 
 on:
+  schedule:
+    # 매일 한국시간 오전 9시 (UTC 00:00)
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       command:
@@ -22,7 +25,7 @@ on:
         default: "1"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: neon-jobkorea-incremental
@@ -50,8 +53,21 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JOBKOREA_REQUEST_PAYLOAD_JSON: ${{ inputs.request_payload_json }}
-          JOBKOREA_START_PAGE: ${{ inputs.start_page }}
-        run: python scripts/neon_incremental_crawl.py "${{ inputs.command }}"
+          JOBKOREA_START_PAGE: ${{ inputs.start_page || '1' }}
+        run: python scripts/neon_incremental_crawl.py "${{ inputs.command || 'crawl-and-export' }}"
+
+      - name: 정적 JSON 저장소 반영
+        if: success() && (github.event_name == 'schedule' || inputs.command == 'crawl-and-export')
+        run: |
+          if git diff --quiet -- frontend/public/static_jobs.json; then
+            echo "정적 공고 변경 없음"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/static_jobs.json
+          git commit -m "chore: refresh Neon JobKorea snapshot"
+          git push
 
       - name: 결과 업로드
         if: always()
