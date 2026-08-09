@@ -10,6 +10,18 @@ if not database_url:
     raise SystemExit("DATABASE_URL is required")
 
 with psycopg.connect(database_url) as conn, conn.cursor() as cur:
+    reset_count = 0
+    if os.environ.get("RESET_PROCESSING") == "true":
+        cur.execute(
+            """
+            UPDATE detail_fetch_queue
+            SET status='QUEUED', lease_until=NULL, next_attempt_at=NOW(),
+                last_error='운영자 리셋: 정체 실행 취소', updated_at=NOW()
+            WHERE status='PROCESSING'
+            """
+        )
+        reset_count = cur.rowcount
+        conn.commit()
     cur.execute(
         """
         SELECT
@@ -28,6 +40,7 @@ with psycopg.connect(database_url) as conn, conn.cursor() as cur:
 
 print(json.dumps({
     "measured_at": datetime.now(timezone.utc).isoformat(),
+    "reset_count": reset_count,
     "total": row[0], "success": row[1], "processing": row[2],
     "queued": row[3], "failed": row[4], "detail_success": row[5],
     "oldest_queue_at": row[6].isoformat() if row[6] else None,

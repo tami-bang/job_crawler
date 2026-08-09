@@ -19,6 +19,13 @@ from crawler.matcher import analyze_job, job_passes_hard_filters, load_preferenc
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
     "Referer": "https://www.jobkorea.co.kr/recruit/joblist?menucode=duty",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.7,en;q=0.6",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "same-origin",
 }
 
 
@@ -67,22 +74,27 @@ def claim_jobs(conn, limit):
     return rows
 
 
-def fetch_detail(row):
+def fetch_detail(row, client):
     posting_id, source_job_id, title, company_name, raw_list_json = row
     url = f"https://www.jobkorea.co.kr/Recruit/GI_Read/{source_job_id}"
     last_error = None
-    for attempt in range(3):
+    for attempt in range(2):
         try:
-            with httpx.Client(headers=HEADERS, timeout=25, follow_redirects=True) as client:
-                response = client.get(url)
-                response.raise_for_status()
-                parsed = parse_job_detail(response.text)
-                if not parsed.get("raw_detail_text"):
-                    raise RuntimeError("empty parsed detail")
-                return row, url, parsed, None
+            time.sleep(random.uniform(0.35, 0.9))
+            response = client.get(url)
+            response.raise_for_status()
+            parsed = parse_job_detail(response.text)
+            if not parsed.get("raw_detail_text"):
+                raise RuntimeError("empty parsed detail")
+            return row, url, parsed, None
         except Exception as exc:
             last_error = exc
-            time.sleep((2 ** attempt) + random.random())
+            retryable = isinstance(exc, (httpx.TimeoutException, httpx.TransportError))
+            if isinstance(exc, httpx.HTTPStatusError):
+                retryable = exc.response.status_code in (429, 500, 502, 503, 504)
+            if not retryable or attempt == 1:
+                break
+            time.sleep(1.0 + random.uniform(0.5, 1.5))
     return row, url, None, last_error
 
 
@@ -156,35 +168,39 @@ def save_failure(conn, posting_id, error):
     conn.commit()
 
 
-def run(database_url, batch_size=200, workers=4, max_jobs=0):
+def run(database_url, batch_size=20, workers=2, max_jobs=0):
     preferences = load_preferences()
     stats = {"claimed": 0, "success": 0, "failed": 0}
     with psycopg.connect(database_url) as conn:
         ensure_schema(conn)
-        while max_jobs <= 0 or stats["claimed"] < max_jobs:
-            size = min(batch_size, max_jobs - stats["claimed"]) if max_jobs > 0 else batch_size
-            rows = claim_jobs(conn, size)
-            if not rows:
-                break
-            stats["claimed"] += len(rows)
-            with ThreadPoolExecutor(max_workers=workers) as executor:
-                futures = [executor.submit(fetch_detail, row) for row in rows]
-                for future in as_completed(futures):
-                    row, url, parsed, error = future.result()
-                    if error:
-                        save_failure(conn, row[0], error)
-                        stats["failed"] += 1
-                    else:
-                        save_success(conn, row, url, parsed, preferences)
-                        stats["success"] += 1
-            print(json.dumps(stats, ensure_ascii=False), flush=True)
+        timeout = httpx.Timeout(connect=5.0, read=10.0, write=5.0, pool=5.0)
+        limits = httpx.Limits(max_connections=workers, max_keepalive_connections=workers)
+        with httpx.Client(headers=HEADERS, timeout=timeout, limits=limits, follow_redirects=True) as client:
+            client.get("https://www.jobkorea.co.kr/recruit/joblist?menucode=duty")
+            while max_jobs <= 0 or stats["claimed"] < max_jobs:
+                size = min(batch_size, max_jobs - stats["claimed"]) if max_jobs > 0 else batch_size
+                rows = claim_jobs(conn, size)
+                if not rows:
+                    break
+                stats["claimed"] += len(rows)
+                with ThreadPoolExecutor(max_workers=workers) as executor:
+                    futures = [executor.submit(fetch_detail, row, client) for row in rows]
+                    for future in as_completed(futures):
+                        row, url, parsed, error = future.result()
+                        if error:
+                            save_failure(conn, row[0], error)
+                            stats["failed"] += 1
+                        else:
+                            save_success(conn, row, url, parsed, preferences)
+                            stats["success"] += 1
+                print(json.dumps(stats, ensure_ascii=False), flush=True)
     return stats
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--batch-size", type=int, default=200)
-    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--batch-size", type=int, default=20)
+    parser.add_argument("--workers", type=int, default=2)
     parser.add_argument("--max-jobs", type=int, default=0)
     args = parser.parse_args()
     database_url = os.environ.get("DATABASE_URL")

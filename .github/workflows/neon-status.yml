@@ -2,6 +2,12 @@ name: Neon 큐 상태 조회
 
 on:
   workflow_dispatch:
+    inputs:
+      reset_processing:
+        description: "PROCESSING 항목을 QUEUED로 복구"
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -19,4 +25,5 @@ jobs:
       - name: 큐 상태 JSON 출력
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESET_PROCESSING: ${{ inputs.reset_processing && 'true' || 'false' }}
         run: python scripts/neon_queue_stats.py

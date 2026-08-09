@@ -13,7 +13,11 @@ on:
       workers:
         description: "병렬 상세 요청 수"
         required: true
-        default: "4"
+        default: "2"
+      batch_size:
+        description: "한 번에 임대할 큐 크기"
+        required: true
+        default: "20"
 
 permissions:
   actions: write
@@ -40,7 +44,8 @@ jobs:
         run: >-
           python scripts/neon_detail_worker.py
           --max-jobs "${{ inputs.max_jobs || '0' }}"
-          --workers "${{ inputs.workers || '4' }}"
+          --workers "${{ inputs.workers || '2' }}"
+          --batch-size "${{ inputs.batch_size || '20' }}"
 
       - name: 점수순 대시보드 스냅샷 생성
         env:
