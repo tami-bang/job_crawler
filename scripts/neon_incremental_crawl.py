@@ -240,6 +240,52 @@ def enqueue_detail(cur, posting_id: int, reason: str) -> None:
     )
 
 
+def upsert_page(conn, items: list[JobListItem], raw_items: list[dict[str, Any]]) -> dict[str, int]:
+    source_ids = [item.id for item in items]
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT source_job_id, list_content_hash FROM job_postings WHERE source = 'jobkorea' AND source_job_id = ANY(%s)",
+            (source_ids,),
+        )
+        previous_hashes = dict(cur.fetchall())
+
+    states = {}
+    with conn.pipeline(), conn.cursor() as cur:
+        for item, raw_item in zip(items, raw_items):
+            content_hash = item.canonical_hash()
+            previous_hash = previous_hashes.get(item.id)
+            state = "NEW" if previous_hash is None else ("CHANGED" if previous_hash != content_hash else "UNCHANGED")
+            states[item.id] = state
+            cur.execute(
+                """
+                INSERT INTO job_postings (
+                    source, source_job_id, stable_key, title, company_name,
+                    source_posted_at, list_content_hash, raw_list_json, last_seen_at
+                ) VALUES ('jobkorea', %s, %s, %s, %s, %s, %s, %s, NOW())
+                ON CONFLICT (source, source_job_id) DO UPDATE SET
+                    stable_key = EXCLUDED.stable_key, title = EXCLUDED.title,
+                    company_name = EXCLUDED.company_name, source_posted_at = EXCLUDED.source_posted_at,
+                    list_content_hash = EXCLUDED.list_content_hash, raw_list_json = EXCLUDED.raw_list_json,
+                    status = 'ACTIVE', last_seen_at = NOW(), updated_at = NOW()
+                """,
+                (item.id, f"jobkorea:{item.id}", item.title, item.company_name, item.created_at,
+                 content_hash, json.dumps(raw_item, ensure_ascii=False, default=str)),
+            )
+
+    changed_ids = [source_id for source_id, state in states.items() if state != "UNCHANGED"]
+    if changed_ids:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT source_job_id, id FROM job_postings WHERE source = 'jobkorea' AND source_job_id = ANY(%s)",
+                (changed_ids,),
+            )
+            posting_ids = dict(cur.fetchall())
+        with conn.pipeline(), conn.cursor() as cur:
+            for source_id in changed_ids:
+                enqueue_detail(cur, posting_ids[source_id], states[source_id])
+    return states
+
+
 async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_PARTITION) -> dict[str, int]:
     base_payload = load_request_payload()
     stats = {"pages": 0, "seen": 0, "new": 0, "changed": 0}
@@ -274,8 +320,9 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
             async with httpx.AsyncClient(headers=headers, timeout=20, follow_redirects=True) as client:
                 previous_page_ids = None
                 max_pages = int(os.environ.get("JOBKOREA_MAX_PAGES", "500"))
+                start_page = int(os.environ.get("JOBKOREA_START_PAGE", "1"))
                 request_delay = float(os.environ.get("JOBKOREA_REQUEST_DELAY", "0.8"))
-                for page in range(1, max_pages + 1):
+                for page in range(start_page, max_pages + 1):
                     payload = {**base_payload, "page": str(page)}
                     for attempt in range(5):
                         response = await client.post(API_URL, data=payload)
@@ -287,7 +334,7 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                     response.raise_for_status()
                     raw_items = parse_job_list_html(response.text)
                     if not raw_items:
-                        if page == 1:
+                        if page == start_page:
                             raise RuntimeError("first page contained no recognizable job rows")
                         break
                     page_ids = tuple(item["id"] for item in raw_items)
@@ -304,17 +351,21 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                         raise RuntimeError(f"schema validation failed on page {page}: {exc}") from exc
 
                     changes = 0
+                    states = upsert_page(conn, items, raw_items)
+                    for item in items:
+                        state = states[item.id]
+                        stats["seen"] += 1
+                        if state != "UNCHANGED":
+                            stats[state.lower()] += 1
+                            changes += 1
+                        observed_max = max(observed_max, item.created_at) if observed_max else item.created_at
+                    completed_page = page
+                    stats["pages"] += 1
                     with conn.cursor() as cur:
-                        for item, raw_item in zip(items, raw_items):
-                            state, posting_id = upsert_job(cur, item, raw_item)
-                            stats["seen"] += 1
-                            if state != "UNCHANGED":
-                                stats[state.lower()] += 1
-                                changes += 1
-                                enqueue_detail(cur, posting_id, state)
-                            observed_max = max(observed_max, item.created_at) if observed_max else item.created_at
-                        completed_page = page
-                        stats["pages"] += 1
+                        cur.execute(
+                            "UPDATE crawl_partitions SET last_completed_page = %s, last_job_count = %s, updated_at = NOW() WHERE partition_key = %s",
+                            (page, stats["seen"], partition_key),
+                        )
                     conn.commit()
 
                     page_is_old = watermark is not None and max(item.created_at for item in items) < watermark

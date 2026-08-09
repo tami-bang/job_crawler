@@ -16,6 +16,10 @@ on:
         description: "선택: 기본 Form Data를 덮어쓸 JSON"
         required: false
         default: ""
+      start_page:
+        description: "재개 시작 페이지"
+        required: false
+        default: "1"
 
 permissions:
   contents: read
@@ -46,6 +50,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JOBKOREA_REQUEST_PAYLOAD_JSON: ${{ inputs.request_payload_json }}
+          JOBKOREA_START_PAGE: ${{ inputs.start_page }}
         run: python scripts/neon_incremental_crawl.py "${{ inputs.command }}"
 
       - name: 결과 업로드
