@@ -7,6 +7,7 @@ from scripts.neon_incremental_crawl import (
     extract_items,
     parse_datetime,
     parse_job_list_html,
+    parse_relative_posted_at,
 )
 
 
@@ -37,6 +38,10 @@ class NeonIncrementalTests(unittest.TestCase):
         parsed = parse_datetime("2026-08-09T00:00:00Z")
         self.assertEqual(parsed.utcoffset().total_seconds(), 9 * 3600)
         self.assertEqual(parsed.hour, 9)
+
+    def test_relative_minutes_are_supported(self):
+        now = datetime(2026, 8, 9, 22, 30, 42, tzinfo=KST)
+        self.assertEqual(parse_relative_posted_at("28 분 전 등록", now).minute, 2)
 
     def test_extract_items_supports_known_envelopes(self):
         item = {"id": "1"}

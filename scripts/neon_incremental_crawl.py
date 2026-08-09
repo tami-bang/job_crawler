@@ -114,7 +114,10 @@ def parse_relative_posted_at(text: str, now: Optional[datetime] = None) -> datet
         return (now - timedelta(days=int(match.group(1)))).replace(hour=0, minute=0, second=0, microsecond=0)
     match = re.search(r"(\d+)\s*시간\s*전", normalized)
     if match:
-        return now - timedelta(hours=int(match.group(1)))
+        return (now - timedelta(hours=int(match.group(1)))).replace(minute=0, second=0, microsecond=0)
+    match = re.search(r"(\d+)\s*분\s*전", normalized)
+    if match:
+        return (now - timedelta(minutes=int(match.group(1)))).replace(second=0, microsecond=0)
     match = re.search(r"(\d{1,2})/(\d{1,2})", normalized)
     if match:
         month, day = map(int, match.groups())
