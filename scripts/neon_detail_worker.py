@@ -2,11 +2,15 @@ import argparse
 import json
 import os
 import random
+import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 
 import httpx
 import psycopg
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crawler.detail import parse_job_detail
 from crawler.matcher import analyze_job, job_passes_hard_filters, load_preferences
