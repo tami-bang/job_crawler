@@ -327,13 +327,22 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                 request_delay = float(os.environ.get("JOBKOREA_REQUEST_DELAY", "0.8"))
                 for page in range(start_page, max_pages + 1):
                     payload = {**base_payload, "page": str(page)}
+                    response = None
                     for attempt in range(5):
-                        response = await client.post(API_URL, data=payload)
+                        try:
+                            response = await client.post(API_URL, data=payload)
+                        except httpx.RequestError:
+                            if attempt == 4:
+                                raise
+                            await asyncio.sleep((2 ** attempt) + (page % 7) / 10)
+                            continue
                         if response.status_code not in (429, 500, 502, 503, 504):
                             break
                         if attempt == 4:
                             response.raise_for_status()
                         await asyncio.sleep((2 ** attempt) + (page % 7) / 10)
+                    if response is None:
+                        raise RuntimeError(f"no response received for page {page}")
                     response.raise_for_status()
                     raw_items = parse_job_list_html(response.text)
                     if not raw_items:
