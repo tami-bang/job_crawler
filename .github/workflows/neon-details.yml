@@ -1,6 +1,9 @@
 name: Neon 상세 수집 및 점수 계산
 
 on:
+  schedule:
+    # 목록 증분 수집(09:00 KST)이 끝난 뒤 신규 상세를 처리합니다.
+    - cron: "30 0 * * *"
   workflow_dispatch:
     inputs:
       max_jobs:
@@ -13,7 +16,8 @@ on:
         default: "4"
 
 permissions:
-  contents: read
+  actions: write
+  contents: write
 
 concurrency:
   group: neon-jobkorea-details
@@ -35,5 +39,27 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: >-
           python scripts/neon_detail_worker.py
-          --max-jobs "${{ inputs.max_jobs }}"
-          --workers "${{ inputs.workers }}"
+          --max-jobs "${{ inputs.max_jobs || '0' }}"
+          --workers "${{ inputs.workers || '4' }}"
+
+      - name: 점수순 대시보드 스냅샷 생성
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python scripts/neon_incremental_crawl.py export
+
+      - name: 정적 JSON 저장소 반영
+        run: |
+          if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json)" ]; then
+            echo "정적 공고 변경 없음"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/static_jobs.json
+          git commit -m "chore: refresh scored JobKorea snapshot"
+          git push
+
+      - name: GitHub Pages 갱신 요청
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

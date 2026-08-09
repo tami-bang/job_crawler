@@ -55,10 +55,10 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JOBKOREA_REQUEST_PAYLOAD_JSON: ${{ inputs.request_payload_json }}
           JOBKOREA_START_PAGE: ${{ inputs.start_page || '1' }}
-        run: python scripts/neon_incremental_crawl.py "${{ inputs.command || 'crawl-and-export' }}"
+        run: python scripts/neon_incremental_crawl.py "${{ inputs.command || 'crawl' }}"
 
       - name: 정적 JSON 저장소 반영
-        if: success() && (github.event_name == 'schedule' || inputs.command != 'crawl')
+        if: success() && github.event_name != 'schedule' && inputs.command != 'crawl'
         run: |
           if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json)" ]; then
             echo "정적 공고 변경 없음"
@@ -82,7 +82,7 @@ jobs:
           retention-days: 14
 
       - name: GitHub Pages 갱신 요청
-        if: success() && (github.event_name == 'schedule' || inputs.command != 'crawl')
+        if: success() && github.event_name != 'schedule' && inputs.command != 'crawl'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --ref main
