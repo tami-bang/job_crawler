@@ -11,9 +11,9 @@ on:
   workflow_dispatch:
     inputs:
       keyword_batch_size:
-        description: "이번 실행에서 처리할 검색 키워드 수"
+        description: "처리할 검색 키워드 수 (0은 전체)"
         required: true
-        default: "20"
+        default: "0"
       pages:
         description: "키워드별 수집 페이지 수"
         required: true
@@ -21,11 +21,11 @@ on:
       detail_limit:
         description: "상세 내용을 수집할 최대 공고 수"
         required: true
-        default: "25"
+        default: "500"
       report_top_n:
         description: "리포트에 포함할 최대 공고 수"
         required: true
-        default: "200"
+        default: "500"
 
 permissions:
   contents: write
@@ -38,7 +38,7 @@ jobs:
   crawl:
     name: 수집·분석·리포트 생성
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 180
 
     steps:
       - name: 저장소 내려받기
@@ -66,17 +66,13 @@ jobs:
 
       - name: 채용공고 수집 및 분석
         env:
-          KEYWORD_BATCH_SIZE: ${{ inputs.keyword_batch_size || '5' }}
-          PAGES: ${{ inputs.pages || '1' }}
-          DETAIL_LIMIT: ${{ inputs.detail_limit || '25' }}
-          REPORT_TOP_N: ${{ inputs.report_top_n || '50' }}
+          KEYWORD_BATCH_SIZE: ${{ inputs.keyword_batch_size || '0' }}
+          PAGES: ${{ inputs.pages || '5' }}
+          DETAIL_LIMIT: ${{ inputs.detail_limit || '500' }}
+          REPORT_TOP_N: ${{ inputs.report_top_n || '500' }}
         run: |
-          KEYWORD_COUNT=$(python -c "import json; print(len(json.load(open('config/user_preferences.json'))['search_keywords']))")
-          DAY_NUMBER=$(( $(date -u +%s) / 86400 ))
-          KEYWORD_OFFSET=$(( (DAY_NUMBER * KEYWORD_BATCH_SIZE) % KEYWORD_COUNT ))
           python main.py jobkorea-multi-pipeline \
             --keyword-batch-size "$KEYWORD_BATCH_SIZE" \
-            --keyword-offset "$KEYWORD_OFFSET" \
             --pages "$PAGES" \
             --detail-limit "$DETAIL_LIMIT" \
             --report-top-n "$REPORT_TOP_N" \
