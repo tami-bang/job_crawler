@@ -1,9 +1,9 @@
-name: Neon 증분 수집 검증
+name: Neon 일일 수집 및 배포
 
 on:
   schedule:
-    # 매일 한국시간 오전 9시 (UTC 00:00)
-    - cron: "0 0 * * *"
+    # 매일 한국시간 오전 9시 7분 (UTC 00:07) — 정각 혼잡 회피
+    - cron: "7 0 * * *"
   workflow_dispatch:
     inputs:
       command:
@@ -29,14 +29,14 @@ permissions:
   contents: write
 
 concurrency:
-  group: neon-jobkorea-incremental
+  group: neon-jobkorea-pipeline
   cancel-in-progress: false
 
 jobs:
   incremental:
     name: Neon 연결 및 증분 수집
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 360
     steps:
       - name: 저장소 내려받기
         uses: actions/checkout@v4
@@ -57,8 +57,24 @@ jobs:
           JOBKOREA_START_PAGE: ${{ inputs.start_page || '1' }}
         run: python scripts/neon_incremental_crawl.py "${{ inputs.command || 'crawl' }}"
 
+      - name: 예약 실행 · 신규 상세 수집 및 점수 계산
+        if: success() && github.event_name == 'schedule'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: >-
+          python scripts/neon_detail_worker.py
+          --max-jobs 0
+          --workers 2
+          --batch-size 20
+
+      - name: 예약 실행 · 점수순 스냅샷 생성
+        if: success() && github.event_name == 'schedule'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python scripts/neon_incremental_crawl.py export
+
       - name: 정적 JSON 저장소 반영
-        if: success() && github.event_name != 'schedule' && inputs.command != 'crawl'
+        if: success() && (github.event_name == 'schedule' || inputs.command != 'crawl')
         run: |
           if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json)" ]; then
             echo "정적 공고 변경 없음"
@@ -82,7 +98,7 @@ jobs:
           retention-days: 14
 
       - name: GitHub Pages 갱신 요청
-        if: success() && github.event_name != 'schedule' && inputs.command != 'crawl'
+        if: success() && (github.event_name == 'schedule' || inputs.command != 'crawl')
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --ref main

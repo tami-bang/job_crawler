@@ -1,9 +1,6 @@
 name: Neon 상세 수집 및 점수 계산
 
 on:
-  schedule:
-    # 목록 증분 수집(09:00 KST)이 끝난 뒤 신규 상세를 처리합니다.
-    - cron: "30 0 * * *"
   workflow_dispatch:
     inputs:
       max_jobs:
@@ -24,7 +21,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: neon-jobkorea-details
+  group: neon-jobkorea-pipeline
   cancel-in-progress: false
 
 jobs:
