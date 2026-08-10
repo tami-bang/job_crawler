@@ -68,7 +68,7 @@ async function loadDemoSnapshot(): Promise<StaticSnapshot> {
     demoSnapshotPromise = fetch(STATIC_DATA_URL, { cache: "no-store" })
       .then((response) => {
         if (!response.ok) throw new Error("정적 공고 스냅샷을 불러오지 못했습니다.");
-        return response.json().then((payload: Job[] | { updated_at?: string; jobs?: Job[] }) => {
+        return response.json().then((payload: Job[] | { updated_at?: string | null; jobs?: Job[] }) => {
           const jobs = Array.isArray(payload) ? payload : payload.jobs;
           if (!Array.isArray(jobs) || (jobs.length > 0 && (jobs[0].match_score == null || !jobs[0].stable_key))) {
             throw new Error("아직 상세 점수 스냅샷이 아닙니다.");

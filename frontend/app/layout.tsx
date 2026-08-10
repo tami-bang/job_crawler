@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ScrollTopButton from "@/components/ScrollTopButton";
 import SiteFooter from "@/components/SiteFooter";
-import SnapshotUpdatedAt from "@/components/SnapshotUpdatedAt";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,10 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Link href="/favorites">관심공고</Link>
             <Link href="/updates">업데이트 로그</Link>
           </nav>
-          <div className="headerStatus">
-            <SnapshotUpdatedAt />
-            <div className="systemState"><i /> {dataMode}</div>
-          </div>
+          <div className="systemState"><i /> {dataMode}</div>
         </header>
         <main>{children}</main>
         <ScrollTopButton />

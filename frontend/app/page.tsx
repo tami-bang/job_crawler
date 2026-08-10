@@ -1,4 +1,5 @@
 import JobExplorer from "@/components/JobExplorer";
+import SnapshotUpdatedAt from "@/components/SnapshotUpdatedAt";
 import StatsPanel from "@/components/StatsPanel";
 
 export default function Home() {
@@ -11,7 +12,10 @@ export default function Home() {
         <div className="heroSignal" aria-hidden="true"><i /><i /><i /><b>RADAR<br />ACTIVE</b></div>
       </section>
       <section className="contentSection dashboardOverview">
-        <div className="sectionHeading"><div><span>OVERVIEW</span><h2>오늘의 지원 레이더</h2></div><p>LOCAL DB · EXPLAINABLE SCORE</p></div>
+        <div className="sectionHeading">
+          <div><span>OVERVIEW</span><h2>오늘의 지원 레이더</h2></div>
+          <div className="sectionUpdate"><SnapshotUpdatedAt /><p>LOCAL DB · EXPLAINABLE SCORE</p></div>
+        </div>
         <StatsPanel />
       </section>
       <section className="contentSection dashboardMatches">

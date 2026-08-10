@@ -1,0 +1,38 @@
+name: Neon 스냅샷 재추출
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: neon-jobkorea-snapshot
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: DB 기준 스냅샷 재추출
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python scripts/neon_incremental_crawl.py export
+      - name: 스냅샷 커밋
+        run: |
+          if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json)" ]; then
+            echo "스냅샷 변경 없음"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/static_jobs.json
+          git commit -m "chore: refresh Neon JobKorea snapshot"
+          git push

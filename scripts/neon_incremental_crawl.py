@@ -412,6 +412,14 @@ def export_static_json(database_url: str, output: str) -> int:
     with psycopg.connect(database_url) as conn, conn.cursor() as cur:
         cur.execute(
             """
+            SELECT MAX(detail_collected_at)
+            FROM job_postings
+            WHERE status = 'ACTIVE' AND detail_status = 'success'
+            """
+        )
+        latest_collected_at = cur.fetchone()[0]
+        cur.execute(
+            """
             SELECT id, source, source_job_id, stable_key, title, company_name, source_posted_at,
                    detail_url, location, career, employment_type, deadline, deadline_date,
                    raw_detail_text, skill_candidates, detail_status, match_score,
@@ -440,7 +448,10 @@ def export_static_json(database_url: str, output: str) -> int:
             "favorite_memo": None, "favorite_status": None,
         })
     snapshot = {
-        "updated_at": datetime.now(KST).strftime("%Y-%m-%d %H:%M KST"),
+        "updated_at": (
+            latest_collected_at.astimezone(KST).strftime("%Y-%m-%d %H:%M KST")
+            if latest_collected_at else None
+        ),
         "jobs": data,
     }
     output_path = Path(output)
