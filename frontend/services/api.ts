@@ -56,27 +56,36 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 const STATIC_DEMO = process.env.NEXT_PUBLIC_STATIC_DEMO === "true";
 const REPORT_API_URL = process.env.NEXT_PUBLIC_REPORT_API_URL?.replace(/\/$/, "") ?? "";
 const STATIC_DATA_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/static_jobs.json`;
-let demoJobsPromise: Promise<Job[]> | null = null;
+type StaticSnapshot = { updated_at: string | null; jobs: Job[] };
+let demoSnapshotPromise: Promise<StaticSnapshot> | null = null;
 
-async function loadDemoJobs(): Promise<Job[]> {
+async function loadDemoSnapshot(): Promise<StaticSnapshot> {
   if (typeof window === "undefined") {
     const { demoJobs } = await import("./demo-data");
-    return demoJobs;
+    return { updated_at: null, jobs: demoJobs };
   }
-  if (!demoJobsPromise) {
-    demoJobsPromise = fetch(STATIC_DATA_URL, { cache: "no-store" })
+  if (!demoSnapshotPromise) {
+    demoSnapshotPromise = fetch(STATIC_DATA_URL, { cache: "no-store" })
       .then((response) => {
         if (!response.ok) throw new Error("정적 공고 스냅샷을 불러오지 못했습니다.");
-        return response.json().then((jobs: Job[]) => {
+        return response.json().then((payload: Job[] | { updated_at?: string; jobs?: Job[] }) => {
+          const jobs = Array.isArray(payload) ? payload : payload.jobs;
           if (!Array.isArray(jobs) || (jobs.length > 0 && (jobs[0].match_score == null || !jobs[0].stable_key))) {
             throw new Error("아직 상세 점수 스냅샷이 아닙니다.");
           }
-          return jobs;
+          return {
+            updated_at: Array.isArray(payload) ? null : payload.updated_at ?? null,
+            jobs,
+          };
         });
       })
-      .catch(async () => (await import("./demo-data")).demoJobs);
+      .catch(async () => ({ updated_at: null, jobs: (await import("./demo-data")).demoJobs }));
   }
-  return demoJobsPromise;
+  return demoSnapshotPromise;
+}
+
+async function loadDemoJobs(): Promise<Job[]> {
+  return (await loadDemoSnapshot()).jobs;
 }
 
 function getReportDeadline(job: Job) {
@@ -157,6 +166,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  snapshotUpdatedAt: async () => (await loadDemoSnapshot()).updated_at,
   reportApiConfigured: () => Boolean(REPORT_API_URL) || !STATIC_DEMO,
   canEmailReport: () => !STATIC_DEMO || Boolean(REPORT_API_URL),
   reportStatus: async () => {

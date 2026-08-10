@@ -11,6 +11,7 @@ button,input,select { font:inherit; }
 .brand { font-size:24px;font-weight:900;letter-spacing:-1px; }.brand span{color:var(--lime)}.brand i{font-style:normal;font-size:8px;margin-left:6px;color:var(--lime);vertical-align:top}
 nav { display:flex;gap:10px; } nav a { color:#b8c3d5;padding:11px 17px;border-radius:999px;border:1px solid transparent;font-weight:700;font-size:14px; } nav a:hover { color:var(--lime);border-color:#99ff4540;background:#99ff4509; }
 .systemState { color:#8592a8;font:700 11px monospace;letter-spacing:1.6px; }.systemState i { display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px var(--lime);margin-right:8px; }
+.headerStatus{display:flex;align-items:flex-end;flex-direction:column;gap:7px}.snapshotUpdatedAt{color:#aeb9ca;font:800 10px monospace;letter-spacing:.4px;white-space:nowrap}
 main { max-width:1500px;margin:0 auto; }.hero { min-height:650px;padding:110px clamp(24px,6vw,96px) 80px;position:relative;display:flex;flex-direction:column;justify-content:center; }
 .dashboardHero{min-height:auto;padding-top:82px;padding-bottom:36px;justify-content:flex-start}
 .eyebrow { color:var(--lime);font:800 12px monospace;letter-spacing:3px;margin-bottom:28px; }.eyebrow span { display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid #99ff4570;border-radius:50%;margin-right:12px;letter-spacing:0; }
