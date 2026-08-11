@@ -385,6 +385,17 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                     if consecutive_old_unchanged >= 3:
                         break
                     await asyncio.sleep(request_delay)
+        except httpx.ConnectTimeout as exc:
+            conn.rollback()
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE crawl_partitions SET last_run_status = 'SKIPPED', updated_at = NOW() WHERE partition_key = %s",
+                    (partition_key,),
+                )
+            conn.commit()
+            stats["connect_timeout_skipped"] = 1
+            print(f"::warning::JobKorea connection timed out; continuing with existing Neon data: {exc}")
+            return stats
         except Exception:
             conn.rollback()
             with conn.cursor() as cur:
