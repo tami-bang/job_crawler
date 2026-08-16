@@ -48,7 +48,7 @@ export default function SiteFooter() {
     <footer className="siteFooter">
       <div>
         <strong>JOB RADAR</strong>
-        <span>최근 업데이트 2026.06.24 · 지원 결정을 더 빠르게 만드는 개인 채용 레이더</span>
+        <span>지원 결정을 더 빠르게 만드는 개인 채용 레이더</span>
       </div>
       <div className="footerLinks">
         <a href="https://github.com/tami-bang" target="_blank" rel="noreferrer">GitHub</a>

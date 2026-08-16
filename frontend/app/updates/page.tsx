@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import crawlHistoryData from "@/public/crawl_history.json";
 
 type CrawlHistoryEntry = {
   date: string;
@@ -204,24 +205,11 @@ export default function UpdatesPage() {
   const [activeTab, setActiveTab] = useState<"collection" | "patches">("collection");
   const [pageSize, setPageSize] = useState(15);
   const [page, setPage] = useState(1);
-  const [crawlHistory, setCrawlHistory] = useState<CrawlHistoryEntry[]>([]);
-  const [historyLoaded, setHistoryLoaded] = useState(false);
-  useEffect(() => {
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-    fetch(`${basePath}/crawl_history.json`)
-      .then((response) => {
-        if (!response.ok) throw new Error("수집 이력을 불러오지 못했습니다.");
-        return response.json() as Promise<CrawlHistoryEntry[]>;
-      })
-      .then((history) => {
-        const latestHistory = [...history]
-          .sort((a, b) => b.date.localeCompare(a.date))
-          .slice(0, 30);
-        setCrawlHistory(latestHistory);
-      })
-      .catch(() => setCrawlHistory([]))
-      .finally(() => setHistoryLoaded(true));
-  }, []);
+  const crawlHistory = useMemo<CrawlHistoryEntry[]>(() => (
+    [...crawlHistoryData]
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 30)
+  ), []);
   const sortedUpdates = useMemo(() => (
     [...updates].sort((a, b) => b.date.localeCompare(a.date))
   ), []);
@@ -287,7 +275,7 @@ export default function UpdatesPage() {
                 </div>
               </article>
             ))}
-            {historyLoaded && crawlHistory.length === 0 && (
+            {crawlHistory.length === 0 && (
               <div className="crawlHistoryEmpty">다음 크롤링 완료 후 일별 수집 이력이 자동으로 표시됩니다.</div>
             )}
           </div>
