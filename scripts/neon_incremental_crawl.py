@@ -14,6 +14,8 @@ import psycopg
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
+from crawler.location_filter import is_capital_area_location
+
 
 KST = timezone(timedelta(hours=9))
 API_URL = "https://www.jobkorea.co.kr/Recruit/Home/_GI_List/"
@@ -291,7 +293,7 @@ def upsert_page(conn, items: list[JobListItem], raw_items: list[dict[str, Any]])
 
 async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_PARTITION) -> dict[str, int]:
     base_payload = load_request_payload()
-    stats = {"pages": 0, "seen": 0, "new": 0, "changed": 0}
+    stats = {"pages": 0, "seen": 0, "new": 0, "changed": 0, "skipped_location": 0}
     observed_max = None
     completed_page = 0
     consecutive_old_unchanged = 0
@@ -344,15 +346,25 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                     if response is None:
                         raise RuntimeError(f"no response received for page {page}")
                     response.raise_for_status()
-                    raw_items = parse_job_list_html(response.text)
-                    if not raw_items:
+                    parsed_raw_items = parse_job_list_html(response.text)
+                    if not parsed_raw_items:
                         if page == start_page:
                             raise RuntimeError("first page contained no recognizable job rows")
                         break
-                    page_ids = tuple(item["id"] for item in raw_items)
+                    page_ids = tuple(item["id"] for item in parsed_raw_items)
                     if page_ids == previous_page_ids:
                         raise RuntimeError(f"pagination did not advance on page {page}")
                     previous_page_ids = page_ids
+                    raw_items = [
+                        item for item in parsed_raw_items
+                        if is_capital_area_location(item.get("areaCodeList"))
+                    ]
+                    stats["skipped_location"] += len(parsed_raw_items) - len(raw_items)
+                    if not raw_items:
+                        completed_page = page
+                        stats["pages"] += 1
+                        await asyncio.sleep(request_delay)
+                        continue
                     try:
                         items = [JobListItem.model_validate(raw) for raw in raw_items]
                     except ValidationError as exc:
@@ -444,6 +456,8 @@ def export_static_json(database_url: str, output: str) -> int:
         rows = cur.fetchall()
     data = []
     for row in rows:
+        if not is_capital_area_location(row[8]):
+            continue
         data.append({
             "id": row[0], "source": row[1], "source_job_id": row[2], "stable_key": row[3],
             "title": row[4], "company_name": row[5], "posted_date": row[6].isoformat(),

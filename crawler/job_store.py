@@ -3,6 +3,7 @@ import hashlib
 import json
 
 from crawler.database import DEFAULT_DB_PATH, get_connection, init_database
+from crawler.location_filter import is_capital_area_location
 from crawler.parser import is_always_open_deadline, normalize_deadline_date, normalize_url
 
 
@@ -279,7 +280,11 @@ def _get_changed_fields(existing, job, company_id):
 
 
 def _is_valid_job(job):
-    return bool(_clean_text(job.get("title")) and make_duplicate_key(job))
+    return bool(
+        _clean_text(job.get("title"))
+        and make_duplicate_key(job)
+        and is_capital_area_location(job.get("location"))
+    )
 
 
 def _hash_job(job):

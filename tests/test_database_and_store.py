@@ -35,7 +35,7 @@ class DatabaseAndStoreTests(unittest.TestCase):
                 "company": "테스트 회사",
                 "url": "https://example.com/Recruit/GI_Read/100",
                 "normalized_url": "https://example.com/Recruit/GI_Read/100",
-                "location": "서울",
+                "location": "서울 강남구",
                 "career": "신입",
                 "education": "학력무관",
                 "employment_type": "정규직",
@@ -67,6 +67,7 @@ class DatabaseAndStoreTests(unittest.TestCase):
                 "company": "테스트 회사",
                 "url": "https://example.com/Recruit/GI_Read/200",
                 "normalized_url": "https://example.com/Recruit/GI_Read/200",
+                "location": "경기 성남시",
                 "deadline": "2026-12-31",
                 "raw_text": "테스트 공고",
             }
@@ -84,6 +85,26 @@ class DatabaseAndStoreTests(unittest.TestCase):
                 ).fetchone()
             self.assertEqual(row[0], "active")
             self.assertEqual(row[1], 1)
+
+    def test_non_capital_area_jobs_are_not_saved(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = str(Path(temp_dir) / "jobs.db")
+            init_database(db_path)
+            with sqlite3.connect(db_path) as conn:
+                run_id = conn.execute(
+                    "INSERT INTO crawl_runs (source, crawl_type) VALUES ('jobkorea', 'list')"
+                ).lastrowid
+
+            jobs = [
+                {"job_id": "301", "title": "서울 개발자", "location": "서울 강남구"},
+                {"job_id": "302", "title": "부산 개발자", "location": "부산 해운대구"},
+                {"job_id": "303", "title": "복수지역 개발자", "location": "서울 외 14"},
+                {"job_id": "304", "title": "지역 미정 개발자", "location": ""},
+            ]
+            result = save_job_list_items(jobs, run_id, db_path=db_path)
+
+            self.assertEqual(result["new"], 1)
+            self.assertEqual(result["skipped"], 3)
 
 
 if __name__ == "__main__":
