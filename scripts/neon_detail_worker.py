@@ -176,7 +176,16 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
         timeout = httpx.Timeout(connect=5.0, read=10.0, write=5.0, pool=5.0)
         limits = httpx.Limits(max_connections=workers, max_keepalive_connections=workers)
         with httpx.Client(headers=HEADERS, timeout=timeout, limits=limits, follow_redirects=True) as client:
-            client.get("https://www.jobkorea.co.kr/recruit/joblist?menucode=duty")
+            try:
+                client.get("https://www.jobkorea.co.kr/recruit/joblist?menucode=duty")
+            except httpx.ConnectTimeout as exc:
+                stats["connect_timeout_skipped"] = 1
+                print(
+                    f"::warning::JobKorea detail connection timed out; "
+                    f"continuing with existing Neon data: {exc}",
+                    flush=True,
+                )
+                return stats
             while max_jobs <= 0 or stats["claimed"] < max_jobs:
                 size = min(batch_size, max_jobs - stats["claimed"]) if max_jobs > 0 else batch_size
                 rows = claim_jobs(conn, size)
