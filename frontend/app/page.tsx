@@ -6,10 +6,12 @@ export default function Home() {
   return (
     <>
       <section className="hero dashboardHero">
-        <div className="eyebrow"><span>01</span> DECISION DASHBOARD</div>
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white whitespace-nowrap">
-          나에게 딱 맞는 <span className="text-[#22c55e]">채용 공고 레이더</span>
-        </h1>
+        <div className="heroCopy">
+          <div className="eyebrow"><span>01</span> DECISION DASHBOARD</div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] xl:text-5xl font-bold tracking-tight text-white whitespace-nowrap break-keep">
+            나에게 딱 맞는 <span className="text-[#22c55e]">채용 공고 레이더</span>
+          </h1>
+        </div>
         <div className="heroSignal" aria-hidden="true"><i /><i /><i /><b>RADAR<br />ACTIVE</b></div>
       </section>
       <section className="contentSection dashboardOverview">
