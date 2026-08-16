@@ -10,6 +10,7 @@ import {
   writeUserState,
 } from "./job-state";
 import { legacyIdToStableKeyMap } from "./legacy-job-id-map";
+import { isCapitalAreaLocation } from "./location-filter";
 
 export type Job = {
   id: number;
@@ -130,6 +131,7 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
     .map((snapshot, index) => ({ ...snapshot, id: -(index + 1) } as Job));
 
   return [...demoJobs, ...savedFavorites]
+    .filter((job) => isCapitalAreaLocation(job.location))
     .map((job) => {
       const stableKey = getStableJobKey(job);
       const interaction = userState[stableKey] ?? {};
