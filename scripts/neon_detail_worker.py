@@ -101,14 +101,6 @@ def fetch_detail(row, client):
     return row, url, None, last_error
 
 
-def is_network_error(error):
-    if isinstance(error, (httpx.TimeoutException, httpx.TransportError)):
-        return True
-    return isinstance(error, httpx.HTTPStatusError) and error.response.status_code in (
-        429, 500, 502, 503, 504
-    )
-
-
 def release_network_batch(conn, rows, error):
     posting_ids = [row[0] for row in rows]
     with conn.cursor() as cur:
@@ -221,12 +213,12 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
                     futures = [executor.submit(fetch_detail, row, client) for row in rows]
                     results = [future.result() for future in as_completed(futures)]
                     errors = [result[3] for result in results if result[3] is not None]
-                    if len(errors) == len(rows) and all(is_network_error(error) for error in errors):
+                    if len(errors) == len(rows):
                         release_network_batch(conn, rows, errors[0])
                         stats["network_error_skipped"] = len(rows)
                         print(
-                            "::warning::All detail requests in the batch failed at the network "
-                            "boundary; released leases and continuing with existing Neon data",
+                            "::warning::All detail requests in the batch failed; released leases "
+                            "and continuing with existing Neon data",
                             flush=True,
                         )
                         return stats
