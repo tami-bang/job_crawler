@@ -128,11 +128,12 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
     .map((job) => {
       const stableKey = getStableJobKey(job);
       const interaction = userState[stableKey] ?? {};
+      const isFavorite = Boolean(interaction.isFavorite);
       return {
         ...job,
         stable_key: stableKey,
-        is_favorite: Boolean(interaction.isFavorite),
-        is_disliked: Boolean(interaction.isDisliked),
+        is_favorite: isFavorite,
+        is_disliked: !isFavorite && Boolean(interaction.isDisliked),
         is_viewed: Boolean(interaction.isViewed),
         favorite_memo: interaction.memo ?? null,
         favorite_status: interaction.status ?? null,

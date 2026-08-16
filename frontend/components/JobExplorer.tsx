@@ -7,6 +7,7 @@ import {
   applicationStatusMeta,
   CalendarStatusFilter,
   getApplicationTone,
+  getDisplayApplicationStatus,
   getPipelineStep,
   matchesCalendarStatusFilter,
   normalizeApplicationStatus,
@@ -1301,8 +1302,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                   {dayJobs.slice(0, 3).map((job) => {
                     const daysUntilDeadline = getDaysUntilDeadline(getEffectiveDeadlineDate(job), todayKey);
                     const expired = daysUntilDeadline !== null && daysUntilDeadline < 0;
-                    const tone = getApplicationTone(job.is_disliked ? "excluded" : job.favorite_status, expired);
-                    const urgent = normalizeApplicationStatus(job.favorite_status) === "planned"
+                    const displayStatus = getDisplayApplicationStatus(job.favorite_status, job.is_favorite, job.is_disliked);
+                    const tone = getApplicationTone(displayStatus, expired);
+                    const urgent = displayStatus === "planned"
                       && daysUntilDeadline !== null && daysUntilDeadline >= 0 && daysUntilDeadline <= 3;
                     return (
                       <button
@@ -1336,15 +1338,16 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <div className="calendarJobList">
               {calendarModalJobs.map((job) => {
                 const expired = isExpiredJob(job, todayKey);
-                const normalizedStatus = normalizeApplicationStatus(job.is_disliked ? "excluded" : job.favorite_status);
+                const normalizedStatus = getDisplayApplicationStatus(job.favorite_status, job.is_favorite, job.is_disliked);
                 const tone = getApplicationTone(normalizedStatus, expired);
                 const pipelineStep = getPipelineStep(normalizedStatus);
+                const expiredPlanned = expired && normalizedStatus === "planned";
                 return (
                 <article className={`calendarJobItem statusTone-${tone}`} key={job.id}>
                   <div>
                     <div className="calendarJobHeading">
                       <strong><b>{getDynamicMatchScore(job, matchBasis)}</b> {job.company_name || "회사 미상"}</strong>
-                      <span className="applicationStatusBadge">{expired ? "마감" : applicationStatusMeta[normalizedStatus].label}</span>
+                      <span className="applicationStatusBadge">{expiredPlanned ? "마감" : applicationStatusMeta[normalizedStatus].label}</span>
                     </div>
                     <p>{job.title}</p>
                     <small>{[job.location, job.career, job.employment_type].filter(Boolean).join(" · ")}</small>

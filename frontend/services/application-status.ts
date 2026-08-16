@@ -35,6 +35,16 @@ export function normalizeApplicationStatus(status: string | null | undefined): A
   return status && status in applicationStatusMeta ? status as ApplicationStatus : "planned";
 }
 
+export function getDisplayApplicationStatus(
+  status: string | null | undefined,
+  isFavorite = false,
+  isDisliked = false,
+): ApplicationStatus {
+  if (isFavorite) return normalizeApplicationStatus(status);
+  if (isDisliked) return "excluded";
+  return normalizeApplicationStatus(status);
+}
+
 export function getApplicationTone(status: string | null | undefined, expired = false): ApplicationTone {
   const normalized = normalizeApplicationStatus(status);
   if (expired && normalized === "planned") return "inactive";

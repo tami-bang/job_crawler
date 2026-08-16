@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getApplicationTone,
+  getDisplayApplicationStatus,
   getPipelineStep,
   matchesCalendarStatusFilter,
   normalizeApplicationStatus,
@@ -23,6 +24,12 @@ describe("application status presentation", () => {
   it("uses planned as the safe default", () => {
     expect(normalizeApplicationStatus(null)).toBe("planned");
     expect(normalizeApplicationStatus("unknown")).toBe("planned");
+  });
+
+  it("prioritizes an active favorite status over a stale disliked flag", () => {
+    expect(getDisplayApplicationStatus("planned", true, true)).toBe("planned");
+    expect(getDisplayApplicationStatus("applied", true, true)).toBe("applied");
+    expect(getDisplayApplicationStatus(null, false, true)).toBe("excluded");
   });
 
   it("filters calendar jobs by application group", () => {
