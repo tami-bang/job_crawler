@@ -7,6 +7,7 @@ import {
   V2_METADATA_KEY,
   V2_USER_STATE_KEY,
   FAVORITE_POLLUTION_REPAIR_KEY,
+  FAVORITE_POLLUTION_REPAIR_V2_KEY,
   checksumState,
   getStableJobKey,
   getMissingFavoriteSnapshots,
@@ -148,9 +149,16 @@ describe("stable job state", () => {
       "jobkorea:100": { isFavorite: true, isDisliked: false, status: "planned", isViewed: true },
       "jobkorea:200": { isFavorite: true, isDisliked: false, status: "planned", memo: "" },
       "jobkorea:300": { isFavorite: true, isDisliked: false, status: "applied" },
+      "jobkorea:400": {
+        isFavorite: true,
+        isDisliked: false,
+        status: "planned",
+        memo: "",
+        jobSnapshot: { id: 400, company_name: "㈜올리브인터넷" },
+      },
     }));
 
-    expect(repairPollutedDislikedFavorites(storage)).toBe(1);
+    expect(repairPollutedDislikedFavorites(storage)).toBe(2);
     expect(readUserState(storage)["jobkorea:100"]).toMatchObject({
       isFavorite: false,
       isDisliked: true,
@@ -158,7 +166,9 @@ describe("stable job state", () => {
     });
     expect(readUserState(storage)["jobkorea:200"]?.isFavorite).toBe(true);
     expect(readUserState(storage)["jobkorea:300"]?.isFavorite).toBe(true);
+    expect(readUserState(storage)["jobkorea:400"]).toMatchObject({ isFavorite: false, isDisliked: true });
     expect(storage.getItem(FAVORITE_POLLUTION_REPAIR_KEY)).toBe("complete");
+    expect(storage.getItem(FAVORITE_POLLUTION_REPAIR_V2_KEY)).toBe("complete");
     expect(repairPollutedDislikedFavorites(storage)).toBe(0);
   });
 
@@ -167,10 +177,12 @@ describe("stable job state", () => {
     storage.setItem(V2_USER_STATE_KEY, "{}");
     storage.setItem(V2_METADATA_KEY, "{}");
     storage.setItem(FAVORITE_POLLUTION_REPAIR_KEY, "complete");
+    storage.setItem(FAVORITE_POLLUTION_REPAIR_V2_KEY, "complete");
     resetUserStorage(storage);
     expect(storage.getItem(V2_USER_STATE_KEY)).toBeNull();
     expect(storage.getItem(V2_METADATA_KEY)).toBeNull();
     expect(storage.getItem(FAVORITE_POLLUTION_REPAIR_KEY)).toBeNull();
+    expect(storage.getItem(FAVORITE_POLLUTION_REPAIR_V2_KEY)).toBeNull();
   });
 
   it("keeps the full saved posting available after it disappears from a refreshed snapshot", () => {

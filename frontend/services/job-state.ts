@@ -4,6 +4,7 @@ export const V1_VIEWED_KEY = "job-radar-viewed-jobs";
 export const V2_USER_STATE_KEY = "job-radar-user-state-v2";
 export const V2_METADATA_KEY = "job-radar-migration-meta-v2";
 export const FAVORITE_POLLUTION_REPAIR_KEY = "job-radar-repair-disliked-favorites-v1";
+export const FAVORITE_POLLUTION_REPAIR_V2_KEY = "job-radar-repair-disliked-favorites-v2";
 
 const MIGRATION_VERSION = 2;
 const TEMP_STATE_KEY = `${V2_USER_STATE_KEY}-pending`;
@@ -87,16 +88,25 @@ export function sanitizeUserState(state: UserState): { state: UserState; changed
 }
 
 export function repairPollutedDislikedFavorites(storage: StorageLike): number {
-  if (storage.getItem(FAVORITE_POLLUTION_REPAIR_KEY) === "complete") return 0;
+  if (storage.getItem(FAVORITE_POLLUTION_REPAIR_V2_KEY) === "complete") return 0;
 
   const state = readUserState(storage);
   let repairedCount = 0;
   const repaired = Object.fromEntries(Object.entries(state).map(([stableKey, interaction]) => {
+    const snapshotCompany = String(interaction.jobSnapshot?.company_name ?? "");
+    const knownPollutedCompany = [
+      "올리브인터넷",
+      "삼성에이엑스아이",
+      "한국디지털컨버전스협회",
+      "플리뷰",
+      "민코딩",
+      "잉카인터넷",
+    ].some((company) => snapshotCompany.includes(company));
     const pollutedByPreviousMigration = interaction.isFavorite
       && !interaction.isDisliked
       && !interaction.isDeleted
       && interaction.status === "planned"
-      && interaction.memo === undefined;
+      && (interaction.memo === undefined || knownPollutedCompany);
     if (!pollutedByPreviousMigration) return [stableKey, interaction];
     repairedCount += 1;
     return [stableKey, {
@@ -110,6 +120,7 @@ export function repairPollutedDislikedFavorites(storage: StorageLike): number {
 
   if (repairedCount > 0) writeUserState(storage, repaired);
   storage.setItem(FAVORITE_POLLUTION_REPAIR_KEY, "complete");
+  storage.setItem(FAVORITE_POLLUTION_REPAIR_V2_KEY, "complete");
   return repairedCount;
 }
 
@@ -121,6 +132,7 @@ export function resetUserStorage(storage: RemovableStorageLike) {
     V2_USER_STATE_KEY,
     V2_METADATA_KEY,
     FAVORITE_POLLUTION_REPAIR_KEY,
+    FAVORITE_POLLUTION_REPAIR_V2_KEY,
     TEMP_STATE_KEY,
   ];
   keys.forEach((key) => {
