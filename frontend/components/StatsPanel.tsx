@@ -22,8 +22,12 @@ export default function StatsPanel() {
   return (
     <div className="statsGrid">
       {cards.map(([code, value, label, description]) => (
-        <article className="statCard" key={String(code)} title={String(description)}>
+        <article className="statCard relative group cursor-help transition-all" key={String(code)}>
           <span>{code}</span><strong>{String(value).padStart(2, "0")}</strong><small>{label}</small>
+          <div className="statTooltip pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap rounded-md bg-zinc-900/95 border border-zinc-700 px-3 py-1.5 text-xs text-zinc-200 shadow-xl backdrop-blur-sm">
+            {description}
+            <div className="statTooltipArrow absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-700" />
+          </div>
         </article>
       ))}
     </div>
