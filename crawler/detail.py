@@ -85,6 +85,23 @@ SCHEMA_EMPLOYMENT_TYPES = {
     "INTERN": "인턴",
 }
 
+DETAIL_BODY_SELECTORS = (
+    '[data-sentry-component="RecruitmentDetail"]',
+    '[data-sentry-component="JobDetail"]',
+    ".recruitment-detail",
+    ".detail-content",
+    ".view-content",
+    ".artReadJobSum",
+)
+
+DETAIL_NOISE_SELECTORS = (
+    "header", "nav", "footer", "aside", "noscript",
+    '[data-sentry-component*="Recommend"]',
+    '[class*="recommend"]', '[class*="Recommend"]',
+    '[class*="companyInfo"]', '[class*="CompanyInfo"]',
+    '[class*="floating"]', '[class*="Floating"]',
+)
+
 
 def collect_jobkorea_details(
     fetch_func,
@@ -346,10 +363,7 @@ def parse_job_detail(html):
     soup = BeautifulSoup(html, "html.parser")
     structured = extract_jobposting_data(soup)
     meta_deadline = extract_detail_deadline(soup)
-    for tag in soup(["script", "style", "noscript"]):
-        tag.decompose()
-
-    text = _normalize_text(soup.get_text("\n", strip=True))
+    text, body_source, has_core_content = extract_detail_body(soup, structured)
     lines = _extract_lines(text)
     deadline = meta_deadline or extract_deadline_from_text(text)
     posted_date = extract_start_date_from_text(text)
@@ -357,6 +371,8 @@ def parse_job_detail(html):
     return {
         "description_text": text,
         "raw_detail_text": text,
+        "body_source": body_source,
+        "has_core_content": has_core_content,
         "main_tasks": _extract_section(lines, SECTION_LABELS["main_tasks"]),
         "qualifications": _extract_section(lines, SECTION_LABELS["qualifications"]),
         "preferred_conditions": _extract_section(lines, SECTION_LABELS["preferred_conditions"]),
@@ -370,6 +386,49 @@ def parse_job_detail(html):
         "education": _normalize_structured_text(structured.get("educationRequirements")),
         "employment_type": extract_employment_type(structured, text),
     }
+
+
+def extract_detail_body(soup, structured):
+    structured_description = structured.get("description")
+    if structured_description:
+        description_soup = BeautifulSoup(str(structured_description), "html.parser")
+        _remove_detail_noise(description_soup)
+        text = _normalize_text(description_soup.get_text("\n", strip=True))
+        if text:
+            return text, "json_ld", True
+
+    for selector in DETAIL_BODY_SELECTORS:
+        container = soup.select_one(selector)
+        if container is None:
+            continue
+        _remove_detail_noise(container)
+        text = _normalize_text(container.get_text("\n", strip=True))
+        if text:
+            return _trim_detail_text(text), "detail_container", True
+
+    _remove_detail_noise(soup)
+    text = _trim_detail_text(_normalize_text(soup.get_text("\n", strip=True)))
+    core_markers = ("모집요강", "지원자격", "근무지주소", "접수기간", "담당업무", "자격요건")
+    marker_count = sum(marker in text for marker in core_markers)
+    return text, "semantic_fallback", marker_count >= 2
+
+
+def _remove_detail_noise(node):
+    for tag in node.select("script, style, " + ", ".join(DETAIL_NOISE_SELECTORS)):
+        tag.decompose()
+
+
+def _trim_detail_text(text):
+    start = text.find("모집요강")
+    if start >= 0:
+        text = text[start:]
+    end_positions = [
+        position for marker in ("\n기업 정보", "\n기업정보 더보기", "\n추천공고")
+        if (position := text.find(marker)) > 0
+    ]
+    if end_positions:
+        text = text[:min(end_positions)]
+    return text.strip()
 
 
 def extract_career_from_text(lines):

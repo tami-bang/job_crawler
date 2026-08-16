@@ -87,8 +87,11 @@ def fetch_detail(row, client):
             response = client.get(url)
             response.raise_for_status()
             parsed = parse_job_detail(response.text)
-            if not parsed.get("raw_detail_text"):
-                raise RuntimeError("empty parsed detail")
+            detail_text = parsed.get("raw_detail_text") or ""
+            if not parsed.get("has_core_content") or len(detail_text) < 120:
+                raise RuntimeError(
+                    f"invalid parsed detail: source={parsed.get('body_source')} length={len(detail_text)}"
+                )
             return row, url, parsed, None
         except Exception as exc:
             last_error = exc
@@ -166,7 +169,6 @@ def save_success(conn, row, url, parsed, preferences):
             "UPDATE detail_fetch_queue SET status='SUCCESS', lease_until=NULL, last_error=NULL, updated_at=NOW() WHERE job_posting_id=%s",
             (row[0],),
         )
-    conn.commit()
 
 
 def save_failure(conn, posting_id, error):
@@ -182,7 +184,6 @@ def save_failure(conn, posting_id, error):
             (str(error)[:2000], posting_id),
         )
         cur.execute("UPDATE job_postings SET detail_status='failed', updated_at=NOW() WHERE id=%s", (posting_id,))
-    conn.commit()
 
 
 def run(database_url, batch_size=20, workers=2, max_jobs=0):
@@ -222,13 +223,18 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
                             flush=True,
                         )
                         return stats
-                    for row, url, parsed, error in results:
-                        if error:
-                            save_failure(conn, row[0], error)
-                            stats["failed"] += 1
-                        else:
-                            save_success(conn, row, url, parsed, preferences)
-                            stats["success"] += 1
+                    try:
+                        for row, url, parsed, error in results:
+                            if error:
+                                save_failure(conn, row[0], error)
+                                stats["failed"] += 1
+                            else:
+                                save_success(conn, row, url, parsed, preferences)
+                                stats["success"] += 1
+                        conn.commit()
+                    except Exception:
+                        conn.rollback()
+                        raise
                 print(json.dumps(stats, ensure_ascii=False), flush=True)
     return stats
 
