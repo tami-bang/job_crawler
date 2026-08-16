@@ -101,6 +101,28 @@ def fetch_detail(row, client):
     return row, url, None, last_error
 
 
+def is_network_error(error):
+    if isinstance(error, (httpx.TimeoutException, httpx.TransportError)):
+        return True
+    return isinstance(error, httpx.HTTPStatusError) and error.response.status_code in (
+        429, 500, 502, 503, 504
+    )
+
+
+def release_network_batch(conn, rows, error):
+    posting_ids = [row[0] for row in rows]
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE detail_fetch_queue SET status='QUEUED', lease_until=NULL,
+                next_attempt_at=NOW() + INTERVAL '30 minutes', last_error=%s, updated_at=NOW()
+            WHERE job_posting_id = ANY(%s)
+            """,
+            (str(error)[:2000], posting_ids),
+        )
+    conn.commit()
+
+
 def build_match_job(row, parsed):
     posting_id, _source_job_id, title, _company_name, raw_list_json = row
     raw = json.loads(raw_list_json or "{}")
@@ -197,8 +219,18 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
                 stats["claimed"] += len(rows)
                 with ThreadPoolExecutor(max_workers=workers) as executor:
                     futures = [executor.submit(fetch_detail, row, client) for row in rows]
-                    for future in as_completed(futures):
-                        row, url, parsed, error = future.result()
+                    results = [future.result() for future in as_completed(futures)]
+                    errors = [result[3] for result in results if result[3] is not None]
+                    if len(errors) == len(rows) and all(is_network_error(error) for error in errors):
+                        release_network_batch(conn, rows, errors[0])
+                        stats["network_error_skipped"] = len(rows)
+                        print(
+                            "::warning::All detail requests in the batch failed at the network "
+                            "boundary; released leases and continuing with existing Neon data",
+                            flush=True,
+                        )
+                        return stats
+                    for row, url, parsed, error in results:
                         if error:
                             save_failure(conn, row[0], error)
                             stats["failed"] += 1
