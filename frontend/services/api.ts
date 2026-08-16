@@ -3,6 +3,7 @@ import {
   getMissingFavoriteSnapshots,
   migrateUserStorageV2,
   readUserState,
+  sanitizeUserState,
   updateUserInteraction,
   writeUserState,
 } from "./job-state";
@@ -103,16 +104,17 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
   if (typeof window !== "undefined") {
     try {
       migrateUserStorageV2(localStorage, legacyIdToStableKeyMap);
-      userState = readUserState(localStorage);
-      let snapshotsAdded = false;
+      const sanitized = sanitizeUserState(readUserState(localStorage));
+      userState = sanitized.state;
+      let stateChanged = sanitized.changed;
       demoJobs.forEach((job) => {
         const stableKey = getStableJobKey(job);
         const interaction = userState[stableKey];
         if (!interaction?.isFavorite || interaction.jobSnapshot) return;
         userState[stableKey] = { ...interaction, jobSnapshot: { ...job } };
-        snapshotsAdded = true;
+        stateChanged = true;
       });
-      if (snapshotsAdded) writeUserState(localStorage, userState);
+      if (stateChanged) writeUserState(localStorage, userState);
     } catch {
       // 저장소가 차단되거나 용량이 부족해도 공고 탐색은 계속 허용합니다.
     }
@@ -259,7 +261,7 @@ export const api = {
         isFavorite: true,
         isDisliked: false,
         memo: current.memo ?? "",
-        status: current.status ?? "planned",
+        status: current.status === "excluded" ? "planned" : (current.status ?? "planned"),
         jobSnapshot: { ...job },
       }));
       return getDemoJob(jobId);

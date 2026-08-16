@@ -11,6 +11,7 @@ import {
   getMissingFavoriteSnapshots,
   migrateUserStorageV2,
   readUserState,
+  sanitizeUserState,
   updateUserInteraction,
 } from "./job-state";
 
@@ -87,6 +88,34 @@ describe("stable job state", () => {
 
     const returnedJob = { id: 99, source: "jobkorea", source_job_id: "100" };
     expect(stateWhileMissing[getStableJobKey(returnedJob)]?.memo).toBe("복구됨");
+  });
+
+  it("repairs a favorite that was incorrectly persisted as excluded or disliked", () => {
+    const { state, changed } = sanitizeUserState({
+      "jobkorea:100": {
+        isFavorite: true,
+        isDisliked: true,
+        status: "excluded",
+        memo: "지원 예정 공고",
+      },
+      "jobkorea:200": { isFavorite: false, isDisliked: true, status: "excluded" },
+    });
+
+    expect(changed).toBe(true);
+    expect(state["jobkorea:100"]).toMatchObject({
+      isFavorite: true,
+      isDisliked: false,
+      status: "planned",
+      memo: "지원 예정 공고",
+    });
+    expect(state["jobkorea:200"]).toMatchObject({ isDisliked: true, status: "excluded" });
+  });
+
+  it("does not rewrite already valid favorite state", () => {
+    const original = { "jobkorea:100": { isFavorite: true, isDisliked: false, status: "applied" } };
+    const result = sanitizeUserState(original);
+    expect(result.changed).toBe(false);
+    expect(result.state).toEqual(original);
   });
 
   it("keeps the full saved posting available after it disappears from a refreshed snapshot", () => {

@@ -67,6 +67,22 @@ export function readUserState(storage: StorageLike): UserState {
   return parseJson<UserState>(storage.getItem(V2_USER_STATE_KEY), {});
 }
 
+export function sanitizeUserState(state: UserState): { state: UserState; changed: boolean } {
+  let changed = false;
+  const sanitized = Object.fromEntries(Object.entries(state).map(([stableKey, interaction]) => {
+    if (interaction.isFavorite && (interaction.status === "excluded" || interaction.isDisliked)) {
+      changed = true;
+      return [stableKey, {
+        ...interaction,
+        isDisliked: false,
+        status: "planned",
+      }];
+    }
+    return [stableKey, interaction];
+  }));
+  return { state: sanitized, changed };
+}
+
 export function getMissingFavoriteSnapshots(
   state: UserState,
   currentStableKeys: Set<string>,
