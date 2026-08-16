@@ -2,7 +2,7 @@ const capitalAreaPrefixes = ["서울", "서울특별시", "경기", "경기도",
 
 export function isCapitalAreaLocation(location: string | null | undefined) {
   const normalized = String(location ?? "").trim();
-  if (!normalized) return false;
+  if (!normalized) return true;
   return capitalAreaPrefixes.some((prefix) => (
     normalized === prefix
     || normalized.startsWith(`${prefix} `)

@@ -15,7 +15,7 @@ def is_capital_area_location(value):
     else:
         text = str(value or "").strip()
     if not text:
-        return False
+        return True
 
     starts_in_allowed_area = any(
         re.search(rf"(^|[\n,/·])\s*{re.escape(prefix)}(?=\s|전체|$)", text)

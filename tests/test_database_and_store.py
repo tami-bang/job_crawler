@@ -103,8 +103,8 @@ class DatabaseAndStoreTests(unittest.TestCase):
             ]
             result = save_job_list_items(jobs, run_id, db_path=db_path)
 
-            self.assertEqual(result["new"], 2)
-            self.assertEqual(result["skipped"], 2)
+            self.assertEqual(result["new"], 3)
+            self.assertEqual(result["skipped"], 1)
 
 
 if __name__ == "__main__":

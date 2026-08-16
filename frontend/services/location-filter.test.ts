@@ -10,8 +10,8 @@ describe("capital area location filter", () => {
     expect(isCapitalAreaLocation("부산 해운대구")).toBe(false);
   });
 
-  it("allows capital-area-led multi-region locations and rejects missing locations", () => {
-    expect(isCapitalAreaLocation(null)).toBe(false);
+  it("allows capital-area-led multi-region and missing locations", () => {
+    expect(isCapitalAreaLocation(null)).toBe(true);
     expect(isCapitalAreaLocation("서울 외 14")).toBe(true);
   });
 });
