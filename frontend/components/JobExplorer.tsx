@@ -611,6 +611,11 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [viewedJobs, setViewedJobs] = useState<Set<number>>(() => new Set());
   const [dislikingJobs, setDislikingJobs] = useState<Set<number>>(() => new Set());
 
+  const changePage = (nextPage: number) => {
+    setPage(nextPage);
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  };
+
   const loadJobs = useCallback(async (term = "", source: "initial" | "search" = "initial") => {
     setLoading(true);
     if (source === "search") setSearchFeedback("검색 중...");
@@ -1304,16 +1309,16 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             ))}
           </div>
           <div className="pagination" aria-label="공고 페이지네이션">
-            <button disabled={currentPage <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>←</button>
+            <button disabled={currentPage <= 1} onClick={() => changePage(Math.max(1, currentPage - 1))}>←</button>
             <strong>{currentPage} / {totalPages}</strong>
-            <button disabled={currentPage >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>→</button>
+            <button disabled={currentPage >= totalPages} onClick={() => changePage(Math.min(totalPages, currentPage + 1))}>→</button>
             <label className="pageSizeSelect bottom">
               <span>하단 옵션</span>
               <select
                 value={pageSize}
                 onChange={(event) => {
                   setPageSize(Number(event.target.value));
-                  setPage(1);
+                  changePage(1);
                 }}
               >
                 {pageSizeOptions.map((option) => <option key={option} value={option}>{option}개씩</option>)}

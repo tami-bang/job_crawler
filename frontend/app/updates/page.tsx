@@ -187,6 +187,10 @@ export default function UpdatesPage() {
   const totalPages = Math.max(1, Math.ceil(sortedUpdates.length / pageSize));
   const currentPage = Math.min(page, totalPages);
   const visibleUpdates = sortedUpdates.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const changePage = (nextPage: number) => {
+    setPage(nextPage);
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  };
 
   return (
     <section className="pageSection">
@@ -216,16 +220,16 @@ export default function UpdatesPage() {
         ))}
       </div>
       <div className="pagination updatePagination" aria-label="업데이트 로그 페이지네이션">
-        <button disabled={currentPage <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>←</button>
+        <button disabled={currentPage <= 1} onClick={() => changePage(Math.max(1, currentPage - 1))}>←</button>
         <strong>{currentPage} / {totalPages}</strong>
-        <button disabled={currentPage >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>→</button>
+        <button disabled={currentPage >= totalPages} onClick={() => changePage(Math.min(totalPages, currentPage + 1))}>→</button>
         <label className="pageSizeSelect bottom">
           <span>표시 개수</span>
           <select
             value={pageSize}
             onChange={(event) => {
               setPageSize(Number(event.target.value));
-              setPage(1);
+              changePage(1);
             }}
           >
             {pageSizeOptions.map((option) => <option key={option} value={option}>{option}개씩</option>)}
