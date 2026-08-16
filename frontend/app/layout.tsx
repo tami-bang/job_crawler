@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const dataMode = process.env.NEXT_PUBLIC_STATIC_DEMO === "true" ? "DEMO DATA" : "LOCAL DATA";
   return (
     <html lang="ko">
       <body>
@@ -26,7 +25,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <Link href="/favorites">관심공고</Link>
               <Link href="/updates">업데이트 로그</Link>
             </nav>
-            <div className="systemState"><i /> {dataMode}</div>
           </div>
         </header>
         <main className="siteMain">{children}</main>
