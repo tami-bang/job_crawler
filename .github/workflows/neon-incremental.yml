@@ -37,6 +37,8 @@ jobs:
     name: Neon 연결 및 증분 수집
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - name: 저장소 내려받기
         uses: actions/checkout@v4
