@@ -887,6 +887,12 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     }
   }
 
+  function handleResetLocalInteractions() {
+    const confirmed = window.confirm("저장·별로·메모·지원 상태를 포함한 이 브라우저의 JobRadar 표시를 모두 초기화할까요?");
+    if (!confirmed || !api.resetLocalInteractions()) return;
+    void loadJobs();
+  }
+
   function handleSearch() {
     void loadJobs(search, "search");
   }
@@ -1020,6 +1026,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       <div className="privacyNotice">
         <strong>내 브라우저 기준</strong>
         <span>GitHub Pages에서는 저장·별로·메모가 이 브라우저에만 저장돼요. 다른 사람이 접속해도 내 표시를 볼 수 없습니다.</span>
+        <button type="button" className="resetLocalStateButton" onClick={handleResetLocalInteractions}>로컬 표시 초기화</button>
       </div>
       {favoriteDeadlineAlerts.length > 0 && (
         <div className="deadlineAlert" role="status">

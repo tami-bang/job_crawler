@@ -6,11 +6,14 @@ import {
   V1_VIEWED_KEY,
   V2_METADATA_KEY,
   V2_USER_STATE_KEY,
+  FAVORITE_POLLUTION_REPAIR_KEY,
   checksumState,
   getStableJobKey,
   getMissingFavoriteSnapshots,
   migrateUserStorageV2,
   readUserState,
+  repairPollutedDislikedFavorites,
+  resetUserStorage,
   sanitizeUserState,
   updateUserInteraction,
 } from "./job-state";
@@ -24,6 +27,10 @@ class MemoryStorage {
 
   setItem(key: string, value: string) {
     this.values.set(key, value);
+  }
+
+  removeItem(key: string) {
+    this.values.delete(key);
   }
 }
 
@@ -133,6 +140,37 @@ describe("stable job state", () => {
     const result = sanitizeUserState(original);
     expect(result.changed).toBe(false);
     expect(result.state).toEqual(original);
+  });
+
+  it("repairs favorites polluted from disliked state exactly once", () => {
+    const storage = new MemoryStorage();
+    storage.setItem(V2_USER_STATE_KEY, JSON.stringify({
+      "jobkorea:100": { isFavorite: true, isDisliked: false, status: "planned", isViewed: true },
+      "jobkorea:200": { isFavorite: true, isDisliked: false, status: "planned", memo: "" },
+      "jobkorea:300": { isFavorite: true, isDisliked: false, status: "applied" },
+    }));
+
+    expect(repairPollutedDislikedFavorites(storage)).toBe(1);
+    expect(readUserState(storage)["jobkorea:100"]).toMatchObject({
+      isFavorite: false,
+      isDisliked: true,
+      isViewed: true,
+    });
+    expect(readUserState(storage)["jobkorea:200"]?.isFavorite).toBe(true);
+    expect(readUserState(storage)["jobkorea:300"]?.isFavorite).toBe(true);
+    expect(storage.getItem(FAVORITE_POLLUTION_REPAIR_KEY)).toBe("complete");
+    expect(repairPollutedDislikedFavorites(storage)).toBe(0);
+  });
+
+  it("can clear all local interaction and migration data", () => {
+    const storage = new MemoryStorage();
+    storage.setItem(V2_USER_STATE_KEY, "{}");
+    storage.setItem(V2_METADATA_KEY, "{}");
+    storage.setItem(FAVORITE_POLLUTION_REPAIR_KEY, "complete");
+    resetUserStorage(storage);
+    expect(storage.getItem(V2_USER_STATE_KEY)).toBeNull();
+    expect(storage.getItem(V2_METADATA_KEY)).toBeNull();
+    expect(storage.getItem(FAVORITE_POLLUTION_REPAIR_KEY)).toBeNull();
   });
 
   it("keeps the full saved posting available after it disappears from a refreshed snapshot", () => {

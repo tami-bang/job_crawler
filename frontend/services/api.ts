@@ -3,6 +3,8 @@ import {
   getMissingFavoriteSnapshots,
   migrateUserStorageV2,
   readUserState,
+  repairPollutedDislikedFavorites,
+  resetUserStorage,
   sanitizeUserState,
   updateUserInteraction,
   writeUserState,
@@ -104,6 +106,7 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
   if (typeof window !== "undefined") {
     try {
       migrateUserStorageV2(localStorage, legacyIdToStableKeyMap);
+      repairPollutedDislikedFavorites(localStorage);
       const sanitized = sanitizeUserState(readUserState(localStorage));
       userState = sanitized.state;
       let stateChanged = sanitized.changed;
@@ -185,6 +188,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  resetLocalInteractions: () => {
+    if (!STATIC_DEMO || typeof window === "undefined") return false;
+    resetUserStorage(localStorage);
+    dispatchStateEvents();
+    return true;
+  },
   snapshotUpdatedAt: async () => (await loadDemoSnapshot()).updated_at,
   reportApiConfigured: () => Boolean(REPORT_API_URL) || !STATIC_DEMO,
   canEmailReport: () => !STATIC_DEMO || Boolean(REPORT_API_URL),

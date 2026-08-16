@@ -3,6 +3,7 @@ export const V1_DISLIKED_KEY = "job-radar-disliked-jobs";
 export const V1_VIEWED_KEY = "job-radar-viewed-jobs";
 export const V2_USER_STATE_KEY = "job-radar-user-state-v2";
 export const V2_METADATA_KEY = "job-radar-migration-meta-v2";
+export const FAVORITE_POLLUTION_REPAIR_KEY = "job-radar-repair-disliked-favorites-v1";
 
 const MIGRATION_VERSION = 2;
 const TEMP_STATE_KEY = `${V2_USER_STATE_KEY}-pending`;
@@ -38,6 +39,7 @@ export type MigrationMetadata = {
 };
 
 type StorageLike = Pick<Storage, "getItem" | "setItem">;
+type RemovableStorageLike = Pick<Storage, "removeItem">;
 
 function parseJson<T>(value: string | null, fallback: T): T {
   if (!value) return fallback;
@@ -84,6 +86,49 @@ export function sanitizeUserState(state: UserState): { state: UserState; changed
   return { state: sanitized, changed };
 }
 
+export function repairPollutedDislikedFavorites(storage: StorageLike): number {
+  if (storage.getItem(FAVORITE_POLLUTION_REPAIR_KEY) === "complete") return 0;
+
+  const state = readUserState(storage);
+  let repairedCount = 0;
+  const repaired = Object.fromEntries(Object.entries(state).map(([stableKey, interaction]) => {
+    const pollutedByPreviousMigration = interaction.isFavorite
+      && !interaction.isDisliked
+      && !interaction.isDeleted
+      && interaction.status === "planned"
+      && interaction.memo === undefined;
+    if (!pollutedByPreviousMigration) return [stableKey, interaction];
+    repairedCount += 1;
+    return [stableKey, {
+      ...interaction,
+      isFavorite: false,
+      isDisliked: true,
+      status: undefined,
+      jobSnapshot: undefined,
+    }];
+  }));
+
+  if (repairedCount > 0) writeUserState(storage, repaired);
+  storage.setItem(FAVORITE_POLLUTION_REPAIR_KEY, "complete");
+  return repairedCount;
+}
+
+export function resetUserStorage(storage: RemovableStorageLike) {
+  const keys = [
+    V1_FAVORITES_KEY,
+    V1_DISLIKED_KEY,
+    V1_VIEWED_KEY,
+    V2_USER_STATE_KEY,
+    V2_METADATA_KEY,
+    FAVORITE_POLLUTION_REPAIR_KEY,
+    TEMP_STATE_KEY,
+  ];
+  keys.forEach((key) => {
+    storage.removeItem(key);
+    storage.removeItem(`${key}_backup_v1`);
+  });
+}
+
 export function getMissingFavoriteSnapshots(
   state: UserState,
   currentStableKeys: Set<string>,
@@ -118,8 +163,7 @@ export function migrateUserStorageV2(
 ): MigrationMetadata | null {
   const existingState = storage.getItem(V2_USER_STATE_KEY);
   const existingMeta = parseJson<MigrationMetadata | null>(storage.getItem(V2_METADATA_KEY), null);
-  if (existingState && existingMeta?.migration_version === MIGRATION_VERSION
-    && existingMeta.checksum === checksumState(existingState)) {
+  if (existingState && existingMeta?.migration_version === MIGRATION_VERSION) {
     return existingMeta;
   }
 
