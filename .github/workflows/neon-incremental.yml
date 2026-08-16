@@ -79,15 +79,15 @@ jobs:
         run: python scripts/neon_incremental_crawl.py export
 
       - name: 정적 JSON 저장소 반영
-        if: success() && (github.event_name == 'schedule' || inputs.command != 'crawl')
+        if: success()
         run: |
-          if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json)" ]; then
-            echo "정적 공고 변경 없음"
+          if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json frontend/public/crawl_history.json)" ]; then
+            echo "정적 공고 및 수집 이력 변경 없음"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add frontend/public/static_jobs.json
+          git add frontend/public/static_jobs.json frontend/public/crawl_history.json
           git commit -m "chore: refresh Neon JobKorea snapshot"
           git pull --rebase --autostash origin main
           git push
@@ -99,12 +99,7 @@ jobs:
           name: neon-incremental-${{ github.run_number }}
           path: |
             frontend/public/static_jobs.json
+            frontend/public/crawl_history.json
             data/quarantine/
           if-no-files-found: warn
           retention-days: 14
-
-      - name: GitHub Pages 갱신 요청
-        if: success() && (github.event_name == 'schedule' || inputs.command != 'crawl')
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages.yml --ref main

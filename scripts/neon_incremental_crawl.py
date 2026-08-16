@@ -16,6 +16,7 @@ from bs4 import BeautifulSoup
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from crawler.location_filter import is_capital_area_location
+from scripts.crawl_history import record_crawl_history
 
 
 KST = timezone(timedelta(hours=9))
@@ -508,6 +509,12 @@ def export_static_json(database_url: str, output: str) -> int:
     return len(data)
 
 
+def count_total_jobs(database_url: str) -> int:
+    with psycopg.connect(database_url) as conn, conn.cursor() as cur:
+        cur.execute("SELECT COUNT(*) FROM job_postings")
+        return cur.fetchone()[0]
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=("crawl", "export", "crawl-and-export"))
@@ -517,7 +524,11 @@ def main():
     if not database_url:
         raise SystemExit("DATABASE_URL is required")
     if args.command in ("crawl", "crawl-and-export"):
-        print(json.dumps(asyncio.run(run_incremental_crawl(database_url)), ensure_ascii=False))
+        stats = asyncio.run(run_incremental_crawl(database_url))
+        print(json.dumps(stats, ensure_ascii=False))
+        if not stats.get("network_error_skipped"):
+            history_entry = record_crawl_history(stats["new"], count_total_jobs(database_url))
+            print(f"crawl_history={json.dumps(history_entry, ensure_ascii=False)}")
     if args.command in ("export", "crawl-and-export"):
         print(f"exported={export_static_json(database_url, args.output)}")
 

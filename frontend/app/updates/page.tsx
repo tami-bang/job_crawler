@@ -1,6 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+type CrawlHistoryEntry = {
+  date: string;
+  day_of_week: string;
+  new_jobs_count: number;
+  total_jobs_count: number;
+  crawled_at: string;
+};
 
 const updates = [
   {
@@ -195,6 +203,24 @@ export default function UpdatesPage() {
   const pageSizeOptions = [15, 50, 100];
   const [pageSize, setPageSize] = useState(15);
   const [page, setPage] = useState(1);
+  const [crawlHistory, setCrawlHistory] = useState<CrawlHistoryEntry[]>([]);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  useEffect(() => {
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+    fetch(`${basePath}/crawl_history.json`)
+      .then((response) => {
+        if (!response.ok) throw new Error("수집 이력을 불러오지 못했습니다.");
+        return response.json() as Promise<CrawlHistoryEntry[]>;
+      })
+      .then((history) => {
+        const latestHistory = [...history]
+          .sort((a, b) => b.date.localeCompare(a.date))
+          .slice(0, 30);
+        setCrawlHistory(latestHistory);
+      })
+      .catch(() => setCrawlHistory([]))
+      .finally(() => setHistoryLoaded(true));
+  }, []);
   const sortedUpdates = useMemo(() => (
     [...updates].sort((a, b) => b.date.localeCompare(a.date))
   ), []);
@@ -213,6 +239,33 @@ export default function UpdatesPage() {
         <span>매일 조금씩, </span>
         <span className="inline-block [color:var(--lime)]">쓰는 도구로 다듬기.</span>
       </h1>
+      <div className="sectionHeading updateHeading crawlHistoryHeading">
+        <div>
+          <span>DAILY COLLECTION</span>
+          <h2>일별 데이터 수집 로그</h2>
+        </div>
+        <p>LATEST 30 DAYS · KST</p>
+      </div>
+      <div className="updateList crawlHistoryList">
+        {crawlHistory.map((entry) => (
+          <article className="updateItem crawlHistoryItem" key={entry.date}>
+            <div className="updateMeta">
+              <strong>{entry.date}</strong>
+              <span>{entry.day_of_week}요일 · {entry.crawled_at}</span>
+            </div>
+            <div className="updateBody crawlHistoryBody">
+              <h3>
+                <span>{entry.date} ({entry.day_of_week})</span>
+                <b>신규 공고 +{entry.new_jobs_count.toLocaleString("ko-KR")}건 추가</b>
+                <small>(전체 {entry.total_jobs_count.toLocaleString("ko-KR")}건 수집 완료)</small>
+              </h3>
+            </div>
+          </article>
+        ))}
+        {historyLoaded && crawlHistory.length === 0 && (
+          <div className="crawlHistoryEmpty">다음 크롤링 완료 후 일별 수집 이력이 자동으로 표시됩니다.</div>
+        )}
+      </div>
       <div className="sectionHeading updateHeading">
         <div>
           <span>BUILD LOG</span>
