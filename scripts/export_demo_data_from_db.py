@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crawler.database import init_database
 from crawler.detail import extract_career_from_text
+from scripts.crawl_history import record_crawl_history
 
 
 def parse_json_list(value):
@@ -286,9 +287,11 @@ def main():
     rows = [row for row in load_jobs(args.db, args.limit * 4) if is_allowed_by_hard_location(row, hard_filters)]
     jobs = [serialize_job(index, row) for index, row in enumerate(rows[:args.limit], start=1)]
     output_path = Path(args.output)
+    existing_jobs = load_existing_jobs(output_path)
     if args.merge_existing:
-        jobs = merge_jobs(jobs, load_existing_jobs(output_path), args.limit)
+        jobs = merge_jobs(jobs, existing_jobs, args.limit)
     write_demo_data(jobs, output_path, args.db)
+    record_crawl_history(max(0, len(jobs) - len(existing_jobs)), len(jobs))
     print(f"[INFO] demo data exported: jobs={len(jobs)} output={args.output}")
 
 

@@ -504,15 +504,18 @@ def export_static_json(database_url: str, output: str) -> int:
         "jobs": data,
     }
     output_path = Path(output)
+    previous_count = 0
+    if output_path.exists():
+        try:
+            previous_snapshot = json.loads(output_path.read_text(encoding="utf-8"))
+            previous_jobs = previous_snapshot.get("jobs", []) if isinstance(previous_snapshot, dict) else previous_snapshot
+            previous_count = len(previous_jobs) if isinstance(previous_jobs, list) else 0
+        except (OSError, json.JSONDecodeError):
+            previous_count = 0
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(snapshot, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    record_crawl_history(max(0, len(data) - previous_count), len(data))
     return len(data)
-
-
-def count_total_jobs(database_url: str) -> int:
-    with psycopg.connect(database_url) as conn, conn.cursor() as cur:
-        cur.execute("SELECT COUNT(*) FROM job_postings")
-        return cur.fetchone()[0]
 
 
 def main():
@@ -526,9 +529,6 @@ def main():
     if args.command in ("crawl", "crawl-and-export"):
         stats = asyncio.run(run_incremental_crawl(database_url))
         print(json.dumps(stats, ensure_ascii=False))
-        if not stats.get("network_error_skipped"):
-            history_entry = record_crawl_history(stats["new"], count_total_jobs(database_url))
-            print(f"crawl_history={json.dumps(history_entry, ensure_ascii=False)}")
     if args.command in ("export", "crawl-and-export"):
         print(f"exported={export_static_json(database_url, args.output)}")
 

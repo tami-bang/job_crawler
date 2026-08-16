@@ -51,13 +51,13 @@ jobs:
 
       - name: 정적 JSON 저장소 반영
         run: |
-          if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json)" ]; then
-            echo "정적 공고 변경 없음"
+          if [ -z "$(git status --porcelain -- frontend/public/static_jobs.json frontend/public/crawl_history.json)" ]; then
+            echo "정적 공고 및 수집 이력 변경 없음"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add frontend/public/static_jobs.json
+          git add frontend/public/static_jobs.json frontend/public/crawl_history.json
           git commit -m "chore: refresh scored JobKorea snapshot"
           git pull --rebase --autostash origin main
           git push

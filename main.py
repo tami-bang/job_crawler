@@ -12,7 +12,6 @@ from crawler.matcher import DEFAULT_PREFERENCES_PATH, load_preferences, run_matc
 from crawler.parser import parse_html
 from crawler.report import build_match_report
 from crawler.taxonomy import sync_jobkorea_taxonomy
-from scripts.crawl_history import record_crawl_history
 
 
 logger = setup_logger()
@@ -450,10 +449,6 @@ def run_jobkorea_multi_pipeline(sites, options=None):
 
     print_multi_pipeline_summary(summary)
     print_database_summary()
-    with get_connection() as conn:
-        total_jobs_count = conn.execute("SELECT COUNT(1) FROM job_postings").fetchone()[0]
-    history_entry = record_crawl_history(summary["list_total"]["new"], total_jobs_count)
-    print(f"[INFO] crawl history recorded: {json.dumps(history_entry, ensure_ascii=False)}")
 
 
 def print_pipeline_summary(summary):
