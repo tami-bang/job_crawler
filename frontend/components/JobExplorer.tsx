@@ -30,6 +30,7 @@ const calendarStatusFilters: Array<{ value: CalendarStatusFilter; label: string 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 const pageSizeOptions = [15, 50, 100];
 const originExamples = "예: 서울역, 강남역, 서울 강남구 테헤란로 123";
+const EXPLORER_UI_STATE_VERSION = 1;
 const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
 const sortLabels = {
   match_desc: "매칭 점수 높은순",
@@ -41,6 +42,15 @@ const sortLabels = {
 } as const;
 type SortKey = keyof typeof sortLabels;
 type ExplorerView = "list" | "calendar" | "expired";
+type PersistedExplorerState = {
+  version: number;
+  view: ExplorerView;
+  page: number;
+  pageSize: number;
+  sortBy: SortKey;
+  calendarMonth: string;
+  calendarStatusFilter: CalendarStatusFilter;
+};
 type RegionGroup = "서울" | "경기" | "인천";
 type JobCategoryKey = "backend" | "frontend" | "web" | "app" | "system" | "network" | "dba" | "data_engineer" | "data_scientist" | "security" | "software" | "game" | "hardware" | "ai_ml" | "blockchain" | "cloud" | "publisher" | "consulting" | "qa" | "ai_research" | "data_analyst" | "labeler" | "prompt" | "ai_security" | "mlops" | "ai_service";
 type MatchBasisKey =
@@ -587,6 +597,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [pageSize, setPageSize] = useState(15);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [calendarStatusFilter, setCalendarStatusFilter] = useState<CalendarStatusFilter>("all");
+  const [uiStateReady, setUiStateReady] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
@@ -606,8 +617,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
     try {
       const result = await api.jobs(term, favoriteOnly);
       setJobs(result.items);
-      setPage(1);
-      setCalendarMonth(new Date());
+      if (source === "search") {
+        setPage(1);
+        setCalendarMonth(new Date());
+      }
       setError("");
       if (source === "search") {
         setSearchFeedback(`검색 완료 · ${result.items.length}건`);
@@ -620,6 +633,45 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       setLoading(false);
     }
   }, [favoriteOnly]);
+
+  useEffect(() => {
+    const storageKey = `job-radar-explorer-ui-v${EXPLORER_UI_STATE_VERSION}-${favoriteOnly ? "favorites" : "all"}`;
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null") as Partial<PersistedExplorerState> | null;
+      if (saved?.version === EXPLORER_UI_STATE_VERSION) {
+        if (saved.view === "list" || saved.view === "calendar" || saved.view === "expired") setView(saved.view);
+        if (Number.isInteger(saved.page) && Number(saved.page) > 0) setPage(Number(saved.page));
+        if (pageSizeOptions.includes(Number(saved.pageSize))) setPageSize(Number(saved.pageSize));
+        if (saved.sortBy && saved.sortBy in sortLabels) setSortBy(saved.sortBy);
+        if (saved.calendarStatusFilter && calendarStatusFilters.some(({ value }) => value === saved.calendarStatusFilter)) {
+          setCalendarStatusFilter(saved.calendarStatusFilter);
+        }
+        if (typeof saved.calendarMonth === "string" && /^\d{4}-\d{2}$/.test(saved.calendarMonth)) {
+          const [year, month] = saved.calendarMonth.split("-").map(Number);
+          if (month >= 1 && month <= 12) setCalendarMonth(new Date(year, month - 1, 1));
+        }
+      }
+    } catch {
+      localStorage.removeItem(storageKey);
+    } finally {
+      setUiStateReady(true);
+    }
+  }, [favoriteOnly]);
+
+  useEffect(() => {
+    if (!uiStateReady) return;
+    const storageKey = `job-radar-explorer-ui-v${EXPLORER_UI_STATE_VERSION}-${favoriteOnly ? "favorites" : "all"}`;
+    const state: PersistedExplorerState = {
+      version: EXPLORER_UI_STATE_VERSION,
+      view,
+      page,
+      pageSize,
+      sortBy,
+      calendarMonth: `${calendarMonth.getFullYear()}-${String(calendarMonth.getMonth() + 1).padStart(2, "0")}`,
+      calendarStatusFilter,
+    };
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  }, [calendarMonth, calendarStatusFilter, favoriteOnly, page, pageSize, sortBy, uiStateReady, view]);
 
   useEffect(() => { void loadJobs(); }, [loadJobs]);
   useEffect(() => {
