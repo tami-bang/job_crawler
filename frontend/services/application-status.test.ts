@@ -4,6 +4,7 @@ import {
   getApplicationTone,
   getDisplayApplicationStatus,
   getPipelineStep,
+  isCalendarEligible,
   matchesCalendarStatusFilter,
   normalizeApplicationStatus,
 } from "./application-status";
@@ -38,6 +39,13 @@ describe("application status presentation", () => {
     expect(matchesCalendarStatusFilter("document_passed", "passed")).toBe(true);
     expect(matchesCalendarStatusFilter("final_passed", "passed")).toBe(true);
     expect(matchesCalendarStatusFilter("applied", "passed")).toBe(false);
+  });
+
+  it("shows only favorites in the deadline calendar", () => {
+    expect(isCalendarEligible(true, false)).toBe(true);
+    expect(isCalendarEligible(false, false)).toBe(false);
+    expect(isCalendarEligible(false, true)).toBe(false);
+    expect(isCalendarEligible(true, true)).toBe(false);
   });
 
   it("collapses interview rounds into one pipeline step", () => {

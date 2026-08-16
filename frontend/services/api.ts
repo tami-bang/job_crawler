@@ -104,10 +104,7 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
   if (typeof window !== "undefined") {
     try {
       migrateUserStorageV2(localStorage, legacyIdToStableKeyMap);
-      const recoverableStableKeys = new Set(
-        demoJobs.filter((job) => Boolean(job.deadline_date)).map(getStableJobKey),
-      );
-      const sanitized = sanitizeUserState(readUserState(localStorage), recoverableStableKeys);
+      const sanitized = sanitizeUserState(readUserState(localStorage));
       userState = sanitized.state;
       let stateChanged = sanitized.changed;
       demoJobs.forEach((job) => {

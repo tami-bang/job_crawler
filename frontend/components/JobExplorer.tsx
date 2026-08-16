@@ -9,6 +9,7 @@ import {
   getApplicationTone,
   getDisplayApplicationStatus,
   getPipelineStep,
+  isCalendarEligible,
   matchesCalendarStatusFilter,
   normalizeApplicationStatus,
   selectableApplicationStatuses,
@@ -747,14 +748,14 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }, [activeRegion, careerOptions, employmentOptions, expandedFilters]);
 
   const jobsByDeadline = useMemo(() => {
-    const calendarJobs = favoriteOnly ? filteredJobs : activeFilteredJobs;
+    const calendarJobs = filteredJobs.filter((job) => isCalendarEligible(job.is_favorite, job.is_disliked));
     return calendarJobs.filter((job) => matchesCalendarStatusFilter(job.favorite_status, calendarStatusFilter)).reduce<Record<string, Job[]>>((acc, job) => {
       const deadlineDate = getEffectiveDeadlineDate(job);
       if (!deadlineDate) return acc;
       acc[deadlineDate] = [...(acc[deadlineDate] ?? []), job];
       return acc;
     }, {});
-  }, [activeFilteredJobs, calendarStatusFilter, favoriteOnly, filteredJobs]);
+  }, [calendarStatusFilter, filteredJobs]);
   const calendarModalJobs = calendarModalDate ? jobsByDeadline[calendarModalDate] ?? [] : [];
   const tomorrowKey = toDateKey(addDays(new Date(), 1));
   const favoriteDeadlineAlerts = useMemo(() => (

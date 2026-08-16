@@ -109,21 +109,21 @@ describe("stable job state", () => {
       memo: "지원 예정 공고",
     });
     expect(state["jobkorea:200"]).toMatchObject({
-      isFavorite: true,
-      isDisliked: false,
-      status: "planned",
+      isFavorite: false,
+      isDisliked: true,
+      status: "excluded",
     });
   });
 
-  it("recovers only valid source jobs and preserves an explicit deletion", () => {
+  it("preserves disliked jobs and explicit deletions", () => {
     const { state, changed } = sanitizeUserState({
       "jobkorea:100": { isFavorite: false, isDisliked: true, status: "excluded" },
       "jobkorea:200": { isFavorite: false, isDisliked: true, status: "excluded", isDeleted: true },
       "jobkorea:300": { isFavorite: false, isDisliked: true, status: "excluded" },
-    }, new Set(["jobkorea:100", "jobkorea:200"]));
+    });
 
-    expect(changed).toBe(true);
-    expect(state["jobkorea:100"]).toMatchObject({ isFavorite: true, isDisliked: false, status: "planned" });
+    expect(changed).toBe(false);
+    expect(state["jobkorea:100"]).toMatchObject({ isFavorite: false, isDisliked: true, status: "excluded" });
     expect(state["jobkorea:200"]).toMatchObject({ isFavorite: false, isDisliked: true, isDeleted: true });
     expect(state["jobkorea:300"]).toMatchObject({ isFavorite: false, isDisliked: true, status: "excluded" });
   });

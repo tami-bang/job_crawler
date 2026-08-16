@@ -68,18 +68,13 @@ export function readUserState(storage: StorageLike): UserState {
   return parseJson<UserState>(storage.getItem(V2_USER_STATE_KEY), {});
 }
 
-export function sanitizeUserState(
-  state: UserState,
-  recoverableStableKeys: Set<string> = new Set(Object.keys(state)),
-): { state: UserState; changed: boolean } {
+export function sanitizeUserState(state: UserState): { state: UserState; changed: boolean } {
   let changed = false;
   const sanitized = Object.fromEntries(Object.entries(state).map(([stableKey, interaction]) => {
-    const recoverable = recoverableStableKeys.has(stableKey) && !interaction.isDeleted;
-    if (recoverable && (interaction.status === "excluded" || interaction.isDisliked)) {
+    if (interaction.isFavorite && (interaction.status === "excluded" || interaction.isDisliked)) {
       changed = true;
       return [stableKey, {
         ...interaction,
-        isFavorite: true,
         isDisliked: false,
         status: "planned",
       }];

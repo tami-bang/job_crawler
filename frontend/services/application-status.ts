@@ -62,6 +62,10 @@ export function matchesCalendarStatusFilter(
   return normalized.endsWith("_passed");
 }
 
+export function isCalendarEligible(isFavorite: boolean, isDisliked: boolean | undefined) {
+  return isFavorite && !isDisliked;
+}
+
 export function getPipelineStep(status: string | null | undefined) {
   const normalized = normalizeApplicationStatus(status);
   return applicationPipeline.findIndex((step) => (step.statuses as readonly string[]).includes(normalized));
