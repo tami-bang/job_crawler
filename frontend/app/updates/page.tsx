@@ -201,6 +201,7 @@ const updates = [
 
 export default function UpdatesPage() {
   const pageSizeOptions = [15, 50, 100];
+  const [activeTab, setActiveTab] = useState<"collection" | "patches">("collection");
   const [pageSize, setPageSize] = useState(15);
   const [page, setPage] = useState(1);
   const [crawlHistory, setCrawlHistory] = useState<CrawlHistoryEntry[]>([]);
@@ -239,73 +240,103 @@ export default function UpdatesPage() {
         <span>매일 조금씩, </span>
         <span className="inline-block [color:var(--lime)]">쓰는 도구로 다듬기.</span>
       </h1>
-      <div className="sectionHeading updateHeading crawlHistoryHeading">
-        <div>
-          <span>DAILY COLLECTION</span>
-          <h2>일별 데이터 수집 로그</h2>
+      <div className="updateTabs" role="tablist" aria-label="업데이트 로그 종류">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "collection"}
+          aria-controls="collection-log-panel"
+          className={activeTab === "collection" ? "active" : ""}
+          onClick={() => setActiveTab("collection")}
+        >
+          <span aria-hidden="true">📊</span> 수집 로그
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "patches"}
+          aria-controls="patch-notes-panel"
+          className={activeTab === "patches" ? "active" : ""}
+          onClick={() => setActiveTab("patches")}
+        >
+          <span aria-hidden="true">🛠️</span> 패치 노트
+        </button>
+      </div>
+      {activeTab === "collection" && (
+        <div id="collection-log-panel" role="tabpanel">
+          <div className="sectionHeading updateHeading crawlHistoryHeading">
+            <div>
+              <span>DAILY COLLECTION</span>
+              <h2>일별 데이터 수집 로그</h2>
+            </div>
+            <p>LATEST 30 DAYS · KST</p>
+          </div>
+          <div className="updateList crawlHistoryList">
+            {crawlHistory.map((entry) => (
+              <article className="updateItem crawlHistoryItem" key={entry.date}>
+                <div className="updateMeta">
+                  <strong>{entry.date}</strong>
+                  <span>{entry.day_of_week}요일 · {entry.crawled_at}</span>
+                </div>
+                <div className="updateBody crawlHistoryBody">
+                  <h3>
+                    <span>{entry.date} ({entry.day_of_week})</span>
+                    <b>신규 공고 +{entry.new_jobs_count.toLocaleString("ko-KR")}건 추가</b>
+                    <small>(전체 {entry.total_jobs_count.toLocaleString("ko-KR")}건 수집 완료)</small>
+                  </h3>
+                </div>
+              </article>
+            ))}
+            {historyLoaded && crawlHistory.length === 0 && (
+              <div className="crawlHistoryEmpty">다음 크롤링 완료 후 일별 수집 이력이 자동으로 표시됩니다.</div>
+            )}
+          </div>
         </div>
-        <p>LATEST 30 DAYS · KST</p>
-      </div>
-      <div className="updateList crawlHistoryList">
-        {crawlHistory.map((entry) => (
-          <article className="updateItem crawlHistoryItem" key={entry.date}>
-            <div className="updateMeta">
-              <strong>{entry.date}</strong>
-              <span>{entry.day_of_week}요일 · {entry.crawled_at}</span>
+      )}
+      {activeTab === "patches" && (
+        <div id="patch-notes-panel" role="tabpanel">
+          <div className="sectionHeading updateHeading">
+            <div>
+              <span>BUILD LOG</span>
+              <h2>업데이트 로그</h2>
             </div>
-            <div className="updateBody crawlHistoryBody">
-              <h3>
-                <span>{entry.date} ({entry.day_of_week})</span>
-                <b>신규 공고 +{entry.new_jobs_count.toLocaleString("ko-KR")}건 추가</b>
-                <small>(전체 {entry.total_jobs_count.toLocaleString("ko-KR")}건 수집 완료)</small>
-              </h3>
-            </div>
-          </article>
-        ))}
-        {historyLoaded && crawlHistory.length === 0 && (
-          <div className="crawlHistoryEmpty">다음 크롤링 완료 후 일별 수집 이력이 자동으로 표시됩니다.</div>
-        )}
-      </div>
-      <div className="sectionHeading updateHeading">
-        <div>
-          <span>BUILD LOG</span>
-          <h2>업데이트 로그</h2>
+            <p>WHAT CHANGED · WHY IT MATTERS</p>
+          </div>
+          <div className="updateList">
+            {visibleUpdates.map((update) => (
+              <article className="updateItem" key={`${update.date}-${update.title}`}>
+                <div className="updateMeta">
+                  <strong>{update.date}</strong>
+                  <span>{update.tag}</span>
+                </div>
+                <div className="updateBody">
+                  <h3>{update.title}</h3>
+                  <ul>
+                    {update.items.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="pagination updatePagination" aria-label="업데이트 로그 페이지네이션">
+            <button disabled={currentPage <= 1} onClick={() => changePage(Math.max(1, currentPage - 1))}>←</button>
+            <strong>{currentPage} / {totalPages}</strong>
+            <button disabled={currentPage >= totalPages} onClick={() => changePage(Math.min(totalPages, currentPage + 1))}>→</button>
+            <label className="pageSizeSelect bottom">
+              <span>표시 개수</span>
+              <select
+                value={pageSize}
+                onChange={(event) => {
+                  setPageSize(Number(event.target.value));
+                  changePage(1);
+                }}
+              >
+                {pageSizeOptions.map((option) => <option key={option} value={option}>{option}개씩</option>)}
+              </select>
+            </label>
+          </div>
         </div>
-        <p>WHAT CHANGED · WHY IT MATTERS</p>
-      </div>
-      <div className="updateList">
-        {visibleUpdates.map((update) => (
-          <article className="updateItem" key={`${update.date}-${update.title}`}>
-            <div className="updateMeta">
-              <strong>{update.date}</strong>
-              <span>{update.tag}</span>
-            </div>
-            <div className="updateBody">
-              <h3>{update.title}</h3>
-              <ul>
-                {update.items.map((item) => <li key={item}>{item}</li>)}
-              </ul>
-            </div>
-          </article>
-        ))}
-      </div>
-      <div className="pagination updatePagination" aria-label="업데이트 로그 페이지네이션">
-        <button disabled={currentPage <= 1} onClick={() => changePage(Math.max(1, currentPage - 1))}>←</button>
-        <strong>{currentPage} / {totalPages}</strong>
-        <button disabled={currentPage >= totalPages} onClick={() => changePage(Math.min(totalPages, currentPage + 1))}>→</button>
-        <label className="pageSizeSelect bottom">
-          <span>표시 개수</span>
-          <select
-            value={pageSize}
-            onChange={(event) => {
-              setPageSize(Number(event.target.value));
-              changePage(1);
-            }}
-          >
-            {pageSizeOptions.map((option) => <option key={option} value={option}>{option}개씩</option>)}
-          </select>
-        </label>
-      </div>
+      )}
     </section>
   );
 }
