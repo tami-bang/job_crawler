@@ -104,7 +104,10 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
   if (typeof window !== "undefined") {
     try {
       migrateUserStorageV2(localStorage, legacyIdToStableKeyMap);
-      const sanitized = sanitizeUserState(readUserState(localStorage));
+      const recoverableStableKeys = new Set(
+        demoJobs.filter((job) => Boolean(job.deadline_date)).map(getStableJobKey),
+      );
+      const sanitized = sanitizeUserState(readUserState(localStorage), recoverableStableKeys);
       userState = sanitized.state;
       let stateChanged = sanitized.changed;
       demoJobs.forEach((job) => {
@@ -260,6 +263,7 @@ export const api = {
         ...current,
         isFavorite: true,
         isDisliked: false,
+        isDeleted: false,
         memo: current.memo ?? "",
         status: current.status === "excluded" ? "planned" : (current.status ?? "planned"),
         jobSnapshot: { ...job },
@@ -277,6 +281,7 @@ export const api = {
       updateDemoInteraction(stableKey, (current) => ({
         ...current,
         isFavorite: false,
+        isDeleted: true,
         memo: undefined,
         status: undefined,
         jobSnapshot: undefined,
@@ -292,6 +297,7 @@ export const api = {
         ...current,
         isFavorite: status !== "excluded",
         isDisliked: status === "excluded",
+        isDeleted: false,
         memo,
         status,
       }));
@@ -309,6 +315,7 @@ export const api = {
         ...current,
         isFavorite: false,
         isDisliked: true,
+        isDeleted: false,
         memo: undefined,
         status: undefined,
       }));
