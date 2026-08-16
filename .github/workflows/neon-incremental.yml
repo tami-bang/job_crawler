@@ -2,8 +2,8 @@ name: Neon 일일 수집 및 배포
 
 on:
   schedule:
-    # 매일 한국시간 오전 9시 7분 (UTC 00:07) — 정각 혼잡 회피
-    - cron: "7 0 * * *"
+    # 매일 한국시간 오전 9시 13분 (UTC 00:13) — 공유 스케줄러 혼잡 분산
+    - cron: "13 0 * * *"
   workflow_dispatch:
     inputs:
       command:
@@ -55,10 +55,13 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JOBKOREA_REQUEST_PAYLOAD_JSON: ${{ inputs.request_payload_json }}
           JOBKOREA_START_PAGE: ${{ inputs.start_page || '1' }}
-        run: python scripts/neon_incremental_crawl.py "${{ inputs.command || 'crawl' }}"
+        run: |
+          command="${{ inputs.command || 'crawl' }}"
+          if [ "$command" = "crawl-and-export" ]; then command="crawl"; fi
+          python scripts/neon_incremental_crawl.py "$command"
 
       - name: 예약 실행 · 신규 상세 수집 및 점수 계산
-        if: success() && github.event_name == 'schedule'
+        if: success() && (github.event_name == 'schedule' || inputs.command == 'crawl-and-export')
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: >-
@@ -68,7 +71,7 @@ jobs:
           --batch-size 20
 
       - name: 예약 실행 · 점수순 스냅샷 생성
-        if: success() && github.event_name == 'schedule'
+        if: success() && (github.event_name == 'schedule' || inputs.command == 'crawl-and-export')
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python scripts/neon_incremental_crawl.py export
@@ -84,7 +87,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add frontend/public/static_jobs.json
           git commit -m "chore: refresh Neon JobKorea snapshot"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push
 
       - name: 결과 업로드

@@ -23,6 +23,9 @@ HEADERS = {
     "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.7,en;q=0.6",
     "Cache-Control": "no-cache",
     "Pragma": "no-cache",
+    "Sec-CH-UA": '"Google Chrome";v="151", "Chromium";v="151", "Not_A Brand";v="99"',
+    "Sec-CH-UA-Mobile": "?0",
+    "Sec-CH-UA-Platform": '"macOS"',
     "Sec-Fetch-Dest": "document",
     "Sec-Fetch-Mode": "navigate",
     "Sec-Fetch-Site": "same-origin",
@@ -178,11 +181,11 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
         with httpx.Client(headers=HEADERS, timeout=timeout, limits=limits, follow_redirects=True) as client:
             try:
                 client.get("https://www.jobkorea.co.kr/recruit/joblist?menucode=duty")
-            except httpx.ConnectTimeout as exc:
-                stats["connect_timeout_skipped"] = 1
+            except httpx.RequestError as exc:
+                stats["network_error_skipped"] = 1
                 print(
-                    f"::warning::JobKorea detail connection timed out; "
-                    f"continuing with existing Neon data: {exc}",
+                    f"::warning::JobKorea detail connection failed; continuing with existing "
+                    f"Neon data: {type(exc).__name__}: {exc}",
                     flush=True,
                 )
                 return stats

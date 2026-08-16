@@ -103,6 +103,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add frontend/services/demo-data.ts
           git commit -m "chore: refresh daily JobKorea data"
+          git pull --rebase --autostash origin main
           git push
 
       - name: 실행 결과 업로드

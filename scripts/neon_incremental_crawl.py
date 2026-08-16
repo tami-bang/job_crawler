@@ -5,6 +5,7 @@ import asyncio
 import hashlib
 import json
 import os
+import random
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -299,8 +300,19 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
     consecutive_old_unchanged = 0
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+        "Accept": "text/html, */*; q=0.01",
+        "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.7,en;q=0.6",
+        "Cache-Control": "no-cache",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Origin": "https://www.jobkorea.co.kr",
+        "Pragma": "no-cache",
         "Referer": "https://www.jobkorea.co.kr/recruit/joblist?menucode=duty",
+        "Sec-CH-UA": '"Google Chrome";v="151", "Chromium";v="151", "Not_A Brand";v="99"',
+        "Sec-CH-UA-Mobile": "?0",
+        "Sec-CH-UA-Platform": '"macOS"',
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
         "X-Requested-With": "XMLHttpRequest",
     }
 
@@ -322,7 +334,8 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
         watermark = previous_watermark - timedelta(days=3) if previous_watermark else None
 
         try:
-            async with httpx.AsyncClient(headers=headers, timeout=20, follow_redirects=True) as client:
+            timeout = httpx.Timeout(connect=10.0, read=30.0, write=10.0, pool=10.0)
+            async with httpx.AsyncClient(headers=headers, timeout=timeout, follow_redirects=True) as client:
                 previous_page_ids = None
                 max_pages = int(os.environ.get("JOBKOREA_MAX_PAGES", "500"))
                 start_page = int(os.environ.get("JOBKOREA_START_PAGE", "1"))
@@ -330,19 +343,26 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                 for page in range(start_page, max_pages + 1):
                     payload = {**base_payload, "page": str(page)}
                     response = None
-                    for attempt in range(5):
+                    max_attempts = int(os.environ.get("JOBKOREA_MAX_ATTEMPTS", "5"))
+                    for attempt in range(max_attempts):
                         try:
                             response = await client.post(API_URL, data=payload)
-                        except httpx.RequestError:
-                            if attempt == 4:
+                        except httpx.RequestError as exc:
+                            if attempt == max_attempts - 1:
                                 raise
-                            await asyncio.sleep((2 ** attempt) + (page % 7) / 10)
+                            delay = min(30.0, 2 ** attempt) + random.uniform(0.25, 1.25)
+                            print(
+                                f"::warning::JobKorea request attempt {attempt + 1}/{max_attempts} "
+                                f"failed on page {page}: {type(exc).__name__}; retrying in {delay:.1f}s"
+                            )
+                            await asyncio.sleep(delay)
                             continue
                         if response.status_code not in (429, 500, 502, 503, 504):
                             break
-                        if attempt == 4:
+                        if attempt == max_attempts - 1:
                             response.raise_for_status()
-                        await asyncio.sleep((2 ** attempt) + (page % 7) / 10)
+                        delay = min(30.0, 2 ** attempt) + random.uniform(0.25, 1.25)
+                        await asyncio.sleep(delay)
                     if response is None:
                         raise RuntimeError(f"no response received for page {page}")
                     response.raise_for_status()
@@ -397,7 +417,7 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                     if consecutive_old_unchanged >= 3:
                         break
                     await asyncio.sleep(request_delay)
-        except httpx.ConnectTimeout as exc:
+        except (httpx.RequestError, httpx.HTTPStatusError) as exc:
             conn.rollback()
             with conn.cursor() as cur:
                 cur.execute(
@@ -405,8 +425,11 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
                     (partition_key,),
                 )
             conn.commit()
-            stats["connect_timeout_skipped"] = 1
-            print(f"::warning::JobKorea connection timed out; continuing with existing Neon data: {exc}")
+            stats["network_error_skipped"] = 1
+            print(
+                f"::warning::JobKorea network request failed; continuing with existing Neon data: "
+                f"{type(exc).__name__}: {exc}"
+            )
             return stats
         except Exception:
             conn.rollback()
