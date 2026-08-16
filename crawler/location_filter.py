@@ -21,7 +21,7 @@ def is_capital_area_location(value):
         re.search(rf"(^|[\n,/·])\s*{re.escape(prefix)}(?=\s|전체|$)", text)
         for prefix in ALLOWED_LOCATION_PREFIXES
     )
-    if not starts_in_allowed_area or re.search(r"(?:^|\s)외\s*\d+", text):
+    if not starts_in_allowed_area:
         return False
 
     return not any(

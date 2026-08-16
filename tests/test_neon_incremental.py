@@ -17,7 +17,7 @@ class NeonIncrementalTests(unittest.TestCase):
         self.assertTrue(is_capital_area_location("서울 강남구"))
         self.assertTrue(is_capital_area_location(["경기 성남시", "인천 연수구"]))
         self.assertFalse(is_capital_area_location("부산 해운대구"))
-        self.assertFalse(is_capital_area_location("서울 외 14"))
+        self.assertTrue(is_capital_area_location("서울 외 14"))
         self.assertFalse(is_capital_area_location(""))
 
     def test_canonical_hash_ignores_list_order(self):
