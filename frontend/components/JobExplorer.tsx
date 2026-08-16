@@ -2,17 +2,28 @@
 
 import { KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { api, Job } from "@/services/api";
+import {
+  applicationPipeline,
+  applicationStatusMeta,
+  CalendarStatusFilter,
+  getApplicationTone,
+  getPipelineStep,
+  matchesCalendarStatusFilter,
+  normalizeApplicationStatus,
+  selectableApplicationStatuses,
+} from "@/services/application-status";
 import { downloadWorkbook } from "@/services/export-xlsx";
 import { isAlwaysOpenDeadline, matchesEmploymentFilters } from "@/services/job-filters";
 
-const statusLabel: Record<string, string> = {
-  planned: "지원예정",
-  applied: "지원완료",
-  document_passed: "서류합격",
-  first_passed: "1차합격",
-  second_passed: "2차합격",
-  final_passed: "최종합격",
-};
+const statusLabel = Object.fromEntries(
+  selectableApplicationStatuses.map((status) => [status, applicationStatusMeta[status].label]),
+);
+const calendarStatusFilters: Array<{ value: CalendarStatusFilter; label: string }> = [
+  { value: "all", label: "전체" },
+  { value: "planned", label: "지원예정" },
+  { value: "applied", label: "지원완료" },
+  { value: "passed", label: "합격" },
+];
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 const pageSizeOptions = [15, 50, 100];
@@ -259,6 +270,14 @@ function isExpiredJob(job: Job, todayKey: string) {
 function getEffectiveDeadlineDate(job: Job) {
   if (isAlwaysOpen(job.deadline)) return null;
   return job.deadline_date;
+}
+
+function getDaysUntilDeadline(deadlineDate: string | null | undefined, todayKey: string) {
+  if (!deadlineDate) return null;
+  const deadlineTime = getDateTime(deadlineDate, Number.NaN);
+  const todayTime = getDateTime(todayKey, Number.NaN);
+  if (Number.isNaN(deadlineTime) || Number.isNaN(todayTime)) return null;
+  return Math.round((deadlineTime - todayTime) / 86400000);
 }
 
 function normalizeLocationOption(location: string | null) {
@@ -565,6 +584,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [calendarStatusFilter, setCalendarStatusFilter] = useState<CalendarStatusFilter>("all");
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
@@ -727,13 +747,13 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
 
   const jobsByDeadline = useMemo(() => {
     const calendarJobs = favoriteOnly ? filteredJobs : activeFilteredJobs;
-    return calendarJobs.reduce<Record<string, Job[]>>((acc, job) => {
+    return calendarJobs.filter((job) => matchesCalendarStatusFilter(job.favorite_status, calendarStatusFilter)).reduce<Record<string, Job[]>>((acc, job) => {
       const deadlineDate = getEffectiveDeadlineDate(job);
       if (!deadlineDate) return acc;
       acc[deadlineDate] = [...(acc[deadlineDate] ?? []), job];
       return acc;
     }, {});
-  }, [activeFilteredJobs, favoriteOnly, filteredJobs]);
+  }, [activeFilteredJobs, calendarStatusFilter, favoriteOnly, filteredJobs]);
   const calendarModalJobs = calendarModalDate ? jobsByDeadline[calendarModalDate] ?? [] : [];
   const tomorrowKey = toDateKey(addDays(new Date(), 1));
   const favoriteDeadlineAlerts = useMemo(() => (
@@ -1249,6 +1269,19 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <strong>{formatMonth(calendarMonth)}</strong>
             <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}>→</button>
           </div>
+          <div className="calendarStatusFilters" aria-label="지원 상태별 달력 필터">
+            {calendarStatusFilters.map((filter) => (
+              <button
+                type="button"
+                className={calendarStatusFilter === filter.value ? "active" : ""}
+                aria-pressed={calendarStatusFilter === filter.value}
+                onClick={() => setCalendarStatusFilter(filter.value)}
+                key={filter.value}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
           <div className="calendarWeek">
             {weekDays.map((day) => <span key={day}>{day}</span>)}
           </div>
@@ -1265,11 +1298,23 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                       {isToday && <b>TODAY</b>}
                     </span>
                   )}
-                  {dayJobs.slice(0, 3).map((job) => (
-                    <button type="button" className="deadlinePill" onClick={() => setCalendarModalDate(dateKey)} key={job.id}>
-                      <b>{getDynamicMatchScore(job, matchBasis)}</b> {job.company_name || "회사 미상"}
-                    </button>
-                  ))}
+                  {dayJobs.slice(0, 3).map((job) => {
+                    const daysUntilDeadline = getDaysUntilDeadline(getEffectiveDeadlineDate(job), todayKey);
+                    const expired = daysUntilDeadline !== null && daysUntilDeadline < 0;
+                    const tone = getApplicationTone(job.is_disliked ? "excluded" : job.favorite_status, expired);
+                    const urgent = normalizeApplicationStatus(job.favorite_status) === "planned"
+                      && daysUntilDeadline !== null && daysUntilDeadline >= 0 && daysUntilDeadline <= 3;
+                    return (
+                      <button
+                        type="button"
+                        className={`deadlinePill statusTone-${tone} ${urgent ? "deadlineUrgent" : ""}`}
+                        onClick={() => setCalendarModalDate(dateKey)}
+                        key={job.id}
+                      >
+                        <b>{getDynamicMatchScore(job, matchBasis)}</b> {job.company_name || "회사 미상"}
+                      </button>
+                    );
+                  })}
                   {dayJobs.length > 3 && (
                     <button type="button" className="moreJobs" onClick={() => setCalendarModalDate(dateKey)}>
                       +{dayJobs.length - 3}개 더
@@ -1289,10 +1334,18 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             <span className="modalKicker">DEADLINE JOBS</span>
             <h3 id="calendar-day-modal-title">{calendarModalDate} 마감 공고</h3>
             <div className="calendarJobList">
-              {calendarModalJobs.map((job) => (
-                <article className={`calendarJobItem ${job.is_favorite ? "favorite" : ""} ${job.is_disliked ? "disliked" : ""}`} key={job.id}>
+              {calendarModalJobs.map((job) => {
+                const expired = isExpiredJob(job, todayKey);
+                const normalizedStatus = normalizeApplicationStatus(job.is_disliked ? "excluded" : job.favorite_status);
+                const tone = getApplicationTone(normalizedStatus, expired);
+                const pipelineStep = getPipelineStep(normalizedStatus);
+                return (
+                <article className={`calendarJobItem statusTone-${tone}`} key={job.id}>
                   <div>
-                    <strong><b>{getDynamicMatchScore(job, matchBasis)}</b> {job.company_name || "회사 미상"}</strong>
+                    <div className="calendarJobHeading">
+                      <strong><b>{getDynamicMatchScore(job, matchBasis)}</b> {job.company_name || "회사 미상"}</strong>
+                      <span className="applicationStatusBadge">{expired ? "마감" : applicationStatusMeta[normalizedStatus].label}</span>
+                    </div>
                     <p>{job.title}</p>
                     <small>{[job.location, job.career, job.employment_type].filter(Boolean).join(" · ")}</small>
                   </div>
@@ -1302,6 +1355,16 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                       className={`favoriteButton ${job.is_favorite ? "active" : ""}`}
                       onClick={() => void toggleFavorite(job)}
                     >{job.is_favorite ? "💖 저장됨" : "💚 저장"}</button>
+                    {job.is_favorite && (
+                      <select
+                        className="calendarStatusSelect"
+                        aria-label={`${job.company_name || job.title} 지원 상태`}
+                        value={normalizedStatus}
+                        onChange={(event) => void changeStatus(job, event.target.value)}
+                      >
+                        {Object.entries(statusLabel).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+                      </select>
+                    )}
                     <button
                       type="button"
                       aria-label={job.is_disliked ? "별로 표시 해제" : "별로 표시"}
@@ -1321,8 +1384,19 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                       onBlur={(event) => void changeMemo(job, event.target.value)}
                     />
                   )}
+                  {job.is_favorite && (
+                    <div className="applicationPipeline" aria-label={`현재 전형 단계: ${applicationStatusMeta[normalizedStatus].label}`}>
+                      {applicationPipeline.map((step, index) => (
+                        <div className={`${index < pipelineStep ? "complete" : ""} ${index === pipelineStep ? "current" : ""}`} key={step.label}>
+                          <i>{index < pipelineStep ? "✓" : index + 1}</i>
+                          <span>{step.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </article>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
