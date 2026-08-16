@@ -36,8 +36,9 @@ export function normalizeApplicationStatus(status: string | null | undefined): A
 }
 
 export function getApplicationTone(status: string | null | undefined, expired = false): ApplicationTone {
-  if (expired) return "inactive";
-  return applicationStatusMeta[normalizeApplicationStatus(status)].tone;
+  const normalized = normalizeApplicationStatus(status);
+  if (expired && normalized === "planned") return "inactive";
+  return applicationStatusMeta[normalized].tone;
 }
 
 export function matchesCalendarStatusFilter(

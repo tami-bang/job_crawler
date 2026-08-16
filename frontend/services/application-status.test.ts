@@ -14,6 +14,9 @@ describe("application status presentation", () => {
     expect(getApplicationTone("first_passed")).toBe("progress");
     expect(getApplicationTone("final_passed")).toBe("success");
     expect(getApplicationTone("planned", true)).toBe("inactive");
+    expect(getApplicationTone("applied", true)).toBe("progress");
+    expect(getApplicationTone("document_passed", true)).toBe("progress");
+    expect(getApplicationTone("final_passed", true)).toBe("success");
     expect(getApplicationTone("excluded")).toBe("inactive");
   });
 
