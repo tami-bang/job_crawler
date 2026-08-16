@@ -8,7 +8,7 @@ export default function Home() {
       <section className="hero dashboardHero">
         <div className="heroCopy">
           <div className="eyebrow"><span>01</span> DECISION DASHBOARD</div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] xl:text-5xl font-bold tracking-tight text-white whitespace-nowrap break-keep">
+          <h1 className="text-4xl md:text-5xl lg:text-[52px] font-bold tracking-tight text-white whitespace-nowrap mt-4">
             나에게 딱 맞는 <span className="text-[#22c55e]">채용 공고 레이더</span>
           </h1>
         </div>
