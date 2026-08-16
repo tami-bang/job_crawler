@@ -17,17 +17,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div className="ambient ambientOne" />
         <div className="ambient ambientTwo" />
         <header className="siteHeader">
-          <Link className="brand" href="/">
-            JOB<span>RADAR</span><i>●</i>
-          </Link>
-          <nav aria-label="주요 메뉴">
-            <Link href="/">대시보드</Link>
-            <Link href="/favorites">관심공고</Link>
-            <Link href="/updates">업데이트 로그</Link>
-          </nav>
-          <div className="systemState"><i /> {dataMode}</div>
+          <div className="siteHeaderInner">
+            <Link className="brand" href="/">
+              JOB<span>RADAR</span><i>●</i>
+            </Link>
+            <nav aria-label="주요 메뉴">
+              <Link href="/">대시보드</Link>
+              <Link href="/favorites">관심공고</Link>
+              <Link href="/updates">업데이트 로그</Link>
+            </nav>
+            <div className="systemState"><i /> {dataMode}</div>
+          </div>
         </header>
-        <main>{children}</main>
+        <main className="siteMain">{children}</main>
         <ScrollTopButton />
         <SiteFooter />
       </body>
