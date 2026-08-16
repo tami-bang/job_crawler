@@ -726,13 +726,14 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   }, [activeRegion, careerOptions, employmentOptions, expandedFilters]);
 
   const jobsByDeadline = useMemo(() => {
-    return activeFilteredJobs.reduce<Record<string, Job[]>>((acc, job) => {
+    const calendarJobs = favoriteOnly ? filteredJobs : activeFilteredJobs;
+    return calendarJobs.reduce<Record<string, Job[]>>((acc, job) => {
       const deadlineDate = getEffectiveDeadlineDate(job);
       if (!deadlineDate) return acc;
       acc[deadlineDate] = [...(acc[deadlineDate] ?? []), job];
       return acc;
     }, {});
-  }, [activeFilteredJobs]);
+  }, [activeFilteredJobs, favoriteOnly, filteredJobs]);
   const calendarModalJobs = calendarModalDate ? jobsByDeadline[calendarModalDate] ?? [] : [];
   const tomorrowKey = toDateKey(addDays(new Date(), 1));
   const favoriteDeadlineAlerts = useMemo(() => (

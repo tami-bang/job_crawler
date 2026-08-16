@@ -8,6 +8,7 @@ import {
   V2_USER_STATE_KEY,
   checksumState,
   getStableJobKey,
+  getMissingFavoriteSnapshots,
   migrateUserStorageV2,
   readUserState,
   updateUserInteraction,
@@ -86,6 +87,29 @@ describe("stable job state", () => {
 
     const returnedJob = { id: 99, source: "jobkorea", source_job_id: "100" };
     expect(stateWhileMissing[getStableJobKey(returnedJob)]?.memo).toBe("복구됨");
+  });
+
+  it("keeps the full saved posting available after it disappears from a refreshed snapshot", () => {
+    const storage = new MemoryStorage();
+    updateUserInteraction(storage, "jobkorea:100", () => ({
+      isFavorite: true,
+      memo: "마감 후에도 확인",
+      jobSnapshot: {
+        id: 1,
+        stable_key: "jobkorea:100",
+        title: "저장한 개발자 공고",
+        deadline_date: "2026-08-01",
+      },
+    }));
+
+    const missing = getMissingFavoriteSnapshots(readUserState(storage), new Set(["jobkorea:200"]));
+    expect(missing).toHaveLength(1);
+    expect(missing[0]).toMatchObject({
+      stable_key: "jobkorea:100",
+      title: "저장한 개발자 공고",
+      deadline_date: "2026-08-01",
+    });
+    expect(getMissingFavoriteSnapshots(readUserState(storage), new Set(["jobkorea:100"]))).toEqual([]);
   });
 
   it("does not overwrite a valid completed migration", () => {

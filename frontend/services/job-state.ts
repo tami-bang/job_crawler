@@ -22,6 +22,7 @@ export type UserInteraction = {
   memo?: string;
   status?: string;
   updatedAt?: string;
+  jobSnapshot?: JobIdentity & Record<string, unknown>;
 };
 
 export type UserState = Record<string, UserInteraction>;
@@ -64,6 +65,17 @@ export function checksumState(serializedState: string): string {
 
 export function readUserState(storage: StorageLike): UserState {
   return parseJson<UserState>(storage.getItem(V2_USER_STATE_KEY), {});
+}
+
+export function getMissingFavoriteSnapshots(
+  state: UserState,
+  currentStableKeys: Set<string>,
+): Array<JobIdentity & Record<string, unknown>> {
+  return Object.entries(state).flatMap(([stableKey, interaction]) => {
+    const snapshot = interaction.jobSnapshot;
+    if (!interaction.isFavorite || !snapshot || currentStableKeys.has(stableKey)) return [];
+    return [{ ...snapshot, stable_key: stableKey }];
+  });
 }
 
 export function writeUserState(storage: StorageLike, state: UserState): void {

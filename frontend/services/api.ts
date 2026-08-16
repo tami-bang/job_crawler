@@ -1,8 +1,10 @@
 import {
   getStableJobKey,
+  getMissingFavoriteSnapshots,
   migrateUserStorageV2,
   readUserState,
   updateUserInteraction,
+  writeUserState,
 } from "./job-state";
 import { legacyIdToStableKeyMap } from "./legacy-job-id-map";
 
@@ -102,13 +104,27 @@ async function getDemoJobs(search = "", favoriteOnly = false): Promise<Job[]> {
     try {
       migrateUserStorageV2(localStorage, legacyIdToStableKeyMap);
       userState = readUserState(localStorage);
+      let snapshotsAdded = false;
+      demoJobs.forEach((job) => {
+        const stableKey = getStableJobKey(job);
+        const interaction = userState[stableKey];
+        if (!interaction?.isFavorite || interaction.jobSnapshot) return;
+        userState[stableKey] = { ...interaction, jobSnapshot: { ...job } };
+        snapshotsAdded = true;
+      });
+      if (snapshotsAdded) writeUserState(localStorage, userState);
     } catch {
       // 저장소가 차단되거나 용량이 부족해도 공고 탐색은 계속 허용합니다.
     }
   }
   const term = search.trim().toLowerCase();
 
-  return demoJobs
+  const currentStableKeys = new Set(demoJobs.map(getStableJobKey));
+  const savedFavorites = getMissingFavoriteSnapshots(userState, currentStableKeys)
+    .filter((snapshot) => typeof snapshot.title === "string")
+    .map((snapshot, index) => ({ ...snapshot, id: -(index + 1) } as Job));
+
+  return [...demoJobs, ...savedFavorites]
     .map((job) => {
       const stableKey = getStableJobKey(job);
       const interaction = userState[stableKey] ?? {};
@@ -132,7 +148,7 @@ async function getDemoJob(jobId: number) {
 }
 
 async function getDemoStableKey(jobId: number) {
-  const demoJobs = await loadDemoJobs();
+  const demoJobs = await getDemoJobs();
   const job = demoJobs.find((item) => item.id === jobId);
   if (!job) throw new Error("공고를 찾을 수 없습니다.");
   return getStableJobKey(job);
@@ -234,13 +250,16 @@ export const api = {
   },
   favorite: async (jobId: number) => {
     if (STATIC_DEMO) {
-      const stableKey = await getDemoStableKey(jobId);
+      const job = await getDemoJob(jobId);
+      if (!job) throw new Error("공고를 찾을 수 없습니다.");
+      const stableKey = getStableJobKey(job);
       updateDemoInteraction(stableKey, (current) => ({
         ...current,
         isFavorite: true,
         isDisliked: false,
         memo: current.memo ?? "",
         status: current.status ?? "planned",
+        jobSnapshot: { ...job },
       }));
       return getDemoJob(jobId);
     }
@@ -257,6 +276,7 @@ export const api = {
         isFavorite: false,
         memo: undefined,
         status: undefined,
+        jobSnapshot: undefined,
       }));
       return;
     }
