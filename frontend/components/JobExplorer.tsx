@@ -29,6 +29,7 @@ const calendarStatusFilters: Array<{ value: CalendarStatusFilter; label: string 
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 const pageSizeOptions = [15, 50, 100];
+const paginationScrollOffset = 96;
 const originExamples = "예: 서울역, 강남역, 서울 강남구 테헤란로 123";
 const EXPLORER_UI_STATE_VERSION = 1;
 const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
@@ -616,7 +617,10 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const changePage = (nextPage: number) => {
     setPage(nextPage);
     window.requestAnimationFrame(() => {
-      explorerControlsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const explorerControls = explorerControlsRef.current;
+      if (!explorerControls) return;
+      const targetTop = explorerControls.getBoundingClientRect().top + window.scrollY - paginationScrollOffset;
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
     });
   };
 
