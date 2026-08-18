@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, Job } from "@/services/api";
 import {
   applicationPipeline,
@@ -611,10 +611,13 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [showAlwaysOpenModal, setShowAlwaysOpenModal] = useState(false);
   const [viewedJobs, setViewedJobs] = useState<Set<number>>(() => new Set());
   const [dislikingJobs, setDislikingJobs] = useState<Set<number>>(() => new Set());
+  const explorerControlsRef = useRef<HTMLDivElement>(null);
 
   const changePage = (nextPage: number) => {
     setPage(nextPage);
-    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+    window.requestAnimationFrame(() => {
+      explorerControlsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const loadJobs = useCallback(async (term = "", source: "initial" | "search" = "initial") => {
@@ -1209,7 +1212,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         {renderFilterChips("career", "경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
         {renderFilterChips("employment", "고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
       </div>
-      <div className="explorerControls">
+      <div className="explorerControls" ref={explorerControlsRef}>
         <div className="viewSwitch" role="tablist" aria-label="공고 보기 방식">
           <button className={view === "list" ? "active" : ""} onClick={() => setView("list")}>리스트</button>
           <button className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")}>마감 달력</button>
