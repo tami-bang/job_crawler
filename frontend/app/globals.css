@@ -66,8 +66,9 @@ footer{max-width:1360px;margin:70px auto 0;padding:32px clamp(24px,6vw,96px);bor
   .viewSwitch button{min-width:0;flex:1 1 auto;padding-left:10px;padding-right:10px}
   .siteFooter>div:not(.modalBackdrop),.footerLinks{min-width:0;max-width:100%;align-items:flex-start}
   .modalBackdrop{max-width:100vw;overflow-x:hidden}
-  .calendarDayModal,.calendarDayModal .calendarJobList{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
-  .calendarJobItem{width:100%;max-width:100%;min-width:0;grid-template-columns:minmax(0,1fr);overflow:hidden}
+  .calendarDayModal{width:100%;max-width:100%;min-width:0;height:auto;max-height:calc(100vh - 24px);overflow-x:hidden;overflow-y:auto}
+  .calendarDayModal .calendarJobList{width:100%;max-width:100%;min-width:0;max-height:none;flex:0 0 auto;overflow:visible}
+  .calendarJobItem{width:100%;max-width:100%;min-width:0;height:auto;max-height:none;flex:0 0 auto;grid-template-columns:minmax(0,1fr);overflow:visible}
   .calendarJobItem>*,.calendarJobActions{min-width:0;max-width:100%}
   .applicationPipeline{width:100%;max-width:100%;min-width:0;grid-template-columns:repeat(5,minmax(0,1fr));padding:10px 4px;overflow-x:hidden}
   .applicationPipeline>div{min-width:0;gap:5px;font-size:7px;letter-spacing:-.2px;white-space:nowrap}
