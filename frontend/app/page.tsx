@@ -13,7 +13,6 @@ export default function Home() {
             <span className="inline-block [color:var(--lime)]">채용 공고 레이더</span>
           </h1>
         </div>
-        <div className="heroSignal" aria-hidden="true"><i /><i /><i /><b>RADAR<br />ACTIVE</b></div>
       </section>
       <section className="contentSection dashboardOverview">
         <div className="sectionHeading">
