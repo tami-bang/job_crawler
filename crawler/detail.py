@@ -390,12 +390,11 @@ def parse_job_detail(html):
 
 def extract_detail_body(soup, structured):
     structured_description = structured.get("description")
+    structured_text = ""
     if structured_description:
         description_soup = BeautifulSoup(str(structured_description), "html.parser")
         _remove_detail_noise(description_soup)
-        text = _normalize_text(description_soup.get_text("\n", strip=True))
-        if text:
-            return text, "json_ld", True
+        structured_text = _normalize_text(description_soup.get_text("\n", strip=True))
 
     for selector in DETAIL_BODY_SELECTORS:
         container = soup.select_one(selector)
@@ -404,7 +403,13 @@ def extract_detail_body(soup, structured):
         _remove_detail_noise(container)
         text = _normalize_text(container.get_text("\n", strip=True))
         if text:
-            return _trim_detail_text(text), "detail_container", True
+            container_text = _trim_detail_text(text)
+            if structured_text and container_text not in structured_text:
+                return f"{structured_text}\n{container_text}", "json_ld+detail_container", True
+            return structured_text or container_text, "json_ld" if structured_text else "detail_container", True
+
+    if structured_text:
+        return structured_text, "json_ld", True
 
     _remove_detail_noise(soup)
     text = _trim_detail_text(_normalize_text(soup.get_text("\n", strip=True)))

@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import httpx
 
@@ -7,8 +7,10 @@ from scripts.jobkorea_http import LIST_HEADERS
 from scripts.neon_detail_worker import (
     HEADERS,
     RequestRateLimiter,
+    detect_waf_signals,
     fetch_detail,
     response_diagnostics,
+    save_success,
 )
 
 
@@ -33,7 +35,7 @@ class NeonDetailWorkerTests(unittest.TestCase):
     def test_response_diagnostics_exposes_waf_clues(self):
         response = httpx.Response(
             403,
-            text="  Access denied   by request blocked policy  ",
+            text="<html><head><title>Access Denied</title></head><body>blocked</body></html>",
             headers={"content-type": "text/html; charset=utf-8"},
             request=httpx.Request("GET", "https://www.jobkorea.co.kr/Recruit/GI_Read/123"),
         )
@@ -42,8 +44,12 @@ class NeonDetailWorkerTests(unittest.TestCase):
 
         self.assertIn("status=403", details)
         self.assertIn("content_type=text/html", details)
-        self.assertIn("access denied", details)
-        self.assertIn("body_hint='Access denied by request blocked policy'", details)
+        self.assertIn("block_title:access denied", details)
+
+    def test_waf_detection_ignores_forbidden_as_normal_body_word(self):
+        html = "<html><head><title>개발자 채용</title></head><body>forbidden은 일반 설명 단어입니다.</body></html>"
+
+        self.assertEqual(detect_waf_signals(html), [])
 
     @patch("scripts.neon_detail_worker.time.sleep")
     @patch("scripts.neon_detail_worker.parse_job_detail")
@@ -67,6 +73,36 @@ class NeonDetailWorkerTests(unittest.TestCase):
         self.assertIsNone(result[3])
         self.assertEqual(client.get.call_count, 2)
         sleep.assert_called_once()
+
+    @patch("scripts.neon_detail_worker.job_passes_hard_filters", return_value=False)
+    def test_accepts_short_jsonld_detail_and_marks_queue_success(self, _passes_filters):
+        description = "Python 기반 백엔드 서비스를 설계하고 운영하며 API 품질과 안정성을 지속적으로 개선합니다."
+        html = (
+            "<html><head><script type='application/ld+json'>"
+            f"{{\"@type\": \"JobPosting\", \"description\": \"{description}\"}}"
+            "</script></head><body></body></html>"
+        )
+        client = Mock()
+        client.get.return_value = httpx.Response(
+            200,
+            text=html,
+            request=httpx.Request("GET", "https://www.jobkorea.co.kr/Recruit/GI_Read/123"),
+        )
+        row = (1, "123", "백엔드 개발자", "회사", "{}")
+
+        fetched_row, url, parsed, error = fetch_detail(row, client, RequestRateLimiter(0), 1)
+
+        self.assertIsNone(error)
+        self.assertEqual(parsed["body_source"], "json_ld")
+        self.assertGreaterEqual(len(parsed["raw_detail_text"]), 50)
+
+        conn = MagicMock()
+        cursor = conn.cursor.return_value.__enter__.return_value
+        save_success(conn, fetched_row, url, parsed, {})
+
+        self.assertEqual(cursor.execute.call_count, 2)
+        self.assertIn("detail_status='success'", cursor.execute.call_args_list[0].args[0])
+        self.assertIn("status='SUCCESS'", cursor.execute.call_args_list[1].args[0])
 
     @patch("scripts.neon_detail_worker.time.sleep")
     @patch("scripts.neon_detail_worker.parse_job_detail")

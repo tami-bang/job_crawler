@@ -35,6 +35,25 @@ class JobKoreaDetailTests(unittest.TestCase):
         self.assertEqual(result["career"], "경력 3년 이상")
         self.assertEqual(result["education"], "학력무관")
 
+    def test_combines_short_jsonld_description_with_detail_container(self):
+        payload = {
+            "@type": "JobPosting",
+            "description": "Python 백엔드 API 개발 및 운영",
+        }
+        html = (
+            "<html><head><script type='application/ld+json'>"
+            + json.dumps(payload, ensure_ascii=False)
+            + "</script></head><body>"
+            "<div class='detail-content'>담당업무\n서비스 설계와 개발\n자격요건\n경력 3년 이상</div>"
+            "</body></html>"
+        )
+
+        result = parse_job_detail(html)
+
+        self.assertEqual(result["body_source"], "json_ld+detail_container")
+        self.assertIn("Python 백엔드 API 개발 및 운영", result["raw_detail_text"])
+        self.assertIn("서비스 설계와 개발", result["raw_detail_text"])
+
     def test_falls_back_to_visible_employment_label(self):
         html = "<html><body><div>고용형태\n계약직</div></body></html>"
 

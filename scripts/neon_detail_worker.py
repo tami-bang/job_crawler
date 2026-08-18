@@ -11,6 +11,7 @@ from pathlib import Path
 
 import httpx
 import psycopg
+from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -22,9 +23,13 @@ from scripts.jobkorea_http import DETAIL_HEADERS
 HEADERS = DETAIL_HEADERS
 
 RETRYABLE_STATUS_CODES = {403, 408, 425, 429, 500, 502, 503, 504}
-WAF_MARKERS = (
-    "access denied", "captcha", "cloudflare", "forbidden", "request blocked",
-    "비정상적인 접근", "서비스 이용이 제한", "접근이 제한",
+BLOCK_PAGE_TITLES = {
+    "access denied", "attention required", "request blocked", "접근이 제한되었습니다",
+    "서비스 이용이 제한되었습니다",
+}
+BLOCK_PAGE_SELECTORS = (
+    "#cf-error-details", "#challenge-form", "#captcha", ".captcha", "[class*='captcha']",
+    "[id*='captcha']", "[data-sitekey]",
 )
 
 
@@ -32,17 +37,28 @@ class DetailResponseError(RuntimeError):
     """A successful HTTP response that is not a usable JobKorea detail page."""
 
 
+def detect_waf_signals(html):
+    soup = BeautifulSoup(html or "", "html.parser")
+    title = re.sub(r"\s+", " ", soup.title.get_text(" ", strip=True)).strip().lower() if soup.title else ""
+    signals = []
+    if title in BLOCK_PAGE_TITLES:
+        signals.append(f"block_title:{title}")
+    for selector in BLOCK_PAGE_SELECTORS:
+        if soup.select_one(selector) is not None:
+            signals.append(f"block_element:{selector}")
+    return signals
+
+
 def response_diagnostics(response):
     if response is None:
         return "response=none"
     normalized = re.sub(r"\s+", " ", response.text or "").strip()
     body_hint = normalized[:240].replace("::", ": :") or "<empty>"
-    lowered = normalized.lower()
-    markers = [marker for marker in WAF_MARKERS if marker in lowered]
+    waf_signals = detect_waf_signals(response.text)
     content_type = response.headers.get("content-type", "unknown").split(";", 1)[0]
     return (
         f"status={response.status_code} url={response.url} content_type={content_type} "
-        f"body_length={len(response.content)} waf_markers={markers or ['none']} "
+        f"body_length={len(response.content)} waf_signals={waf_signals or ['none']} "
         f"body_hint={body_hint!r}"
     )
 
@@ -53,6 +69,14 @@ def exception_diagnostics(exc, response=None):
         return f"{type(exc).__name__}: {error_text}"
     error_response = exc.response if isinstance(exc, httpx.HTTPStatusError) else response
     return f"{type(exc).__name__}: {error_text}; {response_diagnostics(error_response)}"
+
+
+def parsed_detail_is_valid(parsed):
+    if not parsed.get("has_core_content"):
+        return False
+    detail_text = parsed.get("raw_detail_text") or ""
+    minimum_length = 50 if str(parsed.get("body_source") or "").startswith("json_ld") else 120
+    return len(detail_text) >= minimum_length
 
 
 class RequestRateLimiter:
@@ -129,7 +153,7 @@ def fetch_detail(row, client, rate_limiter, max_attempts):
             response.raise_for_status()
             parsed = parse_job_detail(response.text)
             detail_text = parsed.get("raw_detail_text") or ""
-            if not parsed.get("has_core_content") or len(detail_text) < 120:
+            if not parsed_detail_is_valid(parsed):
                 raise DetailResponseError(
                     f"invalid parsed detail: source={parsed.get('body_source')} "
                     f"detail_length={len(detail_text)}; {response_diagnostics(response)}"
