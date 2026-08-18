@@ -3,6 +3,7 @@ import json
 import os
 import random
 import sys
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -22,6 +23,7 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.7,en;q=0.6",
     "Cache-Control": "no-cache",
+    "Origin": "https://www.jobkorea.co.kr",
     "Pragma": "no-cache",
     "Sec-CH-UA": '"Google Chrome";v="151", "Chromium";v="151", "Not_A Brand";v="99"',
     "Sec-CH-UA-Mobile": "?0",
@@ -29,7 +31,27 @@ HEADERS = {
     "Sec-Fetch-Dest": "document",
     "Sec-Fetch-Mode": "navigate",
     "Sec-Fetch-Site": "same-origin",
+    "Upgrade-Insecure-Requests": "1",
 }
+
+RETRYABLE_STATUS_CODES = {403, 408, 425, 429, 500, 502, 503, 504}
+
+
+class RequestRateLimiter:
+    """Keep concurrent workers from sending bursty requests to JobKorea."""
+
+    def __init__(self, delay_seconds):
+        self.delay_seconds = max(0.0, delay_seconds)
+        self._lock = threading.Lock()
+        self._last_request_at = 0.0
+
+    def wait(self):
+        with self._lock:
+            elapsed = time.monotonic() - self._last_request_at
+            remaining = self.delay_seconds - elapsed
+            if remaining > 0:
+                time.sleep(remaining + random.uniform(0.1, 0.4))
+            self._last_request_at = time.monotonic()
 
 
 def ensure_schema(conn):
@@ -77,13 +99,13 @@ def claim_jobs(conn, limit):
     return rows
 
 
-def fetch_detail(row, client):
+def fetch_detail(row, client, rate_limiter, max_attempts):
     posting_id, source_job_id, title, company_name, raw_list_json = row
     url = f"https://www.jobkorea.co.kr/Recruit/GI_Read/{source_job_id}"
     last_error = None
-    for attempt in range(2):
+    for attempt in range(max_attempts):
         try:
-            time.sleep(random.uniform(0.35, 0.9))
+            rate_limiter.wait()
             response = client.get(url)
             response.raise_for_status()
             parsed = parse_job_detail(response.text)
@@ -95,12 +117,18 @@ def fetch_detail(row, client):
             return row, url, parsed, None
         except Exception as exc:
             last_error = exc
-            retryable = isinstance(exc, (httpx.TimeoutException, httpx.TransportError))
+            retryable = isinstance(exc, (httpx.RequestError, RuntimeError))
             if isinstance(exc, httpx.HTTPStatusError):
-                retryable = exc.response.status_code in (429, 500, 502, 503, 504)
-            if not retryable or attempt == 1:
+                retryable = exc.response.status_code in RETRYABLE_STATUS_CODES
+            if not retryable or attempt == max_attempts - 1:
                 break
-            time.sleep(1.0 + random.uniform(0.5, 1.5))
+            delay = min(30.0, 2 ** attempt) + random.uniform(0.25, 1.25)
+            print(
+                f"::warning::JobKorea detail attempt {attempt + 1}/{max_attempts} "
+                f"failed for {source_job_id}: {type(exc).__name__}; retrying in {delay:.1f}s",
+                flush=True,
+            )
+            time.sleep(delay)
     return row, url, None, last_error
 
 
@@ -193,10 +221,14 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
         ensure_schema(conn)
         timeout = httpx.Timeout(connect=5.0, read=10.0, write=5.0, pool=5.0)
         limits = httpx.Limits(max_connections=workers, max_keepalive_connections=workers)
+        request_delay = float(os.environ.get("JOBKOREA_DETAIL_REQUEST_DELAY", "1.2"))
+        max_attempts = max(1, int(os.environ.get("JOBKOREA_DETAIL_MAX_ATTEMPTS", "5")))
+        rate_limiter = RequestRateLimiter(request_delay)
         with httpx.Client(headers=HEADERS, timeout=timeout, limits=limits, follow_redirects=True) as client:
             try:
-                client.get("https://www.jobkorea.co.kr/recruit/joblist?menucode=duty")
-            except httpx.RequestError as exc:
+                warmup = client.get("https://www.jobkorea.co.kr/recruit/joblist?menucode=duty")
+                warmup.raise_for_status()
+            except (httpx.RequestError, httpx.HTTPStatusError) as exc:
                 stats["network_error_skipped"] = 1
                 print(
                     f"::warning::JobKorea detail connection failed; continuing with existing "
@@ -211,7 +243,10 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
                     break
                 stats["claimed"] += len(rows)
                 with ThreadPoolExecutor(max_workers=workers) as executor:
-                    futures = [executor.submit(fetch_detail, row, client) for row in rows]
+                    futures = [
+                        executor.submit(fetch_detail, row, client, rate_limiter, max_attempts)
+                        for row in rows
+                    ]
                     results = [future.result() for future in as_completed(futures)]
                     errors = [result[3] for result in results if result[3] is not None]
                     if len(errors) == len(rows):
