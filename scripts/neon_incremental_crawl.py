@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 
 from crawler.location_filter import is_capital_area_location
 from scripts.crawl_history import record_crawl_history
+from scripts.jobkorea_http import LIST_HEADERS
 
 
 KST = timezone(timedelta(hours=9))
@@ -299,23 +300,7 @@ async def run_incremental_crawl(database_url: str, partition_key: str = DEFAULT_
     observed_max = None
     completed_page = 0
     consecutive_old_unchanged = 0
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-        "Accept": "text/html, */*; q=0.01",
-        "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.7,en;q=0.6",
-        "Cache-Control": "no-cache",
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "Origin": "https://www.jobkorea.co.kr",
-        "Pragma": "no-cache",
-        "Referer": "https://www.jobkorea.co.kr/recruit/joblist?menucode=duty",
-        "Sec-CH-UA": '"Google Chrome";v="151", "Chromium";v="151", "Not_A Brand";v="99"',
-        "Sec-CH-UA-Mobile": "?0",
-        "Sec-CH-UA-Platform": '"macOS"',
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-        "X-Requested-With": "XMLHttpRequest",
-    }
+    headers = LIST_HEADERS
 
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:

@@ -14,7 +14,7 @@ on:
           - export
           - crawl
           - crawl-and-export
-        default: export
+        default: crawl-and-export
       request_payload_json:
         description: "선택: 기본 Form Data를 덮어쓸 JSON"
         required: false

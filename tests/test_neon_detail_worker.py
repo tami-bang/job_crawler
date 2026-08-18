@@ -3,7 +3,13 @@ from unittest.mock import Mock, patch
 
 import httpx
 
-from scripts.neon_detail_worker import HEADERS, RequestRateLimiter, fetch_detail
+from scripts.jobkorea_http import LIST_HEADERS
+from scripts.neon_detail_worker import (
+    HEADERS,
+    RequestRateLimiter,
+    fetch_detail,
+    response_diagnostics,
+)
 
 
 class NeonDetailWorkerTests(unittest.TestCase):
@@ -15,6 +21,29 @@ class NeonDetailWorkerTests(unittest.TestCase):
             "Upgrade-Insecure-Requests",
         ):
             self.assertIn(name, HEADERS)
+
+    def test_list_and_detail_headers_share_browser_identity(self):
+        for name in (
+            "User-Agent", "Accept-Language", "Origin", "Referer",
+            "Sec-CH-UA", "Sec-CH-UA-Mobile", "Sec-CH-UA-Platform",
+            "Sec-Fetch-Site",
+        ):
+            self.assertEqual(HEADERS[name], LIST_HEADERS[name])
+
+    def test_response_diagnostics_exposes_waf_clues(self):
+        response = httpx.Response(
+            403,
+            text="  Access denied   by request blocked policy  ",
+            headers={"content-type": "text/html; charset=utf-8"},
+            request=httpx.Request("GET", "https://www.jobkorea.co.kr/Recruit/GI_Read/123"),
+        )
+
+        details = response_diagnostics(response)
+
+        self.assertIn("status=403", details)
+        self.assertIn("content_type=text/html", details)
+        self.assertIn("access denied", details)
+        self.assertIn("body_hint='Access denied by request blocked policy'", details)
 
     @patch("scripts.neon_detail_worker.time.sleep")
     @patch("scripts.neon_detail_worker.parse_job_detail")
@@ -54,6 +83,8 @@ class NeonDetailWorkerTests(unittest.TestCase):
         result = fetch_detail(row, client, RequestRateLimiter(0), max_attempts=3)
 
         self.assertIsInstance(result[3], RuntimeError)
+        self.assertIn("status=200", str(result[3]))
+        self.assertIn("body_hint='challenge'", str(result[3]))
         self.assertEqual(client.get.call_count, 3)
         self.assertEqual(sleep.call_count, 2)
 

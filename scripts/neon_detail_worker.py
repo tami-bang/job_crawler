@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import random
+import re
 import sys
 import threading
 import time
@@ -15,26 +16,43 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crawler.detail import parse_job_detail
 from crawler.matcher import analyze_job, job_passes_hard_filters, load_preferences
+from scripts.jobkorea_http import DETAIL_HEADERS
 
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
-    "Referer": "https://www.jobkorea.co.kr/recruit/joblist?menucode=duty",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.7,en;q=0.6",
-    "Cache-Control": "no-cache",
-    "Origin": "https://www.jobkorea.co.kr",
-    "Pragma": "no-cache",
-    "Sec-CH-UA": '"Google Chrome";v="151", "Chromium";v="151", "Not_A Brand";v="99"',
-    "Sec-CH-UA-Mobile": "?0",
-    "Sec-CH-UA-Platform": '"macOS"',
-    "Sec-Fetch-Dest": "document",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "same-origin",
-    "Upgrade-Insecure-Requests": "1",
-}
+HEADERS = DETAIL_HEADERS
 
 RETRYABLE_STATUS_CODES = {403, 408, 425, 429, 500, 502, 503, 504}
+WAF_MARKERS = (
+    "access denied", "captcha", "cloudflare", "forbidden", "request blocked",
+    "비정상적인 접근", "서비스 이용이 제한", "접근이 제한",
+)
+
+
+class DetailResponseError(RuntimeError):
+    """A successful HTTP response that is not a usable JobKorea detail page."""
+
+
+def response_diagnostics(response):
+    if response is None:
+        return "response=none"
+    normalized = re.sub(r"\s+", " ", response.text or "").strip()
+    body_hint = normalized[:240].replace("::", ": :") or "<empty>"
+    lowered = normalized.lower()
+    markers = [marker for marker in WAF_MARKERS if marker in lowered]
+    content_type = response.headers.get("content-type", "unknown").split(";", 1)[0]
+    return (
+        f"status={response.status_code} url={response.url} content_type={content_type} "
+        f"body_length={len(response.content)} waf_markers={markers or ['none']} "
+        f"body_hint={body_hint!r}"
+    )
+
+
+def exception_diagnostics(exc, response=None):
+    error_text = re.sub(r"\s+", " ", str(exc)).strip()
+    if isinstance(exc, DetailResponseError):
+        return f"{type(exc).__name__}: {error_text}"
+    error_response = exc.response if isinstance(exc, httpx.HTTPStatusError) else response
+    return f"{type(exc).__name__}: {error_text}; {response_diagnostics(error_response)}"
 
 
 class RequestRateLimiter:
@@ -104,6 +122,7 @@ def fetch_detail(row, client, rate_limiter, max_attempts):
     url = f"https://www.jobkorea.co.kr/Recruit/GI_Read/{source_job_id}"
     last_error = None
     for attempt in range(max_attempts):
+        response = None
         try:
             rate_limiter.wait()
             response = client.get(url)
@@ -111,8 +130,9 @@ def fetch_detail(row, client, rate_limiter, max_attempts):
             parsed = parse_job_detail(response.text)
             detail_text = parsed.get("raw_detail_text") or ""
             if not parsed.get("has_core_content") or len(detail_text) < 120:
-                raise RuntimeError(
-                    f"invalid parsed detail: source={parsed.get('body_source')} length={len(detail_text)}"
+                raise DetailResponseError(
+                    f"invalid parsed detail: source={parsed.get('body_source')} "
+                    f"detail_length={len(detail_text)}; {response_diagnostics(response)}"
                 )
             return row, url, parsed, None
         except Exception as exc:
@@ -120,12 +140,18 @@ def fetch_detail(row, client, rate_limiter, max_attempts):
             retryable = isinstance(exc, (httpx.RequestError, RuntimeError))
             if isinstance(exc, httpx.HTTPStatusError):
                 retryable = exc.response.status_code in RETRYABLE_STATUS_CODES
+            diagnostics = exception_diagnostics(exc, response)
             if not retryable or attempt == max_attempts - 1:
+                print(
+                    f"::warning::JobKorea detail attempt {attempt + 1}/{max_attempts} "
+                    f"failed for {source_job_id}: {diagnostics}; no retries remaining",
+                    flush=True,
+                )
                 break
             delay = min(30.0, 2 ** attempt) + random.uniform(0.25, 1.25)
             print(
                 f"::warning::JobKorea detail attempt {attempt + 1}/{max_attempts} "
-                f"failed for {source_job_id}: {type(exc).__name__}; retrying in {delay:.1f}s",
+                f"failed for {source_job_id}: {diagnostics}; retrying in {delay:.1f}s",
                 flush=True,
             )
             time.sleep(delay)
@@ -219,12 +245,12 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
     stats = {"claimed": 0, "success": 0, "failed": 0}
     with psycopg.connect(database_url) as conn:
         ensure_schema(conn)
-        timeout = httpx.Timeout(connect=5.0, read=10.0, write=5.0, pool=5.0)
+        timeout = httpx.Timeout(connect=10.0, read=30.0, write=10.0, pool=10.0)
         limits = httpx.Limits(max_connections=workers, max_keepalive_connections=workers)
         request_delay = float(os.environ.get("JOBKOREA_DETAIL_REQUEST_DELAY", "1.2"))
         max_attempts = max(1, int(os.environ.get("JOBKOREA_DETAIL_MAX_ATTEMPTS", "5")))
         rate_limiter = RequestRateLimiter(request_delay)
-        with httpx.Client(headers=HEADERS, timeout=timeout, limits=limits, follow_redirects=True) as client:
+        with httpx.Client(headers=HEADERS.copy(), timeout=timeout, limits=limits, follow_redirects=True) as client:
             try:
                 warmup = client.get("https://www.jobkorea.co.kr/recruit/joblist?menucode=duty")
                 warmup.raise_for_status()
@@ -232,7 +258,7 @@ def run(database_url, batch_size=20, workers=2, max_jobs=0):
                 stats["network_error_skipped"] = 1
                 print(
                     f"::warning::JobKorea detail connection failed; continuing with existing "
-                    f"Neon data: {type(exc).__name__}: {exc}",
+                    f"Neon data: {exception_diagnostics(exc, locals().get('warmup'))}",
                     flush=True,
                 )
                 return stats
