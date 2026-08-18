@@ -610,6 +610,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [snapshotModal, setSnapshotModal] = useState<{ title: string; body: string } | null>(null);
   const [calendarModalDate, setCalendarModalDate] = useState<string | null>(null);
   const [showAlwaysOpenModal, setShowAlwaysOpenModal] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [viewedJobs, setViewedJobs] = useState<Set<number>>(() => new Set());
   const [dislikingJobs, setDislikingJobs] = useState<Set<number>>(() => new Set());
   const explorerControlsRef = useRef<HTMLDivElement>(null);
@@ -1143,6 +1144,21 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         <button className="ghostButton accent" onClick={() => setShowEmailModal(true)} disabled={sortedJobs.length === 0}>이메일로 보내기</button>
       </div>
 
+      <button
+        type="button"
+        className={`mobileFilterToggle ${showMobileFilters ? "active" : ""}`}
+        aria-expanded={showMobileFilters}
+        aria-controls="mobile-filter-content"
+        onClick={() => setShowMobileFilters((current) => !current)}
+      >
+        <span>⚙️ 필터 조건 설정</span>
+        <b>
+          {selectedLocations.length + jobCategoryFilters.length + matchBasis.length + careerFilters.length + employmentFilters.length + (originAddress.trim() ? 1 : 0)}
+        </b>
+        <i aria-hidden="true">{showMobileFilters ? "▴" : "▾"}</i>
+      </button>
+
+      <div id="mobile-filter-content" className={`mobileFilterContent ${showMobileFilters ? "expanded" : ""}`}>
       <div className="commutePanel" aria-label="네이버지도 경로 검색">
         <label>
           <span>출발지 주소</span>
@@ -1215,6 +1231,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         {renderFilterChips("match-basis", "매칭 기준", matchBasis, matchBasisOptions.map((option) => [option.key, option.label]), setMatchBasis)}
         {renderFilterChips("career", "경력", careerFilters, careerOptions.map((option) => [option, option]), setCareerFilters)}
         {renderFilterChips("employment", "고용형태", employmentFilters, employmentOptions.map((option) => [option, option]), setEmploymentFilters)}
+      </div>
       </div>
       <div className="explorerControls" ref={explorerControlsRef}>
         <div className="viewSwitch" role="tablist" aria-label="공고 보기 방식">
