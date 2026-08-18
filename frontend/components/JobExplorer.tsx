@@ -1477,8 +1477,9 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                     <button type="button" onClick={() => void openSnapshot(job)}>저장 스냅샷</button>
                   </div>
                   {(job.is_favorite || job.is_disliked) && (
-                    <input
+                    <textarea
                       className="memoInput calendarMemoInput"
+                      rows={1}
                       aria-label={job.is_disliked ? "달력 모달 제외 공고 메모" : "달력 모달 관심공고 메모"}
                       defaultValue={job.favorite_memo ?? ""}
                       placeholder={job.is_disliked ? "제외한 이유를 적어두세요" : "저장한 이유나 지원 전 확인할 내용을 적어두세요"}

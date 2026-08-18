@@ -70,6 +70,8 @@ footer{max-width:1360px;margin:70px auto 0;padding:32px clamp(24px,6vw,96px);bor
   .calendarDayModal .calendarJobList{width:100%;max-width:100%;min-width:0;max-height:none;flex:0 0 auto;overflow:visible}
   .calendarJobItem{width:100%;max-width:100%;min-width:0;height:auto;max-height:none;flex:0 0 auto;grid-template-columns:minmax(0,1fr);overflow:visible}
   .calendarJobItem>*,.calendarJobActions{min-width:0;max-width:100%}
+  .calendarJobItem .calendarMemoInput{height:38px;min-height:38px;max-height:38px;margin-top:0;padding:9px 11px;resize:none;overflow:hidden;font:inherit;line-height:18px;transition:height .2s ease,max-height .2s ease,border-color .2s ease}
+  .calendarJobItem .calendarMemoInput:focus{height:96px;min-height:96px;max-height:96px;overflow-y:auto}
   .applicationPipeline{width:100%;max-width:100%;min-width:0;grid-template-columns:repeat(5,minmax(0,1fr));padding:10px 4px;overflow-x:hidden}
   .applicationPipeline>div{min-width:0;gap:5px;font-size:7px;letter-spacing:-.2px;white-space:nowrap}
   .applicationPipeline i{width:18px;height:18px;font-size:8px}
