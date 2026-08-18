@@ -1361,14 +1361,13 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
             ))}
             <button
               type="button"
-              className={`alwaysOpenCalendarButton ${showAlwaysOpenModal ? "active" : ""}`}
-              aria-pressed={showAlwaysOpenModal}
+              aria-haspopup="dialog"
               onClick={() => {
                 setCalendarModalDate(null);
                 setShowAlwaysOpenModal(true);
               }}
             >
-              📌 상시채용 {savedAlwaysOpenJobs.length}
+              상시채용 {savedAlwaysOpenJobs.length}
             </button>
           </div>
           <div className="calendarWeek">
