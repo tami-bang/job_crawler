@@ -94,4 +94,20 @@ footer{max-width:1360px;margin:70px auto 0;padding:32px clamp(24px,6vw,96px);bor
   .crawlHistoryBody h3{gap:6px;font-size:15px}
   .crawlHistoryBody b{font-size:15px}
   .crawlHistoryBody small{font-size:12px}
+  .deadlineCalendar{overflow:hidden;border-radius:16px}
+  .calendarHeader{height:52px;padding:0 10px}
+  .calendarHeader strong{font-size:18px}
+  .calendarHeader button{width:32px;height:32px}
+  .calendarStatusFilters{width:100%;min-width:0;justify-content:flex-start;flex-wrap:nowrap;gap:6px;padding:8px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .calendarStatusFilters::-webkit-scrollbar{display:none}
+  .calendarStatusFilters button{flex:0 0 auto;padding:7px 10px;white-space:nowrap}
+  .calendarWeek,.calendarGrid{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr))}
+  .calendarWeek span{padding:7px 2px;font-size:9px}
+  .calendarCell{min-width:0;min-height:52px;padding:5px 4px}
+  .dayNumber{min-width:22px;height:22px;font-size:10px}
+  .calendarCell.today .dayNumber{width:22px;min-width:22px;padding:0}
+  .dayNumber b{display:none}
+  .deadlinePill,.deadlinePill[class*=statusTone-]{display:inline-block;width:8px;height:8px;margin:6px 2px 0;padding:0;border:0;border-radius:50%;background:var(--status-color);font-size:0;line-height:0;vertical-align:top;box-shadow:none;animation:none}
+  .deadlinePill b{display:none}
+  .moreJobs{display:none}
 }
