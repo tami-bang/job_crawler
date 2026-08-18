@@ -3,6 +3,14 @@ export function isAlwaysOpenDeadline(deadline: string | null | undefined) {
   return ["상시채용", "상시", "채용시마감", "수시채용"].some((label) => normalized.includes(label));
 }
 
+export function isSavedAlwaysOpenJob(
+  deadline: string | null | undefined,
+  deadlineDate: string | null | undefined,
+  isFavorite: boolean | null | undefined,
+) {
+  return Boolean(isFavorite && !deadlineDate && isAlwaysOpenDeadline(deadline));
+}
+
 export function matchesEmploymentFilters(
   deadline: string | null | undefined,
   employmentTokens: string[],

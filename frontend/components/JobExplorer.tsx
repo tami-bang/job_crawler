@@ -15,7 +15,7 @@ import {
   selectableApplicationStatuses,
 } from "@/services/application-status";
 import { downloadWorkbook } from "@/services/export-xlsx";
-import { isAlwaysOpenDeadline, matchesEmploymentFilters } from "@/services/job-filters";
+import { isAlwaysOpenDeadline, isSavedAlwaysOpenJob, matchesEmploymentFilters } from "@/services/job-filters";
 
 const statusLabel = Object.fromEntries(
   selectableApplicationStatuses.map((status) => [status, applicationStatusMeta[status].label]),
@@ -608,6 +608,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
   const [noticeModal, setNoticeModal] = useState<{ title: string; message: string; hint?: string } | null>(null);
   const [snapshotModal, setSnapshotModal] = useState<{ title: string; body: string } | null>(null);
   const [calendarModalDate, setCalendarModalDate] = useState<string | null>(null);
+  const [showAlwaysOpenModal, setShowAlwaysOpenModal] = useState(false);
   const [viewedJobs, setViewedJobs] = useState<Set<number>>(() => new Set());
   const [dislikingJobs, setDislikingJobs] = useState<Set<number>>(() => new Set());
 
@@ -688,7 +689,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       .catch(() => setReportServerReady(false));
   }, []);
   useEffect(() => {
-    const hasOpenModal = Boolean(showEmailModal || noticeModal || snapshotModal || calendarModalDate);
+    const hasOpenModal = Boolean(showEmailModal || noticeModal || snapshotModal || calendarModalDate || showAlwaysOpenModal);
     if (!hasOpenModal) return;
 
     const previousOverflow = document.body.style.overflow;
@@ -701,7 +702,7 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       document.body.style.overflow = previousOverflow;
       document.body.style.paddingRight = previousPaddingRight;
     };
-  }, [calendarModalDate, noticeModal, showEmailModal, snapshotModal]);
+  }, [calendarModalDate, noticeModal, showAlwaysOpenModal, showEmailModal, snapshotModal]);
 
   const employmentOptions = useMemo(() => (
     [...uniqueSorted(jobs.flatMap((job) => getEmploymentFilterTokens(job.employment_type))), "상시채용"]
@@ -813,7 +814,18 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
       return acc;
     }, {});
   }, [calendarStatusFilter, filteredJobs]);
-  const calendarModalJobs = calendarModalDate ? jobsByDeadline[calendarModalDate] ?? [] : [];
+  const savedAlwaysOpenJobs = useMemo(() => (
+    jobs
+      .filter((job) => isSavedAlwaysOpenJob(job.deadline, job.deadline_date, job.is_favorite))
+      .sort((a, b) => getDynamicMatchScore(b, matchBasis) - getDynamicMatchScore(a, matchBasis))
+  ), [jobs, matchBasis]);
+  const calendarModalJobs = showAlwaysOpenModal
+    ? savedAlwaysOpenJobs
+    : calendarModalDate ? jobsByDeadline[calendarModalDate] ?? [] : [];
+  const closeCalendarModal = () => {
+    setCalendarModalDate(null);
+    setShowAlwaysOpenModal(false);
+  };
   const tomorrowKey = toDateKey(addDays(new Date(), 1));
   const favoriteDeadlineAlerts = useMemo(() => (
     jobs
@@ -1347,6 +1359,17 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
                 {filter.label}
               </button>
             ))}
+            <button
+              type="button"
+              className={`alwaysOpenCalendarButton ${showAlwaysOpenModal ? "active" : ""}`}
+              aria-pressed={showAlwaysOpenModal}
+              onClick={() => {
+                setCalendarModalDate(null);
+                setShowAlwaysOpenModal(true);
+              }}
+            >
+              📌 상시채용 {savedAlwaysOpenJobs.length}
+            </button>
           </div>
           <div className="calendarWeek">
             {weekDays.map((day) => <span key={day}>{day}</span>)}
@@ -1394,12 +1417,16 @@ export default function JobExplorer({ favoriteOnly = false }: { favoriteOnly?: b
         </div>
       )}
 
-      {calendarModalDate && (
-        <div className="modalBackdrop" role="presentation" onMouseDown={() => setCalendarModalDate(null)}>
+      {(calendarModalDate || showAlwaysOpenModal) && (
+        <div className="modalBackdrop" role="presentation" onMouseDown={closeCalendarModal}>
           <div className="emailModal calendarDayModal" role="dialog" aria-modal="true" aria-labelledby="calendar-day-modal-title" onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modalClose" aria-label="닫기" onClick={() => setCalendarModalDate(null)}>×</button>
-            <span className="modalKicker">DEADLINE JOBS</span>
-            <h3 id="calendar-day-modal-title">{calendarModalDate} 마감 공고</h3>
+            <button className="modalClose" aria-label="닫기" onClick={closeCalendarModal}>×</button>
+            <span className="modalKicker">{showAlwaysOpenModal ? "ALWAYS OPEN JOBS" : "DEADLINE JOBS"}</span>
+            <h3 id="calendar-day-modal-title">
+              {showAlwaysOpenModal
+                ? `📌 상시 / 채용시 마감 공고 (${savedAlwaysOpenJobs.length}건)`
+                : `${calendarModalDate} 마감 공고`}
+            </h3>
             <div className="calendarJobList">
               {calendarModalJobs.map((job) => {
                 const expired = isExpiredJob(job, todayKey);
