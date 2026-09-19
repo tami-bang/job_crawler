@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026.09.19",
+    "day_of_week": "토",
+    "new_jobs_count": 15,
+    "total_jobs_count": 14258,
+    "crawled_at": "13:32 KST"
+  },
+  {
     "date": "2026.09.18",
     "day_of_week": "금",
     "new_jobs_count": 30,
